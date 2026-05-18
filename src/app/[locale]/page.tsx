@@ -1,4 +1,4 @@
-import { useTranslations } from "next-intl";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import Link from "next/link";
 import { SOURCES } from "@/data/sources";
 import { Doc } from "@/components/ui/Doc";
@@ -16,8 +16,14 @@ const CATEGORIES = [
   { num: "03", key: "rebar", href: "/rebar" },
 ] as const;
 
-export default function HomePage() {
-  const t = useTranslations("home");
+export default async function HomePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("home");
 
   return (
     <div className="page-in">
