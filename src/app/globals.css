@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #0a1628;
+  --color-ink-2: #11253f;
+  --color-ink-3: #1a3556;
+  --color-paper: #f5f1e8;
+  --color-paper-2: #ede5d3;
+  --color-line: #2a4769;
+  --color-amber: #d97706;
+  --color-amber-bright: #f59e0b;
+  --color-gold: #c89500;
+  --color-rust: #b94d2c;
+  --color-teal: #0e7c7b;
+  --color-green: #4d7c0f;
+  --color-red: #991b1b;
+  --color-tpso: #1a3556;
+  --color-cgd: #b94d2c;
+  --color-homepro: #e30613;
+  --color-globalhouse: #f37021;
+  --color-thaiwatsadu: #009a3d;
+  --color-bnb: #003a70;
+
+  --font-sans: "IBM Plex Sans Thai", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-display: "Bebas Neue", "IBM Plex Sans Thai", sans-serif;
+}
+
+html,
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  line-height: 1.55;
+  min-height: 100vh;
+}
+
+body {
+  background-image:
+    linear-gradient(rgba(217, 119, 6, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(217, 119, 6, 0.07) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Page transition */
+@keyframes pageIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-in {
+  animation: pageIn 0.4s ease-out;
+}
+
+/* Doc card with offset shadow */
+.doc {
+  background: var(--color-paper);
+  border: 1.5px solid var(--color-ink);
+  box-shadow: 5px 5px 0 var(--color-ink);
+  padding: 28px;
+  position: relative;
+}
+
+.doc-tag {
+  position: absolute;
+  top: -1.5px;
+  right: 24px;
+  background: var(--color-ink);
+  color: var(--color-amber-bright);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 12px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.field-label::before {
+  content: "⊟ ";
+  color: var(--color-amber);
+}
+
+input.input:focus,
+select.select:focus {
+  outline: none;
+  border-color: var(--color-amber);
+  box-shadow: 3px 3px 0 var(--color-amber);
+  transform: translate(-1px, -1px);
+}

@@ -1,0 +1,196 @@
+{
+  "brand": {
+    "title": "Construction Cost Engine",
+    "subtitle": "TPSO × CGD × MODERN TRADE / DEMO 2026.05",
+    "mark": "⌬"
+  },
+  "nav": {
+    "home": "หน้าหลัก",
+    "wall_tile": "ผนัง-กระเบื้อง",
+    "column_beam": "เสา-คาน",
+    "rebar": "เหล็กเสริม",
+    "compare": "เปรียบเทียบจังหวัด",
+    "stores": "เปรียบเทียบร้าน",
+    "trend": "แนวโน้ม",
+    "source": "แหล่งข้อมูล"
+  },
+  "home": {
+    "docTag": "DOC-001 / OVERVIEW",
+    "title1": "CONSTRUCTION",
+    "title2": "UNIT-COST",
+    "titleAccent": "CALCULATOR",
+    "description": "ระบบคำนวณต้นทุนต่อหน่วยของวัสดุก่อสร้างจากข้อมูล <b>กระทรวงพาณิชย์ (TPSO)</b>, <b>กรมบัญชีกลาง (CGD)</b>, และร้านค้าปลีกสมัยใหม่ 4 แห่ง — HomePro, Global House, Thai Watsadu, BnB Home ครอบคลุม 3 หมวดงานหลักของโครงสร้างอาคาร",
+    "metaSources": "6 SOURCES",
+    "metaRef": "APR/2569",
+    "metaStatus": "LIVE",
+    "stats": {
+      "materials": "รายการวัสดุ",
+      "provinces": "จังหวัด",
+      "sources": "แหล่งข้อมูล",
+      "months": "เดือนย้อนหลัง"
+    },
+    "sourcesHead": "แหล่งข้อมูลราคา 6 แหล่ง",
+    "sourcesRef": "SECTION 01 / DATA SOURCES",
+    "categoriesHead": "หมวดงานก่อสร้าง",
+    "categoriesRef": "SECTION 02 / WORK CATEGORIES",
+    "categories": {
+      "wall_tile": {
+        "tag": "▌ Section A",
+        "title": "งานผนัง-กระเบื้อง",
+        "desc": "คำนวณต้นทุนต่อตารางเมตร พร้อมเผื่อตัด-แตก 5%",
+        "items": [
+          "กระเบื้องเซรามิค (ปูพื้น/ผนัง)",
+          "ปูนกาวซีเมนต์ TPI/จระเข้",
+          "ปูนยาแนว / คิ้ว PVC",
+          "น้ำผสมปูน"
+        ]
+      },
+      "column_beam": {
+        "tag": "▌ Section B",
+        "title": "งานเสา-คาน คอนกรีต",
+        "desc": "คำนวณต้นทุนต่อลูกบาศก์เมตร ตามมาตรฐาน fc'=240",
+        "items": [
+          "ปูนซีเมนต์ปอร์ตแลนด์ Type I",
+          "ทรายหยาบ (ทรายแม่น้ำ)",
+          "หินเบอร์ 1-2 (หินคลุก)",
+          "น้ำผสมปูน W/C = 0.5-0.6"
+        ]
+      },
+      "rebar": {
+        "tag": "▌ Section C",
+        "title": "งานเหล็กเสริม",
+        "desc": "คำนวณตามน้ำหนัก-ขนาด พร้อมวัสดุประกอบครบชุด",
+        "items": [
+          "RB6, RB9 (เหล็กกลม SR24)",
+          "DB10-DB25 (เหล็กข้ออ้อย SD40)",
+          "ลวดผูกเหล็ก #18",
+          "ไม้แบบ + ตะปู"
+        ]
+      }
+    },
+    "cta": "เริ่มคำนวณ"
+  },
+  "calc": {
+    "source": "แหล่งราคา",
+    "province": "เลือกจังหวัด",
+    "area": "พื้นที่ ( ตร.ม. )",
+    "volume": "ปริมาตรคอนกรีต ( ลบ.ม. )",
+    "tileType": "ประเภทกระเบื้อง",
+    "rebarList": "รายการเหล็กเสริม",
+    "submit": "⚡ คำนวณต้นทุน",
+    "addRebar": "+ เพิ่มเหล็กเสริม",
+    "placeholder": "กรอกข้อมูลด้านซ้าย แล้วกดปุ่มคำนวณ",
+    "placeholderRebar": "กรอกรายการเหล็ก แล้วกดปุ่มคำนวณ",
+    "wallTileTitle": "▌ งานผนัง-กระเบื้อง",
+    "columnBeamTitle": "▌ งานเสา-คาน คอนกรีต",
+    "rebarTitle": "▌ งานเหล็กเสริม",
+    "helperColumnBeam": "ตัวอย่าง: เสา 0.20×0.20×3.00 ม. = 0.12 ลบ.ม./ต้น",
+    "result": {
+      "totalCost": "▌ TOTAL COST",
+      "unitCost": "▌ UNIT COST",
+      "sourceLoc": "▌ SOURCE / LOCATION",
+      "bom": "BOM / BILL OF MATERIALS",
+      "bomHead": "▌ รายละเอียดวัสดุ",
+      "breakdown": "BREAKDOWN",
+      "breakdownHead": "▌ สัดส่วนต้นทุน",
+      "breakdownDesc": "วัสดุไหนคิดเป็นต้นทุนเท่าไร",
+      "cols": {
+        "material": "รายการวัสดุ",
+        "qty": "ปริมาณ",
+        "unit": "หน่วย",
+        "unitPrice": "ราคา/หน่วย",
+        "total": "รวม (บาท)"
+      },
+      "total": "TOTAL",
+      "unitWallTile": "บาท / ตร.ม.",
+      "unitColumnBeam": "บาท / ลบ.ม.",
+      "unitRebar": "บาท / ตันเหล็ก"
+    }
+  },
+  "compare": {
+    "title": "▌ เปรียบเทียบราคาราย 10 จังหวัด",
+    "desc": "เลือกวัสดุและแหล่งราคา เพื่อดูราคาในแต่ละภูมิภาคทั่วประเทศ",
+    "selectMaterial": "เลือกวัสดุ",
+    "materialPlaceholder": "— เลือกวัสดุ —",
+    "min": "ราคาต่ำสุด",
+    "max": "ราคาสูงสุด",
+    "avg": "ราคาเฉลี่ย",
+    "diff": "ผลต่าง %",
+    "chartHead": "▌ แผนภูมิแท่งเปรียบเทียบ",
+    "tableHead": "▌ ตารางราคารายจังหวัด",
+    "cols": {
+      "province": "จังหวัด",
+      "region": "ภูมิภาค",
+      "price": "ราคา",
+      "vsMin": "เทียบ MIN"
+    }
+  },
+  "stores": {
+    "title": "▌ เปรียบเทียบราคาระหว่าง 6 แหล่ง",
+    "desc": "เปรียบเทียบราคาวัสดุเดียวกันระหว่างหน่วยงานราชการ (TPSO, CGD) และร้านค้าปลีก (HomePro, Global House, Thai Watsadu, BnB Home)",
+    "selectMaterial": "เลือกวัสดุ",
+    "selectProvince": "จังหวัด (สำหรับ TPSO/CGD)",
+    "min": "ราคาถูกสุด",
+    "max": "ราคาแพงสุด",
+    "avg": "ค่าเฉลี่ย",
+    "save": "ประหยัดได้",
+    "chartHead": "▌ แผนภูมิแท่งเปรียบเทียบ 6 แหล่ง",
+    "tableHead": "▌ ตารางเปรียบเทียบราคา",
+    "insightHead": "▌ ข้อสังเกต",
+    "cols": {
+      "source": "แหล่งข้อมูล",
+      "type": "ประเภท",
+      "price": "ราคา",
+      "vsMin": "+ เทียบถูกสุด",
+      "status": "สถานะ"
+    },
+    "badges": {
+      "cheapest": "ถูกที่สุด ★",
+      "expensive": "แพงที่สุด",
+      "government": "มาตรฐานราชการ",
+      "general": "ทั่วไป"
+    }
+  },
+  "trend": {
+    "title": "▌ แนวโน้มราคา 12 เดือนย้อนหลัง",
+    "desc": "ราคาวัสดุก่อสร้างประจำเดือน พ.ค. 2568 — เม.ย. 2569",
+    "selectMaterial": "เลือกวัสดุเดี่ยว",
+    "allRebar": "⚡ ดูเหล็กทุกขนาด",
+    "first": "เริ่มต้น (พ.ค.68)",
+    "last": "ล่าสุด (เม.ย.69)",
+    "diff": "เปลี่ยนแปลง",
+    "diffPct": "% เปลี่ยน",
+    "chartHead": "▌ กราฟแนวโน้ม",
+    "allRebarTitle": "▌ เปรียบเทียบราคาเหล็กเสริมทุกขนาด"
+  },
+  "source": {
+    "title": "▌ ข้อมูลที่ดึงจากแหล่งราคา",
+    "desc": "เลือกแหล่งราคาเพื่อดูข้อมูลที่ดึงได้ — ระบบ scrape ผ่าน Python (BeautifulSoup) ส่งกลับเป็น JSON",
+    "selectProvince": "เลือกจังหวัด (สำหรับ TPSO/CGD)",
+    "fetch": "↻ ดึงข้อมูล",
+    "success": "✓ STATUS: SUCCESS",
+    "tableHead": "▌ ข้อมูลที่ได้",
+    "jsonLabel": "// API Response — JSON Sample",
+    "cols": {
+      "code": "รหัส",
+      "material": "วัสดุ",
+      "category": "หมวด",
+      "unit": "หน่วย",
+      "price": "ราคา (บาท)"
+    }
+  },
+  "footer": {
+    "about": "▌ ABOUT",
+    "aboutText": "Construction Cost Engine — Prototype สำหรับงานวิจัยการคำนวณต้นทุนวัสดุก่อสร้างต่อหน่วย โดยอ้างอิงจากกระทรวงพาณิชย์ กรมบัญชีกลาง และร้านค้าปลีกสมัยใหม่",
+    "sources": "▌ DATA SOURCES",
+    "disclaimer": "▌ DISCLAIMER",
+    "disclaimerText": "เวอร์ชัน Demo ใช้ข้อมูลจำลอง (mock data) ที่อ้างอิงโครงสร้างจริงของแต่ละแหล่ง การใช้งานจริงต้องเชื่อมต่อ API/Web Scraper ของแต่ละเว็บโดยตรง",
+    "build": "BUILD 2026.05.19 / DEMO+STORES",
+    "copy": "© CONSTRUCTION COST ENGINE"
+  },
+  "groups": {
+    "wall_tile": "🧱 งานผนัง-กระเบื้อง",
+    "column_beam": "🏛 งานเสา-คาน",
+    "rebar": "⛓ งานเหล็กเสริม"
+  }
+}
