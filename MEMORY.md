@@ -1,12 +1,12 @@
 # Construction Cost Engine — Session Memory
 
 ## Current State
-- **Phase:** Phase 1 complete + pushed to GitHub. CI build passes; deploy step blocked on secrets.
+- **Phase:** Phase 1 complete + **DEPLOYED** to Cloudflare Workers ✓
 - **Stack:** Next.js 16 + React 19 + TypeScript (strict) + Tailwind CSS 4 inline `@theme` + Recharts + next-intl (TH) + Cloudflare Workers via `@opennextjs/cloudflare`
-- **GitHub repo:** https://github.com/Bellero-Advanced/construction-cost-engine (private, transferred from MNupakorn)
-- **Latest commit:** `b6a70ad` (`ci: trigger fresh CI run after org transfer`)
-- **CI status:** Typecheck ✓, Build ✓, Deploy ✗ (missing `CLOUDFLARE_API_TOKEN`)
-- **Live URL:** (not yet — pending secrets)
+- **Live URL:** https://construction-cost-engine.steep-tooth-c420.workers.dev ✓
+- **GitHub repo:** https://github.com/Bellero-Advanced/construction-cost-engine (private)
+- **Latest commit:** `8f8616b` (`perf: convert home page to async + setRequestLocale for SSG`)
+- **CI status:** All green ✓ (typecheck + build + deploy)
 - **Worker name:** `construction-cost-engine`
 - **Backend:** None — all mock data in `src/data/`
 - **Last updated:** 2026-05-19
