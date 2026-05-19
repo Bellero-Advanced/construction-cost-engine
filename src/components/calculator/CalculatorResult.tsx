@@ -5,6 +5,7 @@ import { SOURCES } from "@/data/sources";
 import { COLORS } from "@/data/prices";
 import { fmt, fmtInt } from "@/lib/utils";
 import { exportToExcel, exportToPDF } from "@/lib/export";
+import { DataModeBadge } from "@/components/calculator/DataModeBadge";
 import type { CalcResult } from "@/types";
 
 const RES_LABELS = {
@@ -96,6 +97,9 @@ export function CalculatorResult({ data }: { data: CalcResult }) {
           <div className="mt-1 font-mono text-[11px] text-paper/65">
             {prov.name.replace(/\(.*?\)/, "").trim()} —{" "}
             {prov.region.toUpperCase()}
+          </div>
+          <div className="mt-2.5">
+            <DataModeBadge source={data.source} />
           </div>
         </div>
       </div>
