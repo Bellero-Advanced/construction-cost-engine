@@ -41,6 +41,7 @@ export default function RebarPage() {
   const [province, setProvince] = useState<number>(10);
   const [rows, setRows] = useState<Row[]>(initialRows);
   const [result, setResult] = useState<CalcResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const updateRow = (uid: number, patch: Partial<Row>) =>
     setRows((rs) => rs.map((r) => (r.uid === uid ? { ...r, ...patch } : r)));
@@ -52,7 +53,15 @@ export default function RebarPage() {
     setRows((rs) => [...rs, { uid: nextUid++, id: "REBAR_DB12", lengthM: 0 }]);
 
   const submit = () => {
-    if (rows.length === 0) return alert("กรุณาเพิ่มรายการเหล็ก");
+    if (rows.length === 0) {
+      setError("กรุณาเพิ่มรายการเหล็กอย่างน้อย 1 รายการ");
+      return;
+    }
+    if (!rows.some((r) => r.lengthM > 0)) {
+      setError("กรุณากรอกความยาว (เมตร) ของเหล็กอย่างน้อย 1 รายการ");
+      return;
+    }
+    setError(null);
     const data: RebarRow[] = rows.map((r) => ({
       id: r.id,
       lengthM: r.lengthM,
@@ -130,6 +139,11 @@ export default function RebarPage() {
           <Button block onClick={submit}>
             {t("submit")}
           </Button>
+          {error && (
+            <div className="mt-3 border-l-4 border-red bg-red/10 px-3 py-2 font-mono text-[11px] text-red">
+              ⚠ {error}
+            </div>
+          )}
         </div>
         <div>
           {result ? (

@@ -24,9 +24,14 @@ export default function WallTilePage() {
   const [area, setArea] = useState<number>(50);
   const [tile, setTile] = useState<string>("TILE_001");
   const [result, setResult] = useState<CalcResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const submit = () => {
-    if (!area || area <= 0) return alert("พื้นที่ต้องมากกว่า 0");
+    if (!area || area <= 0) {
+      setError("กรุณากรอกพื้นที่ให้มากกว่า 0 ตารางเมตร");
+      return;
+    }
+    setError(null);
     setResult(calcWallTile(source as SourceKey, province, area, tile));
   };
 
@@ -57,6 +62,11 @@ export default function WallTilePage() {
           <Button block onClick={submit}>
             {t("submit")}
           </Button>
+          {error && (
+            <div className="mt-3 border-l-4 border-red bg-red/10 px-3 py-2 font-mono text-[11px] text-red">
+              ⚠ {error}
+            </div>
+          )}
         </div>
         <div>
           {result ? (

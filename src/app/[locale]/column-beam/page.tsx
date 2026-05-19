@@ -22,9 +22,14 @@ export default function ColumnBeamPage() {
   const [province, setProvince] = useState<number>(10);
   const [vol, setVol] = useState<number>(10);
   const [result, setResult] = useState<CalcResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const submit = () => {
-    if (!vol || vol <= 0) return alert("ปริมาตรต้องมากกว่า 0");
+    if (!vol || vol <= 0) {
+      setError("กรุณากรอกปริมาตรคอนกรีตให้มากกว่า 0 ลูกบาศก์เมตร");
+      return;
+    }
+    setError(null);
     setResult(calcColumnBeam(source as SourceKey, province, vol));
   };
 
@@ -53,6 +58,11 @@ export default function ColumnBeamPage() {
           <Button block onClick={submit}>
             {t("submit")}
           </Button>
+          {error && (
+            <div className="mt-3 border-l-4 border-red bg-red/10 px-3 py-2 font-mono text-[11px] text-red">
+              ⚠ {error}
+            </div>
+          )}
         </div>
         <div>
           {result ? (
