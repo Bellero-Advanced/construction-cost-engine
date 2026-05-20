@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
+import { LocaleSwitcher } from "@/components/layout/LocaleSwitcher";
 
 const NAV = [
   { key: "home", href: "/" },
@@ -52,7 +53,7 @@ export default function Header() {
           </div>
         </Link>
 
-        <nav className="flex flex-wrap gap-1">
+        <nav className="flex flex-wrap items-center gap-1">
           {NAV.map((n) => {
             const active =
               n.href === "/" ? pathname === "/" : pathname.startsWith(n.href);
@@ -71,6 +72,9 @@ export default function Header() {
               </Link>
             );
           })}
+          <div className="ml-2">
+            <LocaleSwitcher />
+          </div>
         </nav>
       </div>
     </header>

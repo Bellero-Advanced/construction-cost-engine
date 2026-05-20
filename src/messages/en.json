@@ -1,0 +1,196 @@
+{
+  "brand": {
+    "title": "Construction Cost Engine",
+    "subtitle": "TPSO × CGD × MODERN TRADE / DEMO 2026.05",
+    "mark": "⌬"
+  },
+  "nav": {
+    "home": "Home",
+    "wall_tile": "Wall & Tile",
+    "column_beam": "Column & Beam",
+    "rebar": "Rebar",
+    "compare": "Compare Provinces",
+    "stores": "Compare Stores",
+    "trend": "Trends",
+    "source": "Data Sources"
+  },
+  "home": {
+    "docTag": "DOC-001 / OVERVIEW",
+    "title1": "CONSTRUCTION",
+    "title2": "UNIT-COST",
+    "titleAccent": "CALCULATOR",
+    "description": "A unit-cost calculator for construction materials, sourced from the <b>Ministry of Commerce (TPSO)</b>, <b>Comptroller General's Department (CGD)</b>, and four modern-trade retailers — HomePro, Global House, Thai Watsadu, BnB Home — covering the three main building structural categories.",
+    "metaSources": "6 SOURCES",
+    "metaRef": "APR/2026",
+    "metaStatus": "LIVE",
+    "stats": {
+      "materials": "Materials",
+      "provinces": "Provinces",
+      "sources": "Data Sources",
+      "months": "Months of History"
+    },
+    "sourcesHead": "Six Price Data Sources",
+    "sourcesRef": "SECTION 01 / DATA SOURCES",
+    "categoriesHead": "Construction Work Categories",
+    "categoriesRef": "SECTION 02 / WORK CATEGORIES",
+    "categories": {
+      "wall_tile": {
+        "tag": "▌ Section A",
+        "title": "Wall & Tile",
+        "desc": "Cost per square metre, including 5% cut-and-breakage allowance",
+        "items": [
+          "Ceramic tile (floor / wall)",
+          "TPI / Crocodile tile adhesive",
+          "Tile grout / PVC trim",
+          "Mixing water"
+        ]
+      },
+      "column_beam": {
+        "tag": "▌ Section B",
+        "title": "Concrete Columns & Beams",
+        "desc": "Cost per cubic metre to fc'=240 standard",
+        "items": [
+          "Portland cement Type I",
+          "Coarse sand (river sand)",
+          "Aggregate #1-2 (crushed stone)",
+          "Mixing water (W/C = 0.5-0.6)"
+        ]
+      },
+      "rebar": {
+        "tag": "▌ Section C",
+        "title": "Reinforcing Steel",
+        "desc": "Calculated by weight & size with full accessory bundle",
+        "items": [
+          "RB6, RB9 (round bar SR24)",
+          "DB10-DB25 (deformed bar SD40)",
+          "Tie wire #18",
+          "Formwork + nails"
+        ]
+      }
+    },
+    "cta": "Start Calculating"
+  },
+  "calc": {
+    "source": "Price Source",
+    "province": "Select Province",
+    "area": "Area ( m² )",
+    "volume": "Concrete Volume ( m³ )",
+    "tileType": "Tile Type",
+    "rebarList": "Rebar List",
+    "submit": "⚡ Calculate Cost",
+    "addRebar": "+ Add Rebar",
+    "placeholder": "Fill in the fields on the left, then press Calculate.",
+    "placeholderRebar": "Enter rebar items, then press Calculate.",
+    "wallTileTitle": "▌ Wall & Tile",
+    "columnBeamTitle": "▌ Concrete Columns & Beams",
+    "rebarTitle": "▌ Reinforcing Steel",
+    "helperColumnBeam": "Example: Column 0.20×0.20×3.00 m = 0.12 m³ each",
+    "result": {
+      "totalCost": "▌ TOTAL COST",
+      "unitCost": "▌ UNIT COST",
+      "sourceLoc": "▌ SOURCE / LOCATION",
+      "bom": "BOM / BILL OF MATERIALS",
+      "bomHead": "▌ Material Details",
+      "breakdown": "BREAKDOWN",
+      "breakdownHead": "▌ Cost Breakdown",
+      "breakdownDesc": "Which materials drive the cost",
+      "cols": {
+        "material": "Material",
+        "qty": "Qty",
+        "unit": "Unit",
+        "unitPrice": "Unit Price",
+        "total": "Total (THB)"
+      },
+      "total": "TOTAL",
+      "unitWallTile": "THB / m²",
+      "unitColumnBeam": "THB / m³",
+      "unitRebar": "THB / ton of steel"
+    }
+  },
+  "compare": {
+    "title": "▌ Price comparison across 10 provinces",
+    "desc": "Pick a material and source to see prices region by region.",
+    "selectMaterial": "Select Material",
+    "materialPlaceholder": "— select material —",
+    "min": "Lowest Price",
+    "max": "Highest Price",
+    "avg": "Average",
+    "diff": "Spread %",
+    "chartHead": "▌ Comparison Bar Chart",
+    "tableHead": "▌ Per-province Price Table",
+    "cols": {
+      "province": "Province",
+      "region": "Region",
+      "price": "Price",
+      "vsMin": "vs MIN"
+    }
+  },
+  "stores": {
+    "title": "▌ Price comparison across 6 sources",
+    "desc": "Compare the same material between government agencies (TPSO, CGD) and modern-trade retailers (HomePro, Global House, Thai Watsadu, BnB Home).",
+    "selectMaterial": "Select Material",
+    "selectProvince": "Province (for TPSO/CGD)",
+    "min": "Cheapest",
+    "max": "Most Expensive",
+    "avg": "Average",
+    "save": "You Save",
+    "chartHead": "▌ 6-source Comparison Bar Chart",
+    "tableHead": "▌ Price Comparison Table",
+    "insightHead": "▌ Insights",
+    "cols": {
+      "source": "Source",
+      "type": "Type",
+      "price": "Price",
+      "vsMin": "+ vs cheapest",
+      "status": "Status"
+    },
+    "badges": {
+      "cheapest": "Cheapest ★",
+      "expensive": "Most expensive",
+      "government": "Govt standard",
+      "general": "General"
+    }
+  },
+  "trend": {
+    "title": "▌ 12-month price trend",
+    "desc": "Monthly material prices, May 2025 — Apr 2026",
+    "selectMaterial": "Single Material",
+    "allRebar": "⚡ All rebar sizes",
+    "first": "Start (May 2025)",
+    "last": "Latest (Apr 2026)",
+    "diff": "Change",
+    "diffPct": "% Change",
+    "chartHead": "▌ Trend Chart",
+    "allRebarTitle": "▌ All-rebar price comparison"
+  },
+  "source": {
+    "title": "▌ Data fetched from each source",
+    "desc": "Pick a source to see the parsed data — scraped via Python (BeautifulSoup), returned as JSON.",
+    "selectProvince": "Select Province (for TPSO/CGD)",
+    "fetch": "↻ Fetch Data",
+    "success": "✓ STATUS: SUCCESS",
+    "tableHead": "▌ Data Returned",
+    "jsonLabel": "// API Response — JSON Sample",
+    "cols": {
+      "code": "Code",
+      "material": "Material",
+      "category": "Category",
+      "unit": "Unit",
+      "price": "Price (THB)"
+    }
+  },
+  "footer": {
+    "about": "▌ ABOUT",
+    "aboutText": "Construction Cost Engine — a research prototype for per-unit cost estimation of construction materials, sourcing data from the Ministry of Commerce, Comptroller General's Department, and modern-trade retailers.",
+    "sources": "▌ DATA SOURCES",
+    "disclaimer": "▌ DISCLAIMER",
+    "disclaimerText": "This is a demo build using mock data that mirrors the real schema of each source. Production use requires connecting directly to each source's API or web scraper.",
+    "build": "BUILD 2026.05.20 / DEMO+STORES",
+    "copy": "© CONSTRUCTION COST ENGINE"
+  },
+  "groups": {
+    "wall_tile": "🧱 Wall & Tile",
+    "column_beam": "🏛 Columns & Beams",
+    "rebar": "⛓ Reinforcing Steel"
+  }
+}
