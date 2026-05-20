@@ -92,7 +92,7 @@ export default async function HomePage({
         {Object.values(SOURCES).map((s) => (
           <div
             key={s.key}
-            className="overflow-hidden border-[1.5px] border-ink bg-paper transition-all duration-200 hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[5px_5px_0_var(--color-ink)]"
+            className="overflow-hidden border-[1.5px] border-ink bg-paper hover:shadow-[5px_5px_0_var(--color-ink)]"
           >
             <div
               className="flex items-center justify-between px-[18px] py-3.5 text-white"
@@ -145,7 +145,7 @@ export default async function HomePage({
             <Link
               key={c.key}
               href={c.href}
-              className="group relative block overflow-hidden border-[1.5px] border-ink bg-paper p-[22px] transition-all duration-200 hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[5px_5px_0_var(--color-ink)]"
+              className="group relative block overflow-hidden border-[1.5px] border-ink bg-paper p-[22px] hover:shadow-[5px_5px_0_var(--color-ink)]"
             >
               <div className="absolute right-3 top-2 z-0 font-display text-[64px] leading-none text-paper-2">
                 {c.num}
@@ -172,9 +172,7 @@ export default async function HomePage({
               </ul>
               <span className="relative inline-flex items-center gap-1.5 bg-ink px-3.5 py-2 font-mono text-xs font-bold uppercase tracking-[0.1em] text-amber">
                 {t("cta")}
-                <span className="transition-transform duration-200 group-hover:translate-x-1">
-                  →
-                </span>
+                <span className="group-hover:translate-x-1">→</span>
               </span>
             </Link>
           );

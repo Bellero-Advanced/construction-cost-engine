@@ -81,7 +81,7 @@ export default function Header() {
                 href={n.href}
                 onClick={() => setOpen(false)}
                 className={cn(
-                  "border border-transparent px-3.5 py-2.5 font-sans text-[13px] font-medium uppercase tracking-[0.05em] transition-all duration-150 lg:py-2",
+                  "border border-transparent px-3.5 py-2.5 font-sans text-[13px] font-medium uppercase tracking-[0.05em] lg:py-2",
                   active
                     ? "bg-amber font-bold text-ink"
                     : "text-paper hover:border-amber hover:text-amber-bright",

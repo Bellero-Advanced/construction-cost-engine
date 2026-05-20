@@ -8,7 +8,9 @@
 - `src/lib/scrapers/homepro.ts` — provider template. Implements `PriceProvider`, returns `null` until a real fetch is wired.
 - `src/app/api/prices/[source]/[material]/route.ts` — `GET /api/prices/:source/:material?province=10` → `{ price, live, fetchedAt, ttlSec }`.
 - `src/app/api/prices/status/route.ts` — `GET /api/prices/status` → which sources are live vs mock.
+- `src/app/api/admin/refresh-prices/route.ts` — `POST` with `x-admin-token` header to fan-out fetches; called by the weekly cron.
 - `src/components/calculator/DataModeBadge.tsx` — green `LIVE` / amber `MOCK` pill, rendered in every calculator result.
+- `wrangler.jsonc` — weekly cron `17 3 * * 0` (Sun 03:17 UTC) wired to `/api/admin/refresh-prices`. KV binding entry is commented in, ready to uncomment after `wrangler kv namespace create PRICES_KV`.
 
 ## How to plug in a real source
 

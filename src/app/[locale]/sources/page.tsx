@@ -52,7 +52,7 @@ export default function SourcesPage() {
                 type="button"
                 onClick={() => setSrcKey(String(k))}
                 className={
-                  "flex items-center gap-1.5 border-[1.5px] border-ink px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.1em] transition-all duration-150 " +
+                  "flex items-center gap-1.5 border-[1.5px] border-ink px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.1em] " +
                   (active
                     ? "bg-ink text-paper"
                     : "bg-paper text-ink hover:bg-paper-2")

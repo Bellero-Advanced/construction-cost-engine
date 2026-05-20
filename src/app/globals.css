@@ -33,6 +33,17 @@ body {
   font-family: var(--font-sans);
   line-height: 1.55;
   min-height: 100vh;
+  scroll-behavior: auto;
+}
+
+/* Snappy "Rust-like" UI: no transitions or animations anywhere by default.
+   Color/background/border state changes are still visible — they just snap
+   instantly instead of fading. */
+*,
+*::before,
+*::after {
+  transition: none !important;
+  animation: none !important;
 }
 
 body {
@@ -55,20 +66,10 @@ body {
   font-family: var(--font-mono);
 }
 
-/* Page transition */
-@keyframes pageIn {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
+/* Page transition — disabled for snappy UX; class kept as a no-op so existing
+   markup doesn't need to change. */
 .page-in {
-  animation: pageIn 0.4s ease-out;
+  animation: none;
 }
 
 /* Doc card with offset shadow */
@@ -104,7 +105,6 @@ select.select:focus {
   outline: none;
   border-color: var(--color-amber);
   box-shadow: 3px 3px 0 var(--color-amber);
-  transform: translate(-1px, -1px);
 }
 
 /* ===== PRINT — generate clean PDF via browser Print to PDF ===== */

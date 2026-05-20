@@ -13,5 +13,18 @@
       "binding": "WORKER_SELF_REFERENCE",
       "service": "construction-cost-engine"
     }
-  ]
+  ],
+  // Phase 3 — uncomment after running:
+  //   wrangler kv namespace create PRICES_KV
+  //   wrangler kv namespace create PRICES_KV --preview
+  // and pasting the resulting IDs here.
+  // "kv_namespaces": [
+  //   { "binding": "PRICES_KV", "id": "<production-id>", "preview_id": "<preview-id>" }
+  // ],
+  "triggers": {
+    // Phase 3 — weekly refresh hook for the live-price ETL once a real
+    // provider is wired. Calls /api/admin/refresh-prices.
+    // Sundays 03:17 UTC (avoids the 0/30 minute mark — see CronCreate guidance).
+    "crons": ["17 3 * * 0"]
+  }
 }

@@ -38,7 +38,7 @@ export function DataModeBadge({ source }: { source: string }) {
   if (status.live) {
     return (
       <span className="inline-flex items-center gap-1.5 border border-green/40 bg-green/10 px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-green">
-        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-green" />
+        <span className="h-1.5 w-1.5 rounded-full bg-green" />
         LIVE · {status.name}
       </span>
     );

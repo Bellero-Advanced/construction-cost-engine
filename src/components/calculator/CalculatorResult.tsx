@@ -115,14 +115,14 @@ export function CalculatorResult({ data }: { data: CalcResult }) {
             <button
               type="button"
               onClick={() => exportToExcel(data)}
-              className="inline-flex items-center gap-1.5 border-[1.5px] border-ink bg-green px-3.5 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.1em] text-paper transition-all duration-150 hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[3px_3px_0_var(--color-ink)] active:translate-x-0 active:translate-y-0 active:shadow-none"
+              className="inline-flex items-center gap-1.5 border-[1.5px] border-ink bg-green px-3.5 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.1em] text-paper hover:shadow-[3px_3px_0_var(--color-ink)] active:shadow-none"
             >
               ⬇ EXCEL
             </button>
             <button
               type="button"
               onClick={() => exportToPDF()}
-              className="inline-flex items-center gap-1.5 border-[1.5px] border-ink bg-red px-3.5 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.1em] text-paper transition-all duration-150 hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[3px_3px_0_var(--color-ink)] active:translate-x-0 active:translate-y-0 active:shadow-none"
+              className="inline-flex items-center gap-1.5 border-[1.5px] border-ink bg-red px-3.5 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.1em] text-paper hover:shadow-[3px_3px_0_var(--color-ink)] active:shadow-none"
             >
               ⬇ PDF
             </button>
@@ -213,7 +213,7 @@ export function CalculatorResult({ data }: { data: CalcResult }) {
           {segs.map((s, i) => (
             <div
               key={i}
-              className="flex items-center justify-center overflow-hidden whitespace-nowrap font-mono text-[11px] font-bold text-paper transition-all duration-300"
+              className="flex items-center justify-center overflow-hidden whitespace-nowrap font-mono text-[11px] font-bold text-paper"
               style={{ width: `${s.pct}%`, background: s.color }}
             >
               {s.pct >= 8 ? `${s.pct.toFixed(1)}%` : ""}

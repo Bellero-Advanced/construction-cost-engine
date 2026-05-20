@@ -6,7 +6,7 @@ import type {
 } from "react";
 
 const fieldBase =
-  "w-full px-3 py-2.5 bg-paper border-[1.5px] border-ink font-sans text-sm transition-all duration-150";
+  "w-full px-3 py-2.5 bg-paper border-[1.5px] border-ink font-sans text-sm";
 
 export function Field({
   label,

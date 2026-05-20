@@ -30,9 +30,9 @@ export function Button({
     <button
       {...rest}
       className={cn(
-        "inline-flex items-center justify-center gap-2 border-[1.5px] border-ink font-mono font-bold uppercase tracking-[0.1em] transition-all duration-150",
-        "hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[3px_3px_0_var(--color-ink)]",
-        "active:translate-x-0 active:translate-y-0 active:shadow-none",
+        "inline-flex items-center justify-center gap-2 border-[1.5px] border-ink font-mono font-bold uppercase tracking-[0.1em]",
+        "hover:shadow-[3px_3px_0_var(--color-ink)] hover:bg-amber-bright",
+        "active:shadow-none",
         size === "sm"
           ? "px-3.5 py-2 text-[11px]"
           : "px-[18px] py-3 text-[13px]",
