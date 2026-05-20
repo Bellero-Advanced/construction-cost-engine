@@ -76,23 +76,50 @@ body {
 .doc {
   background: var(--color-paper);
   border: 1.5px solid var(--color-ink);
-  box-shadow: 5px 5px 0 var(--color-ink);
-  padding: 28px;
+  box-shadow: 4px 4px 0 var(--color-ink);
+  padding: 16px;
   position: relative;
+}
+
+@media (min-width: 640px) {
+  .doc {
+    padding: 22px;
+    box-shadow: 5px 5px 0 var(--color-ink);
+  }
+}
+
+@media (min-width: 1024px) {
+  .doc {
+    padding: 28px;
+  }
 }
 
 .doc-tag {
   position: absolute;
   top: -1.5px;
-  right: 24px;
+  right: 12px;
   background: var(--color-ink);
   color: var(--color-amber-bright);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
-  padding: 4px 12px;
-  letter-spacing: 0.2em;
+  padding: 3px 8px;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (min-width: 640px) {
+  .doc-tag {
+    right: 24px;
+    font-size: 10px;
+    padding: 4px 12px;
+    letter-spacing: 0.2em;
+    max-width: none;
+  }
 }
 
 .field-label::before {

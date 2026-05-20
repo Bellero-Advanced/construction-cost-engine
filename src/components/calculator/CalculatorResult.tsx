@@ -82,7 +82,7 @@ export function CalculatorResult({ data }: { data: CalcResult }) {
           highlight
         />
         <div
-          className="relative overflow-hidden border-l-[5px] bg-ink px-5 py-[18px] text-paper"
+          className="relative overflow-hidden border-l-[5px] bg-ink px-4 py-4 text-paper sm:px-5 sm:py-[18px]"
           style={{ borderLeftColor: src.color }}
         >
           <div className="mb-1 font-mono text-[10px] uppercase tracking-[0.2em] text-paper/70">
@@ -108,7 +108,7 @@ export function CalculatorResult({ data }: { data: CalcResult }) {
       <div className="doc mb-6" data-print-area>
         <span className="doc-tag">{RES_LABELS.bom}</span>
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b-[1.5px] border-ink pb-3 print:hidden">
-          <h3 className="font-display text-[24px] tracking-[0.03em]">
+          <h3 className="font-display text-[18px] tracking-[0.03em] sm:text-[24px]">
             {RES_LABELS.bomHead}
           </h3>
           <div className="flex gap-2">
@@ -132,19 +132,19 @@ export function CalculatorResult({ data }: { data: CalcResult }) {
           <table className="w-full border-collapse text-[13px]">
             <thead className="bg-ink text-amber-bright">
               <tr>
-                <th className="border-b-2 border-amber p-3 text-left font-mono text-[10px] font-bold uppercase tracking-[0.15em]">
+                <th className="border-b-2 border-amber p-2 sm:p-3 text-left font-mono text-[10px] font-bold uppercase tracking-[0.15em]">
                   {RES_LABELS.cols.material}
                 </th>
-                <th className="border-b-2 border-amber p-3 text-right font-mono text-[10px] font-bold uppercase tracking-[0.15em]">
+                <th className="border-b-2 border-amber p-2 sm:p-3 text-right font-mono text-[10px] font-bold uppercase tracking-[0.15em]">
                   {RES_LABELS.cols.qty}
                 </th>
-                <th className="border-b-2 border-amber p-3 text-center font-mono text-[10px] font-bold uppercase tracking-[0.15em]">
+                <th className="border-b-2 border-amber p-2 sm:p-3 text-center font-mono text-[10px] font-bold uppercase tracking-[0.15em]">
                   {RES_LABELS.cols.unit}
                 </th>
-                <th className="border-b-2 border-amber p-3 text-right font-mono text-[10px] font-bold uppercase tracking-[0.15em]">
+                <th className="border-b-2 border-amber p-2 sm:p-3 text-right font-mono text-[10px] font-bold uppercase tracking-[0.15em]">
                   {RES_LABELS.cols.unitPrice}
                 </th>
-                <th className="border-b-2 border-amber p-3 text-right font-mono text-[10px] font-bold uppercase tracking-[0.15em]">
+                <th className="border-b-2 border-amber p-2 sm:p-3 text-right font-mono text-[10px] font-bold uppercase tracking-[0.15em]">
                   {RES_LABELS.cols.total}
                 </th>
               </tr>
@@ -152,7 +152,7 @@ export function CalculatorResult({ data }: { data: CalcResult }) {
             <tbody>
               {data.items.map((it) => (
                 <tr key={it.id + it.name} className="hover:bg-paper-2">
-                  <td className="border-b border-dashed border-paper-2 p-3">
+                  <td className="border-b border-dashed border-paper-2 p-2 sm:p-3">
                     <strong>{it.name}</strong>
                     {it.useFor && (
                       <div className="text-[11px] text-ink-3">
@@ -160,16 +160,16 @@ export function CalculatorResult({ data }: { data: CalcResult }) {
                       </div>
                     )}
                   </td>
-                  <td className="border-b border-dashed border-paper-2 p-3 text-right font-mono">
+                  <td className="border-b border-dashed border-paper-2 p-2 sm:p-3 text-right font-mono">
                     {fmt(it.qty)}
                   </td>
-                  <td className="border-b border-dashed border-paper-2 p-3 text-center text-[11px]">
+                  <td className="border-b border-dashed border-paper-2 p-2 sm:p-3 text-center text-[11px]">
                     {it.unit}
                   </td>
-                  <td className="border-b border-dashed border-paper-2 p-3 text-right font-mono">
+                  <td className="border-b border-dashed border-paper-2 p-2 sm:p-3 text-right font-mono">
                     {fmt(it.unitPrice)}
                   </td>
-                  <td className="border-b border-dashed border-paper-2 p-3 text-right font-mono font-bold">
+                  <td className="border-b border-dashed border-paper-2 p-2 sm:p-3 text-right font-mono font-bold">
                     {fmt(it.total)}
                   </td>
                 </tr>
@@ -179,11 +179,11 @@ export function CalculatorResult({ data }: { data: CalcResult }) {
               <tr className="bg-paper-2 font-bold">
                 <td
                   colSpan={4}
-                  className="border-y-2 border-ink p-3 text-right"
+                  className="border-y-2 border-ink p-2 sm:p-3 text-right"
                 >
                   <strong>{RES_LABELS.total}</strong>
                 </td>
-                <td className="border-y-2 border-ink p-3 text-right font-mono text-[15px]">
+                <td className="border-y-2 border-ink p-2 sm:p-3 text-right font-mono text-[15px]">
                   {fmt(data.total)}
                 </td>
               </tr>
@@ -256,14 +256,14 @@ function SumCard({
     <div
       className={
         highlight
-          ? "relative overflow-hidden border-l-[5px] border-ink bg-amber px-5 py-[18px] text-ink"
-          : "relative overflow-hidden border-l-[5px] border-amber bg-ink px-5 py-[18px] text-paper"
+          ? "relative overflow-hidden border-l-[5px] border-ink bg-amber px-4 py-4 text-ink sm:px-5 sm:py-[18px]"
+          : "relative overflow-hidden border-l-[5px] border-amber bg-ink px-4 py-4 text-paper sm:px-5 sm:py-[18px]"
       }
     >
       <div className="mb-1 font-mono text-[10px] uppercase tracking-[0.2em] opacity-70">
         {label}
       </div>
-      <div className="font-display text-[38px] leading-none tracking-[0.02em]">
+      <div className="font-display text-[30px] leading-none tracking-[0.02em] sm:text-[38px]">
         {value}
       </div>
       <div className="mt-1 font-mono text-[11px] opacity-65">{sub}</div>
@@ -279,11 +279,11 @@ export function CalcPlaceholder({
   text: string;
 }) {
   return (
-    <div className="border-2 border-dashed border-line bg-white/40 px-6 py-20 text-center text-ink-3">
-      <div className="mb-3 font-display text-[80px] leading-none text-amber">
+    <div className="border-2 border-dashed border-line bg-white/40 px-4 py-12 text-center text-ink-3 sm:px-6 sm:py-20">
+      <div className="mb-3 font-display text-[56px] leading-none text-amber sm:text-[80px]">
         {icon}
       </div>
-      <p className="font-mono text-xs uppercase tracking-[0.15em] whitespace-pre-line">
+      <p className="font-mono text-[10px] uppercase tracking-[0.12em] whitespace-pre-line sm:text-xs sm:tracking-[0.15em]">
         {text}
       </p>
     </div>
