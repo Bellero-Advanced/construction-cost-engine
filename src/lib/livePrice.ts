@@ -17,6 +17,7 @@
  */
 
 import { getPrice } from "@/lib/pricing";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import type { SourceKey } from "@/types";
 
 export interface PriceResult {
@@ -39,7 +40,6 @@ const cacheKey = (s: string, m: string, p: number) => `${s}:${m}:${p}`;
 
 async function getKv(): Promise<KVNamespace | null> {
   try {
-    const { getCloudflareContext } = await import("@opennextjs/cloudflare");
     const ctx = await getCloudflareContext({ async: true });
     return (ctx?.env as CloudflareEnv | undefined)?.PRICES_KV ?? null;
   } catch {

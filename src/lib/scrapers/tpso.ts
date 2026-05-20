@@ -11,6 +11,10 @@
  * Cloudflare Workers runtime when the route module graph is built.
  */
 
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+import type { PriceProvider } from "@/lib/livePrice";
+import { getPrice as getMockPrice } from "@/lib/pricing";
+
 const TPSO_INDEX_PAGE = "https://tpso.go.th/summary-trade-economy-th";
 const KV_KEY = "tpso:cmi:latest";
 
@@ -148,15 +152,11 @@ export async function readTpsoIndex(
  * delta versus baseline. Returns null if KV has no snapshot — caller
  * falls back to mock.
  */
-import type { PriceProvider } from "@/lib/livePrice";
-import { getPrice as getMockPrice } from "@/lib/pricing";
-
 export const tpsoProvider: PriceProvider = {
   key: "tpso",
   ttlSec: 60 * 60 * 24 * 7, // weekly
   async fetch(materialId: string, provinceId: number) {
     try {
-      const { getCloudflareContext } = await import("@opennextjs/cloudflare");
       const ctx = await getCloudflareContext({ async: true });
       const kv = (ctx?.env as { PRICES_KV?: KVNamespace } | undefined)
         ?.PRICES_KV;

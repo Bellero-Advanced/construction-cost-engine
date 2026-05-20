@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { readTpsoIndex, TPSO_CMI_BASELINE } from "@/lib/scrapers/tpso";
 
 export const runtime = "edge";
@@ -6,7 +7,6 @@ export const runtime = "edge";
 export async function GET() {
   let kv: KVNamespace | undefined;
   try {
-    const { getCloudflareContext } = await import("@opennextjs/cloudflare");
     const ctx = await getCloudflareContext({ async: true });
     kv = (ctx?.env as { PRICES_KV?: KVNamespace } | undefined)?.PRICES_KV;
   } catch {

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { listRegisteredProviders } from "@/lib/livePrice";
 import { refreshTpsoIndex } from "@/lib/scrapers/tpso";
 import type { CmiSnapshot } from "@/lib/scrapers/tpso";
@@ -7,7 +8,6 @@ export const runtime = "edge";
 
 async function getKv(): Promise<KVNamespace | undefined> {
   try {
-    const { getCloudflareContext } = await import("@opennextjs/cloudflare");
     const ctx = await getCloudflareContext({ async: true });
     return (ctx?.env as { PRICES_KV?: KVNamespace } | undefined)?.PRICES_KV;
   } catch {
@@ -17,7 +17,6 @@ async function getKv(): Promise<KVNamespace | undefined> {
 
 async function getExpectedToken(): Promise<string | undefined> {
   try {
-    const { getCloudflareContext } = await import("@opennextjs/cloudflare");
     const ctx = await getCloudflareContext({ async: true });
     return (ctx?.env as { ADMIN_REFRESH_TOKEN?: string } | undefined)
       ?.ADMIN_REFRESH_TOKEN;
