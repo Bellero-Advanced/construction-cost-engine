@@ -4,7 +4,6 @@ import { listRegisteredProviders } from "@/lib/livePrice";
 import { refreshTpsoIndex } from "@/lib/scrapers/tpso";
 import type { CmiSnapshot } from "@/lib/scrapers/tpso";
 
-export const runtime = "edge";
 
 async function getKv(): Promise<KVNamespace | undefined> {
   try {

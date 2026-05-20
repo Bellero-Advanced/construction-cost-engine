@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { readTpsoIndex, TPSO_CMI_BASELINE } from "@/lib/scrapers/tpso";
 
-export const runtime = "edge";
 
 export async function GET() {
   let kv: KVNamespace | undefined;

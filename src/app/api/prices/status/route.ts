@@ -3,7 +3,6 @@ import { listRegisteredProviders } from "@/lib/livePrice";
 import { SOURCES, SOURCE_KEYS } from "@/data/sources";
 import type { SourceKey } from "@/types";
 
-export const runtime = "edge";
 
 export async function GET() {
   const live = new Set<SourceKey>(listRegisteredProviders());

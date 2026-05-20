@@ -5,7 +5,6 @@ import { SOURCES } from "@/data/sources";
 import { PROVINCES } from "@/data/provinces";
 import type { SourceKey } from "@/types";
 
-export const runtime = "edge";
 
 export async function GET(
   _req: Request,
