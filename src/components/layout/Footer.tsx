@@ -4,7 +4,7 @@ import { SOURCES } from "@/data/sources";
 export default function Footer() {
   const t = useTranslations("footer");
   return (
-    <footer className="mt-12 border-t-4 border-amber bg-ink px-7 pt-8 pb-6 text-paper">
+    <footer className="mt-12 border-t-4 border-amber bg-ink px-4 pt-8 pb-6 text-paper sm:px-6 lg:px-7">
       <div className="mx-auto max-w-[1280px]">
         <div className="grid gap-6 border-b border-dashed border-line pb-5 md:grid-cols-3">
           <div>

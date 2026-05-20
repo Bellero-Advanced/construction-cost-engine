@@ -90,7 +90,9 @@ export default async function LocaleLayout({
       <body>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <Header />
-          <main className="mx-auto max-w-[1280px] px-7 py-8">{children}</main>
+          <main className="mx-auto max-w-[1280px] px-4 py-6 sm:px-6 sm:py-8 lg:px-7">
+            {children}
+          </main>
           <Footer />
         </NextIntlClientProvider>
       </body>

@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { LocaleSwitcher } from "@/components/layout/LocaleSwitcher";
 
 const NAV = [
   { key: "home", href: "/" },
@@ -21,6 +21,7 @@ export default function Header() {
   const tBrand = useTranslations("brand");
   const tNav = useTranslations("nav");
   const pathname = usePathname();
+  const [open, setOpen] = useState(false);
 
   return (
     <header className="relative overflow-hidden border-b-4 border-amber bg-ink text-paper">
@@ -32,10 +33,10 @@ export default function Header() {
             "radial-gradient(circle at 12% 50%, rgba(217,119,6,0.18), transparent 35%), radial-gradient(circle at 88% 50%, rgba(14,124,123,0.15), transparent 35%)",
         }}
       />
-      <div className="relative mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-4 px-7 py-[22px]">
-        <Link href="/" className="flex items-center gap-4">
+      <div className="relative mx-auto flex max-w-[1280px] flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6 sm:py-5 lg:px-7 lg:py-[22px]">
+        <Link href="/" className="flex items-center gap-3 sm:gap-4">
           <div
-            className="flex h-14 w-14 items-center justify-center border-2 border-paper bg-amber font-display text-[32px] text-ink"
+            className="flex h-11 w-11 items-center justify-center border-2 border-paper bg-amber font-display text-[24px] text-ink sm:h-14 sm:w-14 sm:text-[32px]"
             style={{
               boxShadow: "4px 4px 0 var(--color-ink-3)",
               transform: "rotate(-2deg)",
@@ -43,17 +44,34 @@ export default function Header() {
           >
             {tBrand("mark")}
           </div>
-          <div>
-            <h1 className="font-display text-[26px] leading-tight tracking-[0.04em] text-paper">
+          <div className="min-w-0">
+            <h1 className="font-display text-[18px] leading-tight tracking-[0.04em] text-paper sm:text-[22px] lg:text-[26px]">
               {tBrand("title")}
             </h1>
-            <div className="font-mono text-[11px] uppercase tracking-[0.15em] text-amber-bright">
+            <div className="hidden font-mono text-[10px] uppercase tracking-[0.12em] text-amber-bright sm:block sm:text-[11px] sm:tracking-[0.15em]">
               {tBrand("subtitle")}
             </div>
           </div>
         </Link>
 
-        <nav className="flex flex-wrap items-center gap-1">
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-expanded={open}
+          aria-controls="primary-nav"
+          aria-label="Toggle navigation"
+          className="ml-auto inline-flex items-center justify-center border-2 border-amber bg-ink-3/40 px-3 py-2 font-mono text-[12px] font-bold tracking-wider text-amber-bright lg:hidden"
+        >
+          {open ? "✕ ปิด" : "☰ เมนู"}
+        </button>
+
+        <nav
+          id="primary-nav"
+          className={cn(
+            "w-full lg:flex lg:w-auto lg:flex-wrap lg:items-center lg:gap-1",
+            open ? "flex flex-col gap-1" : "hidden",
+          )}
+        >
           {NAV.map((n) => {
             const active =
               n.href === "/" ? pathname === "/" : pathname.startsWith(n.href);
@@ -61,8 +79,9 @@ export default function Header() {
               <Link
                 key={n.key}
                 href={n.href}
+                onClick={() => setOpen(false)}
                 className={cn(
-                  "border border-transparent px-3.5 py-2 font-sans text-[13px] font-medium uppercase tracking-[0.05em] transition-all duration-150",
+                  "border border-transparent px-3.5 py-2.5 font-sans text-[13px] font-medium uppercase tracking-[0.05em] transition-all duration-150 lg:py-2",
                   active
                     ? "bg-amber font-bold text-ink"
                     : "text-paper hover:border-amber hover:text-amber-bright",
@@ -72,9 +91,6 @@ export default function Header() {
               </Link>
             );
           })}
-          <div className="ml-2">
-            <LocaleSwitcher />
-          </div>
         </nav>
       </div>
     </header>
