@@ -5,9 +5,11 @@
  * and caches the snapshot in KV.
  *
  * The PDF is text-based (not scanned), so no OCR is needed.
+ *
+ * `unpdf` is imported lazily at call time (not at module load) because
+ * loading its pdfjs-internal dependencies eagerly fails in the
+ * Cloudflare Workers runtime when the route module graph is built.
  */
-
-import { extractText, getDocumentProxy } from "unpdf";
 
 const TPSO_INDEX_PAGE = "https://tpso.go.th/summary-trade-economy-th";
 const KV_KEY = "tpso:cmi:latest";
@@ -71,6 +73,7 @@ export async function fetchLatestReportUrl(): Promise<string | null> {
 export async function parseCmiPdf(
   buf: Uint8Array,
 ): Promise<CmiSnapshot | null> {
+  const { extractText, getDocumentProxy } = await import("unpdf");
   const doc = await getDocumentProxy(buf);
   const { text } = await extractText(doc, { mergePages: true });
 
