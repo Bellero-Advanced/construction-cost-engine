@@ -1,16 +1,61 @@
 import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
-import { getMessages, setRequestLocale } from "next-intl/server";
+import {
+  getMessages,
+  getTranslations,
+  setRequestLocale,
+} from "next-intl/server";
 import { notFound } from "next/navigation";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { locales } from "@/i18n";
+import { locales, defaultLocale } from "@/i18n";
 
-export const metadata: Metadata = {
-  title: "Construction Cost Engine — TPSO × CGD × Modern Trade",
-  description:
-    "ระบบคำนวณต้นทุนต่อหน่วยของวัสดุก่อสร้าง 20 รายการ จาก 6 แหล่งราคา (TPSO, CGD, HomePro, Global House, Thai Watsadu, BnB Home) ครอบคลุม 10 จังหวัด",
-};
+const SITE_URL =
+  "https://construction-cost-engine.steep-tooth-c420.workers.dev";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  if (!(locales as readonly string[]).includes(locale)) {
+    return {};
+  }
+  const tBrand = await getTranslations({ locale, namespace: "brand" });
+  const tHome = await getTranslations({ locale, namespace: "home" });
+
+  const description = tHome("description").replace(/<[^>]+>/g, "");
+  const localePath = (l: string) => (l === defaultLocale ? "" : `/${l}`);
+
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: `${tBrand("title")} — TPSO × CGD × Modern Trade`,
+      template: `%s — ${tBrand("title")}`,
+    },
+    description,
+    alternates: {
+      canonical: localePath(locale) || "/",
+      languages: Object.fromEntries(
+        locales.map((l) => [l, localePath(l) || "/"]),
+      ),
+    },
+    openGraph: {
+      type: "website",
+      url: localePath(locale) || "/",
+      title: tBrand("title"),
+      description,
+      locale,
+      siteName: tBrand("title"),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: tBrand("title"),
+      description,
+    },
+  };
+}
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
