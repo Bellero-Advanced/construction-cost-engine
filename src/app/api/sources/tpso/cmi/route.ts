@@ -6,8 +6,8 @@ export const runtime = "edge";
 export async function GET() {
   let kv: KVNamespace | undefined;
   try {
-    const mod = await import("@opennextjs/cloudflare");
-    const ctx = mod.getCloudflareContext();
+    const { getCloudflareContext } = await import("@opennextjs/cloudflare");
+    const ctx = await getCloudflareContext({ async: true });
     kv = (ctx?.env as { PRICES_KV?: KVNamespace } | undefined)?.PRICES_KV;
   } catch {
     /* ignore */

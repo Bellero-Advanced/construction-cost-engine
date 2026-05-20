@@ -156,8 +156,8 @@ export const tpsoProvider: PriceProvider = {
   ttlSec: 60 * 60 * 24 * 7, // weekly
   async fetch(materialId: string, provinceId: number) {
     try {
-      const mod = await import("@opennextjs/cloudflare");
-      const ctx = mod.getCloudflareContext();
+      const { getCloudflareContext } = await import("@opennextjs/cloudflare");
+      const ctx = await getCloudflareContext({ async: true });
       const kv = (ctx?.env as { PRICES_KV?: KVNamespace } | undefined)
         ?.PRICES_KV;
       const snap = await readTpsoIndex(kv);

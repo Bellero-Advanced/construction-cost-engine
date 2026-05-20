@@ -7,8 +7,8 @@ export const runtime = "edge";
 
 async function getKv(): Promise<KVNamespace | undefined> {
   try {
-    const mod = await import("@opennextjs/cloudflare");
-    const ctx = mod.getCloudflareContext();
+    const { getCloudflareContext } = await import("@opennextjs/cloudflare");
+    const ctx = await getCloudflareContext({ async: true });
     return (ctx?.env as { PRICES_KV?: KVNamespace } | undefined)?.PRICES_KV;
   } catch {
     return undefined;
@@ -17,8 +17,8 @@ async function getKv(): Promise<KVNamespace | undefined> {
 
 async function getExpectedToken(): Promise<string | undefined> {
   try {
-    const mod = await import("@opennextjs/cloudflare");
-    const ctx = mod.getCloudflareContext();
+    const { getCloudflareContext } = await import("@opennextjs/cloudflare");
+    const ctx = await getCloudflareContext({ async: true });
     return (ctx?.env as { ADMIN_REFRESH_TOKEN?: string } | undefined)
       ?.ADMIN_REFRESH_TOKEN;
   } catch {

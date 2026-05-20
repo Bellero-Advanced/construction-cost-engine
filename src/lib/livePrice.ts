@@ -39,8 +39,8 @@ const cacheKey = (s: string, m: string, p: number) => `${s}:${m}:${p}`;
 
 async function getKv(): Promise<KVNamespace | null> {
   try {
-    const mod = await import("@opennextjs/cloudflare");
-    const ctx = mod.getCloudflareContext();
+    const { getCloudflareContext } = await import("@opennextjs/cloudflare");
+    const ctx = await getCloudflareContext({ async: true });
     return (ctx?.env as CloudflareEnv | undefined)?.PRICES_KV ?? null;
   } catch {
     return null;
