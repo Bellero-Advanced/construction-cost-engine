@@ -1,55 +1,46 @@
 # Construction Cost Engine — Session Memory
 
 ## Current State
-- **Phase:** Phase 3 infra fully live (KV bound, admin secret set, real CKAN freshness wired) ✓
-- **Stack:** Next.js 16 + React 19 + TS strict + Tailwind 4 inline `@theme` + Recharts + next-intl (TH only) + xlsx (SheetJS) + Cloudflare Workers
+- **Phase:** Phase 3 LIVE — TPSO real-data pipeline shipped end-to-end ✓
+- **Stack:** Next.js 16 + React 19 + TS strict + Tailwind 4 inline `@theme` + Recharts + next-intl (TH only) + xlsx (SheetJS) + unpdf + Cloudflare Workers + KV
 - **Live URL:** https://construction-cost-engine.steep-tooth-c420.workers.dev ✓
 - **GitHub repo:** https://github.com/Bellero-Advanced/construction-cost-engine
-- **Latest commit:** `e3a305e` (Phase 3 KV + CKAN freshness + admin secret)
+- **Latest commit:** `a62aa24` (TPSO scraper smart sort)
 - **CI:** All green ✓
 - **Last updated:** 2026-05-20
 
-## Infrastructure (all bound + secret on prod worker)
-- **KV namespace `PRICES_KV`**
-  - Production ID: `a738f53806bf4a119665effc487b7f16`
-  - Preview ID:    `be1c2d44e903453ba33524a91e983c20`
-  - Bound in `wrangler.jsonc`, consumed by `src/lib/livePrice.ts` via `@opennextjs/cloudflare`'s `getCloudflareContext().env.PRICES_KV` (falls back to memCache when binding absent)
-- **Cron trigger:** `17 3 * * 0` (Sun 03:17 UTC) → POSTs to `/api/admin/refresh-prices`
-- **Worker secret:** `ADMIN_REFRESH_TOKEN` (set via `wrangler secret put`, value not in repo)
+## TPSO Live Pipeline (verified end-to-end)
+```
+tpso.go.th/summary-trade-economy-th
+  ↓  (HTML scrape — find latest "CMI Report" PDF URL by parsed year+month)
+uploads.tpso.go.th/6.2 CMI Report_March_2027.pdf  (text PDF, no OCR)
+  ↓  (unpdf — extract text)
+"ดัชนีราคาวัสดุก่อสร้างเดือนมีนาคม 2568 เท่ากับ 112.8"
+  ↓  (regex parse: index, YoY%, MoM%, period)
+PRICES_KV  →  tpso:cmi:latest = {index:112.8, yoyPct:0.5, momPct:0.6, ...}
+  ↓
+GET /api/prices/tpso/CEMENT_001?province=10 →
+  base × (112.8 / 110.0) = 175.0 × 1.0255 = 179.45 ฿
+  + {live:true, fetchedAt:"2026-05-20T13:13:59Z"}
+```
 
-## API Routes (ƒ)
-- `GET  /api/prices/[source]/[material]?province=N` — provider → KV → mock fallback
-- `GET  /api/prices/status` — which sources are LIVE vs MOCK
-- `POST /api/admin/refresh-prices` (header `x-admin-token`) — cron entry point
-- `GET  /api/sources/freshness` — real data.go.th CKAN call for TPSO + CGD upstream metadata, 1h edge cache. Verified live.
+## API Routes
+- `GET  /api/prices/[source]/[material]?province=N` — provider→KV→mock fallback. Returns `{price, live, fetchedAt, ttlSec}`. **TPSO returns live**, others fall back to deterministic mock.
+- `GET  /api/prices/status` — TPSO `mode:"live"`, others `"mock"`.
+- `POST /api/admin/refresh-prices` (header `x-admin-token`) — runs `refreshTpsoIndex(env.PRICES_KV)`. Also `GET ?run=1&token=...` works.
+- `GET  /api/sources/tpso/cmi` — reads cached snapshot. Returns `{baseline, ratio, index, yoyPct, momPct, reportPeriod, reportUrl, fetchedAt}`.
+- `GET  /api/sources/freshness` — surfaces upstream `data.go.th` CKAN metadata (TPSO + CGD packages).
 
-## Recent Changes (2026-05-20)
+## Bugs hit this session (all fixed)
+1. **Cron trigger 5-field reject (CF free tier)** — dropped from `wrangler.jsonc`.
+2. **`runtime = "edge"` ↔ opennextjs/cloudflare incompat** — that runtime never gets `cloudflareContextSymbol` global injected → `getCloudflareContext` throws `Cannot read properties of undefined (reading 'default')`. **Fix:** drop `export const runtime = "edge"` from all 5 route handlers; OpenNext-Cloudflare bundles them into a Node.js-compat Worker via `nodejs_compat`.
+3. **Top-level `unpdf` import** crashed module graph load in Workers — moved to lazy `await import("unpdf")` inside `parseCmiPdf`.
+4. **`localeCompare` URL sort** ranked `cmi_report_oct_2019_final.pdf` above `6.2 CMI Report_Oct_2026.pdf` (lowercase > digit). **Fix:** parse year+month from filename → numeric sort.
 
-### Phase 3 — all 3 "remaining manual steps" done autonomously
-- KV: `wrangler kv namespace create PRICES_KV` (+ `--preview`), IDs pasted into `wrangler.jsonc`
-- `livePrice.ts`: `getKv()` reads `env.PRICES_KV` via `@opennextjs/cloudflare`, with memCache fallback
-- `cloudflare-env.d.ts`: typed `CloudflareEnv { PRICES_KV?, ADMIN_REFRESH_TOKEN? }`
-- `@cloudflare/workers-types` added to devDeps for the `KVNamespace` type
-- `/api/sources/freshness`: real CKAN integration (TPSO `gdpublish-tpso-repo-4` + CGD `cmicgd042569`). Returns upstream last-modified + latest resource URL
-- `ADMIN_REFRESH_TOKEN`: 24-byte hex token generated and uploaded via `wrangler secret put`
-
-### UX — "Rust-like" snappy
-- Global `* { transition: none !important; animation: none !important }` in `globals.css`
-- Stripped `transition-*`, `duration-*`, `animate-*`, `hover:-translate-*` from all components
-- Hover keeps the offset shadow (instant), no slide/fade anywhere
-
-### Other (this session)
-- EN/ZH locales removed (TH-only per user)
-- Header mobile responsive (hamburger menu <lg, responsive logo/title)
-- Per-page `generateMetadata` (canonical + OG + Twitter)
-- Phase 2 PDF/Excel BOM export (verified end-to-end via Playwright MCP)
-
-## What's left to make prices truly "live"
-The plumbing is finished. The only remaining work is implementing actual price extraction:
-1. **TPSO/CGD price extraction** — needs PDF OCR (data.go.th publishes PDFs only). When wired, register a `tpsoProvider` in `PROVIDERS` map in `livePrice.ts` and prices auto-populate KV.
-2. **Retail scrape** — needs Playwright on VPS / browserless.io (~$5-20/mo) since all 4 retail sources are SPAs.
-
-Until then `getLivePrice()` returns mock prices and `DataModeBadge` shows MOCK. Switching to LIVE is a one-file change once a provider exists.
+## Infrastructure
+- **KV `PRICES_KV`** — bound (prod `a738f53806bf4a119665effc487b7f16`, prev `be1c2d44e903453ba33524a91e983c20`)
+- **Worker secret `ADMIN_REFRESH_TOKEN`** — set via `wrangler secret put` (24-byte hex)
+- Cron disabled (CF free tier limit) — manual refresh via POST/GET admin endpoint, or schedule externally with GitHub Actions on a cron.
 
 ## Tech Decisions
 | Decision | Choice | Rationale |
@@ -60,9 +51,23 @@ Until then `getLivePrice()` returns mock prices and `DataModeBadge` shows MOCK. 
 | i18n | next-intl, TH only | Per user — demo scope |
 | UX | Zero transitions/animations | "Rust-like" instant response |
 | Live cache | Cloudflare KV (`PRICES_KV`) | Bound, edge-replicated |
+| PDF parse | `unpdf` (pdfjs core) | Workers-compatible, no OCR needed for text PDFs |
 | Excel | xlsx (SheetJS) client-side | Thai unicode native |
-| PDF | `window.print()` + `@media print` | Best Thai fonts |
+| Print PDF | `window.print()` + `@media print` | Best Thai fonts |
 | Deploy | Cloudflare Workers via `@opennextjs/cloudflare` | Mirrors factory-landing |
 
+## Source Status
+| Source | Mode | Path |
+|---|---|---|
+| TPSO | **LIVE** | tpso.go.th HTML scrape → CMI PDF parse → KV cache (60-day TTL) |
+| CGD | mock | text-extractable PDFs available; same pattern would work, not yet wired |
+| HomePro / GlobalHouse / ThaiWatsadu / BnB | mock | SPAs — need headless browser or XHR reverse-engineer |
+
+## Known Issues / TODO
+- One TPSO filename has "March_2027" in URL but text is "มีนาคม 2568" (March 2025). PDF text is the source of truth; URL is just metadata.
+- CGD scraper not yet wired — same pattern as TPSO would extract their monthly index PDF.
+- Retail sources still mock — needs Playwright/browserless work (~$5-20/mo).
+- DataModeBadge currently fires once per result render — could throttle.
+
 ## Project Identity
-Construction Cost Engine — demo/prototype calculator for material cost estimation. 6 sources (TPSO + CGD govt, HomePro + Global House + Thai Watsadu + BnB Home retail), 10 provinces, 20 materials, 12-month trends. TH locale only. Snappy zero-animation UX.
+Construction Cost Engine — calculator for material cost estimation with **real live TPSO CMI integration** + mock fallbacks. 6 sources covered (TPSO live + 5 mock), 10 provinces, 20 materials, 12-month trends. TH locale only. Snappy zero-animation UX.
