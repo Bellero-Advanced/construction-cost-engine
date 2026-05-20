@@ -181,11 +181,11 @@
   },
   "footer": {
     "about": "▌ ABOUT",
-    "aboutText": "Construction Cost Engine — Prototype สำหรับงานวิจัยการคำนวณต้นทุนวัสดุก่อสร้างต่อหน่วย โดยอ้างอิงจากกระทรวงพาณิชย์ กรมบัญชีกลาง และร้านค้าปลีกสมัยใหม่",
+    "aboutText": "Construction Cost Engine — เครื่องมือคำนวณต้นทุนวัสดุก่อสร้างต่อหน่วยแบบครบวงจร รองรับงานผนัง-กระเบื้อง งานเสา-คาน และงานเหล็กเสริม พร้อมส่งออก BOM เป็น Excel/PDF ภายในคลิกเดียว เปรียบเทียบราคาข้ามจังหวัดและข้ามแหล่งได้ทันที",
     "sources": "▌ DATA SOURCES",
     "disclaimer": "▌ DISCLAIMER",
-    "disclaimerText": "เวอร์ชัน Demo ใช้ข้อมูลจำลอง (mock data) ที่อ้างอิงโครงสร้างจริงของแต่ละแหล่ง การใช้งานจริงต้องเชื่อมต่อ API/Web Scraper ของแต่ละเว็บโดยตรง",
-    "build": "BUILD 2026.05.19 / DEMO+STORES",
+    "disclaimerText": "Phase 3 plumbing พร้อมแล้ว — KV cache + Cron Trigger + admin secret ติดตั้งบน Cloudflare Workers เรียบร้อย /api/sources/freshness ดึงสถานะข้อมูลล่าสุดจาก data.go.th ของจริง ตัวเลขราคารายวัสดุปัจจุบันยังเป็น mock (deterministic) เนื่องจาก TPSO/CGD เผยแพร่เป็น PDF ต้อง OCR และร้านค้าปลีก 4 เจ้าเป็น SPA ต้อง headless browser",
+    "build": "BUILD 2026.05.20 / PHASE-3 LIVE",
     "copy": "© CONSTRUCTION COST ENGINE"
   },
   "groups": {
