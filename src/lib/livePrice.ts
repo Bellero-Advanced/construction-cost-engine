@@ -83,16 +83,15 @@ const DEFAULT_TTL: Record<SourceKey, number> = {
 };
 
 /**
- * Registry of live providers. Empty by default — every source falls back to
- * the deterministic mock until a real scraper is registered here.
- *
- * Example future entry:
- *   import { homeproProvider } from "@/lib/scrapers/homepro";
- *   const PROVIDERS: Partial<Record<SourceKey, PriceProvider>> = {
- *     homepro: homeproProvider,
- *   };
+ * Registry of live providers. The `tpso` provider parses the latest
+ * CMI Report PDF from tpso.go.th and applies the index delta to the
+ * deterministic mock baseline.
  */
-const PROVIDERS: Partial<Record<SourceKey, PriceProvider>> = {};
+import { tpsoProvider } from "@/lib/scrapers/tpso";
+
+const PROVIDERS: Partial<Record<SourceKey, PriceProvider>> = {
+  tpso: tpsoProvider,
+};
 
 export async function getLivePrice(
   sourceKey: SourceKey | string,

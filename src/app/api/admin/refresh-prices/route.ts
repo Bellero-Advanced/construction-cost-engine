@@ -1,59 +1,82 @@
-/**
- * Phase 3 — weekly cron entry point for refreshing live prices.
- *
- * Cron schedule is defined in `wrangler.jsonc` (`triggers.crons`).
- * Currently a no-op skeleton: walks every registered PriceProvider and
- * calls `fetch()` for each (source × material × province) tuple, but the
- * PROVIDERS map in `src/lib/livePrice.ts` is empty until a real scraper
- * is wired.
- *
- * To run manually:
- *   curl -X POST https://construction-cost-engine.steep-tooth-c420.workers.dev/api/admin/refresh-prices \
- *     -H "x-admin-token: $ADMIN_REFRESH_TOKEN"
- */
-
 import { NextResponse } from "next/server";
 import { listRegisteredProviders } from "@/lib/livePrice";
+import { refreshTpsoIndex } from "@/lib/scrapers/tpso";
+import type { CmiSnapshot } from "@/lib/scrapers/tpso";
 
 export const runtime = "edge";
 
+async function getKv(): Promise<KVNamespace | undefined> {
+  try {
+    const mod = await import("@opennextjs/cloudflare");
+    const ctx = mod.getCloudflareContext();
+    return (ctx?.env as { PRICES_KV?: KVNamespace } | undefined)?.PRICES_KV;
+  } catch {
+    return undefined;
+  }
+}
+
+async function getExpectedToken(): Promise<string | undefined> {
+  try {
+    const mod = await import("@opennextjs/cloudflare");
+    const ctx = mod.getCloudflareContext();
+    return (ctx?.env as { ADMIN_REFRESH_TOKEN?: string } | undefined)
+      ?.ADMIN_REFRESH_TOKEN;
+  } catch {
+    return process.env.ADMIN_REFRESH_TOKEN;
+  }
+}
+
+async function runRefresh(): Promise<{
+  ok: boolean;
+  results: { provider: string; ok: boolean; snapshot?: CmiSnapshot | null }[];
+}> {
+  const kv = await getKv();
+  const out: {
+    provider: string;
+    ok: boolean;
+    snapshot?: CmiSnapshot | null;
+  }[] = [];
+
+  // TPSO
+  try {
+    const snap = await refreshTpsoIndex(kv);
+    out.push({ provider: "tpso", ok: !!snap, snapshot: snap });
+  } catch (e) {
+    out.push({ provider: "tpso", ok: false, snapshot: null });
+    console.error("tpso refresh failed:", (e as Error).message);
+  }
+
+  return { ok: out.some((r) => r.ok), results: out };
+}
+
 export async function POST(req: Request) {
   const token = req.headers.get("x-admin-token");
-  const expected = process.env.ADMIN_REFRESH_TOKEN;
-
+  const expected = await getExpectedToken();
   if (expected && token !== expected) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
-
-  const providers = listRegisteredProviders();
-  if (providers.length === 0) {
-    return NextResponse.json({
-      ok: true,
-      message: "no providers registered — nothing to refresh",
-      providers: [],
-    });
-  }
-
-  // Once a provider is wired, fan-out fetch calls here:
-  //   for (const key of providers) {
-  //     for (const m of TOP_MATERIALS) {
-  //       for (const p of TOP_PROVINCES) {
-  //         await getLivePrice(key, m, p); // populates KV via cache write
-  //       }
-  //     }
-  //   }
-
-  return NextResponse.json({
-    ok: true,
-    message: `would refresh ${providers.length} provider(s)`,
-    providers,
-  });
+  const result = await runRefresh();
+  return NextResponse.json(result);
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  const url = new URL(req.url);
+  const wantsRun = url.searchParams.get("run") === "1";
+  const token =
+    req.headers.get("x-admin-token") ?? url.searchParams.get("token");
+  const expected = await getExpectedToken();
+
+  if (wantsRun) {
+    if (expected && token !== expected) {
+      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    }
+    const result = await runRefresh();
+    return NextResponse.json(result);
+  }
+
   return NextResponse.json({
     ok: true,
-    info: "POST with x-admin-token to refresh. Configured cron: weekly Sun 03:17 UTC (see wrangler.jsonc).",
+    info: "POST or GET ?run=1 with x-admin-token / ?token= to refresh. Configured cron: weekly Sun 03:17 UTC (see wrangler.jsonc).",
     providers: listRegisteredProviders(),
   });
 }
