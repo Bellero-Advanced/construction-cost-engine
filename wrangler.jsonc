@@ -23,11 +23,9 @@
       "id": "a738f53806bf4a119665effc487b7f16",
       "preview_id": "be1c2d44e903453ba33524a91e983c20"
     }
-  ],
-  "triggers": {
-    // Phase 3 — weekly refresh hook for the live-price ETL once a real
-    // provider is wired. Calls /api/admin/refresh-prices.
-    // Sundays 03:17 UTC (avoids the 0/30 minute mark — see CronCreate guidance).
-    "crons": ["17 3 * * 0"]
-  }
+  ]
+  // Cron trigger removed — Cloudflare's free Workers tier rejected the
+  // 5-field schedule. Refresh is performed manually via:
+  //   curl -X POST .../api/admin/refresh-prices -H "x-admin-token: $TOKEN"
+  // or scheduled externally (e.g. GitHub Actions on a schedule).
 }
