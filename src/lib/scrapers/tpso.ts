@@ -54,6 +54,53 @@ function parsePeriod(text: string): string {
   return m ? `${m[1]} ${m[2]}` : "";
 }
 
+const MONTH_LOOKUP: Record<string, number> = {
+  jan: 1,
+  january: 1,
+  feb: 2,
+  february: 2,
+  mar: 3,
+  march: 3,
+  apr: 4,
+  april: 4,
+  may: 5,
+  jun: 6,
+  june: 6,
+  jul: 7,
+  july: 7,
+  aug: 8,
+  august: 8,
+  sep: 9,
+  sept: 9,
+  september: 9,
+  oct: 10,
+  october: 10,
+  nov: 11,
+  november: 11,
+  dec: 12,
+  december: 12,
+};
+
+/**
+ * Score a candidate URL by year×100 + month, parsed from the filename.
+ * Higher score = more recent. Returns 0 if year/month can't be parsed.
+ */
+function scoreReportUrl(url: string): number {
+  const filename = decodeURIComponent(url.split("/").pop() ?? "").toLowerCase();
+  const yearMatch = filename.match(/(20\d{2})/);
+  if (!yearMatch) return 0;
+  const year = parseInt(yearMatch[1], 10);
+  let month = 0;
+  for (const [name, num] of Object.entries(MONTH_LOOKUP)) {
+    const re = new RegExp(`\\b${name}\\b|_${name}_|_${name}\\.|${name}_\\d{4}`);
+    if (re.test(filename)) {
+      month = Math.max(month, num);
+      break;
+    }
+  }
+  return year * 100 + month;
+}
+
 export async function fetchLatestReportUrl(): Promise<string | null> {
   const r = await fetch(TPSO_INDEX_PAGE, {
     headers: { "user-agent": "Mozilla/5.0 (cost-engine refresh)" },
@@ -67,11 +114,9 @@ export async function fetchLatestReportUrl(): Promise<string | null> {
     ),
   ].map((m) => m[0].replace(/\\$/, ""));
   if (matches.length === 0) return null;
-  // Sort lexicographically descending — filenames embed year/month so
-  // the lexicographic latest tends to be the most recent. Bias toward
-  // 2026/2025 reports.
-  const sorted = matches.sort((a, b) => b.localeCompare(a));
-  return sorted[0] ?? null;
+  // Sort by year/month parsed from filename — most recent first.
+  matches.sort((a, b) => scoreReportUrl(b) - scoreReportUrl(a));
+  return matches[0] ?? null;
 }
 
 export async function parseCmiPdf(
