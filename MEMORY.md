@@ -1,24 +1,28 @@
 # Construction Cost Engine — Session Memory
 
 ## Current State
-- **Phase:** Phase 3 stub + EN/ZH locale expansion + per-page SEO metadata ✓
-- **Stack:** Next.js 16 + React 19 + TypeScript (strict) + Tailwind CSS 4 inline `@theme` + Recharts + next-intl (TH/EN/ZH) + xlsx (SheetJS) + Cloudflare Workers
+- **Phase:** Phase 3 stub + per-page SEO + mobile responsive header/footer ✓
+- **Stack:** Next.js 16 + React 19 + TypeScript (strict) + Tailwind CSS 4 inline `@theme` + Recharts + next-intl (TH only) + xlsx (SheetJS) + Cloudflare Workers
 - **Live URL:** https://construction-cost-engine.steep-tooth-c420.workers.dev ✓
 - **GitHub repo:** https://github.com/Bellero-Advanced/construction-cost-engine (private)
-- **Latest commit:** `e461f08` (per-page SEO metadata)
-- **CI status:** All green ✓
+- **Latest commit:** `f9deaef` (TH-only + mobile responsive)
+- **CI:** All green ✓
 - **Last updated:** 2026-05-20
 
 ## Recent Sessions
 
-### 2026-05-20 — EN/ZH locales + per-page SEO
-- `src/messages/en.json` + `zh.json` — full translation parity with `th.json`
-- `src/i18n.ts` — `locales = ["th","en","zh"]`
-- `src/components/layout/LocaleSwitcher.tsx` — TH/EN/中 pill switcher in header, preserves path, omits prefix for default (TH)
-- `src/lib/pageMeta.ts` — `buildPageMetadata({locale, navKey, path})` helper (canonical + hreflang + OG + Twitter)
-- 7 thin `layout.tsx` files (wall-tile, column-beam, rebar, compare, stores, trend, sources) export `generateMetadata`
-- `[locale]/layout.tsx` — root metadata pulls translated title/description, hreflang for all 3 locales
-- **Build:** 24 SSG routes (8 pages × 3 locales) + 2 ƒ API routes. `tsc --noEmit` clean.
+### 2026-05-20 — TH-only revert + mobile responsive
+- Per user goal: removed EN/ZH locales (`messages/en.json`, `zh.json`, `LocaleSwitcher.tsx`)
+- `src/i18n.ts` → `locales = ["th"]`
+- Header: hamburger menu on <lg, responsive logo (`h-11 w-11 sm:h-14 sm:w-14`), responsive title sizing, mobile container padding
+- Footer + main: `px-4 sm:px-6 lg:px-7` consistent responsive padding
+- Per-page `generateMetadata` retained (single locale, hreflang collapses to TH)
+- Build: 8 SSG routes + 2 ƒ API routes, `tsc --noEmit` clean
+
+### 2026-05-20 — Per-page SEO metadata
+- `src/lib/pageMeta.ts` — shared `buildPageMetadata` helper (canonical + OG + Twitter)
+- `[locale]/layout.tsx` → `generateMetadata` with translated title/desc
+- 7 thin `layout.tsx` files for inner pages with localized titles
 
 ### 2026-05-19 — Phase 3 live-price stub
 - `src/lib/livePrice.ts` — resolver: provider → cache → mock fallback
@@ -26,9 +30,9 @@
 - `/api/prices/[source]/[material]` + `/api/prices/status` routes (edge)
 - `DataModeBadge` — LIVE/MOCK pill in calculator result
 - `docs/phase-3-live-prices.md` — how-to-plug-in-a-source guide
-- Source feasibility (verified): TPSO/CGD PDF-only on data.go.th; retail = SPA. Both need multi-day infra.
+- Source feasibility: TPSO/CGD PDF-only on data.go.th; retail = SPA. Both need multi-day infra.
 
-### 2026-05-19 — Phase 2 PDF/Excel BOM export (previous)
+### 2026-05-19 — Phase 2 PDF/Excel BOM export
 - `src/lib/export.ts` — `xlsx` (SheetJS) + `window.print()`
 - Print-only header in `CalculatorResult`, `@media print` CSS in `globals.css`
 - Inline error UI on all 3 calculator pages (replaced `alert()`)
@@ -40,7 +44,7 @@
 | Framework | Next.js 16 (App Router) | Modern SSR + RSC |
 | Charts | Recharts | React-native, tree-shakes |
 | Styling | Tailwind CSS 4 inline `@theme` | Tokens in `globals.css` |
-| i18n | next-intl, TH/EN/ZH | as-needed prefix, default = TH |
+| i18n | next-intl, TH only | Per user — demo scope |
 | Data | Mock + Phase 3 live-resolver | Optional live override per source |
 | Excel | xlsx (SheetJS) client-side | Thai unicode native |
 | PDF | `window.print()` + `@media print` | Best Thai fonts |
@@ -56,15 +60,11 @@
 
 ## Known Issues / TODO
 - No real scraper wired (Phase 3 stub only)
-- Mobile responsive polish — currently desktop-first
-- Footer / source detail pages may have a few remaining TH-only hardcoded strings to audit
+- Calculator sidebar is `lg:sticky` so on tablet (md only) it scrolls inline — acceptable
 
 ## Next Priority Tasks
-1. **Wire one real source.** Easiest: CGD PDF ETL via Cron Trigger → KV. ~2 days.
+1. **Wire one real source.** Easiest: CGD PDF ETL via Cron Trigger → KV. ~2 days, requires CF dashboard work.
 2. **Add KV binding.** `wrangler kv:namespace create PRICES_KV` → bind in `wrangler.jsonc` → swap memCache.
-3. **Mobile responsive polish.** Header nav wraps awkwardly on narrow screens; calculator sidebar should collapse.
-4. Audit remaining hardcoded TH strings (sources page table headers, etc.)
 
 ## Project Identity
-Construction Cost Engine — Demo/prototype calculator for material cost estimation, sourcing prices from 6 sources (TPSO + CGD government, HomePro + Global House + Thai Watsadu + BnB Home retail) across 10 Thai provinces, 20 materials, 12-month trend.
-
+Construction Cost Engine — Demo/prototype calculator for material cost estimation, sourcing prices from 6 sources (TPSO + CGD government, HomePro + Global House + Thai Watsadu + BnB Home retail) across 10 Thai provinces, 20 materials, 12-month trend. TH locale only.
