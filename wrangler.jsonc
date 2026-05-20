@@ -14,13 +14,16 @@
       "service": "construction-cost-engine"
     }
   ],
-  // Phase 3 — uncomment after running:
+  // Phase 3 — KV namespace for live-price cache. Created via:
   //   wrangler kv namespace create PRICES_KV
   //   wrangler kv namespace create PRICES_KV --preview
-  // and pasting the resulting IDs here.
-  // "kv_namespaces": [
-  //   { "binding": "PRICES_KV", "id": "<production-id>", "preview_id": "<preview-id>" }
-  // ],
+  "kv_namespaces": [
+    {
+      "binding": "PRICES_KV",
+      "id": "a738f53806bf4a119665effc487b7f16",
+      "preview_id": "be1c2d44e903453ba33524a91e983c20"
+    }
+  ],
   "triggers": {
     // Phase 3 — weekly refresh hook for the live-price ETL once a real
     // provider is wired. Calls /api/admin/refresh-prices.

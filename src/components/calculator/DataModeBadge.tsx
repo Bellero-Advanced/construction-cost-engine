@@ -15,8 +15,8 @@ export function DataModeBadge({ source }: { source: string }) {
   useEffect(() => {
     let cancelled = false;
     fetch("/api/prices/status")
-      .then((r) => r.json())
-      .then((data: { sources: SourceStatus[] }) => {
+      .then((r) => r.json() as Promise<{ sources: SourceStatus[] }>)
+      .then((data) => {
         if (cancelled) return;
         const s = data.sources.find((x) => x.key === source);
         if (s) setStatus(s);

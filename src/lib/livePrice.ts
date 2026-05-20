@@ -37,17 +37,39 @@ const memCache = new Map<string, { price: number; fetchedAt: number }>();
 
 const cacheKey = (s: string, m: string, p: number) => `${s}:${m}:${p}`;
 
+async function getKv(): Promise<KVNamespace | null> {
+  try {
+    const mod = await import("@opennextjs/cloudflare");
+    const ctx = mod.getCloudflareContext();
+    return (ctx?.env as CloudflareEnv | undefined)?.PRICES_KV ?? null;
+  } catch {
+    return null;
+  }
+}
+
 async function kvGet(
   key: string,
 ): Promise<{ price: number; fetchedAt: number } | null> {
+  const kv = await getKv();
+  if (kv) {
+    const v = await kv.get<{ price: number; fetchedAt: number }>(key, "json");
+    if (v) return v;
+  }
   return memCache.get(key) ?? null;
 }
 
 async function kvPut(
   key: string,
   value: { price: number; fetchedAt: number },
+  ttlSec: number,
 ): Promise<void> {
   memCache.set(key, value);
+  const kv = await getKv();
+  if (kv) {
+    await kv.put(key, JSON.stringify(value), {
+      expirationTtl: Math.max(60, ttlSec),
+    });
+  }
 }
 
 // Default TTLs by source tier — in seconds.
@@ -103,7 +125,7 @@ export async function getLivePrice(
   try {
     const fresh = await provider.fetch(materialId, provinceId);
     if (fresh != null && Number.isFinite(fresh) && fresh > 0) {
-      await kvPut(key, { price: fresh, fetchedAt: now });
+      await kvPut(key, { price: fresh, fetchedAt: now }, ttlSec);
       return {
         price: fresh,
         live: true,
