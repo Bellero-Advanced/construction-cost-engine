@@ -13,10 +13,39 @@ import type { PriceProvider } from "@/lib/livePrice";
 
 const CGD_INDEX_PAGE =
   "https://www.cgd.go.th/cs/internet/internet/ราคามาตรฐาน.html";
-// Fallback: the data.go.th CKAN package commonly used for CGD building prices.
-const CGD_CKAN_PACKAGE =
-  "https://data.go.th/api/3/action/package_show?id=cmicgd042569";
 const KV_KEY = "cgd:building:latest";
+
+/**
+ * data.go.th publishes CGD building-material packages monthly with the
+ * pattern `cmicgd<MMYY>` (Buddhist Era). We auto-discover by walking
+ * back up to 12 months from "today" until a package responds 200.
+ */
+async function fetchLatestCgdPdfUrl(): Promise<string | null> {
+  const now = new Date();
+  for (let back = 0; back < 12; back++) {
+    const d = new Date(now.getFullYear(), now.getMonth() - back, 1);
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const yyBE = (d.getFullYear() + 543) % 100;
+    const yy = String(yyBE).padStart(2, "0");
+    const pkgId = `cmicgd${mm}${yy}`;
+    try {
+      const r = await fetch(
+        `https://data.go.th/api/3/action/package_show?id=${encodeURIComponent(pkgId)}`,
+        { signal: AbortSignal.timeout(6000) },
+      );
+      if (!r.ok) continue;
+      const data = (await r.json()) as CkanPackage;
+      const resources = data.result?.resources ?? [];
+      const pdf = resources.find((res) =>
+        (res.format ?? "").toUpperCase().includes("PDF"),
+      );
+      if (pdf?.url) return pdf.url;
+    } catch {
+      // try next month back
+    }
+  }
+  return null;
+}
 
 export interface CgdSnapshot {
   prices: Record<string, number>;
@@ -47,23 +76,6 @@ interface CkanResource {
 }
 interface CkanPackage {
   result?: { resources?: CkanResource[] };
-}
-
-async function fetchLatestCgdPdfUrl(): Promise<string | null> {
-  try {
-    const r = await fetch(CGD_CKAN_PACKAGE, {
-      signal: AbortSignal.timeout(8000),
-    });
-    if (!r.ok) return null;
-    const data = (await r.json()) as CkanPackage;
-    const resources = data.result?.resources ?? [];
-    const pdf = resources.find((res) =>
-      (res.format ?? "").toUpperCase().includes("PDF"),
-    );
-    return pdf?.url ?? null;
-  } catch {
-    return null;
-  }
 }
 
 /**

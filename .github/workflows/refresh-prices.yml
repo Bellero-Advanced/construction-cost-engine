@@ -1,0 +1,29 @@
+name: refresh-prices
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Refresh govt sources
+        env:
+          WORKER_URL: ${{ secrets.WORKER_URL }}
+          ADMIN_REFRESH_TOKEN: ${{ secrets.ADMIN_REFRESH_TOKEN }}
+        run: |
+          set -e
+          for src in tpso cgd dit; do
+            curl -fsSL -X POST "$WORKER_URL/api/admin/refresh-prices?source=$src" \
+              -H "x-admin-token: $ADMIN_REFRESH_TOKEN" --max-time 60 | head -c 4000
+            echo
+          done
+      - name: Snapshot daily history
+        env:
+          WORKER_URL: ${{ secrets.WORKER_URL }}
+          ADMIN_REFRESH_TOKEN: ${{ secrets.ADMIN_REFRESH_TOKEN }}
+        run: |
+          curl -fsSL -X POST "$WORKER_URL/api/admin/snapshot-history" \
+            -H "x-admin-token: $ADMIN_REFRESH_TOKEN" --max-time 30 | head -c 4000

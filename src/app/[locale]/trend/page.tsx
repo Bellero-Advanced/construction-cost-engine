@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   CartesianGrid,
@@ -15,10 +15,22 @@ import {
 import { Doc } from "@/components/ui/Doc";
 import { Field, Select } from "@/components/ui/Field";
 import { Stat } from "@/components/ui/Stat";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { MATERIALS } from "@/data/materials";
 import { MONTH_LABELS, TRENDS } from "@/data/prices";
 import { fmt, fmtInt } from "@/lib/utils";
+
+const HISTORY_SOURCES = [
+  { key: "dit", label: "DIT (รายวัน)" },
+  { key: "cgd", label: "CGD (รายเดือน)" },
+  { key: "tpso", label: "TPSO (CMI index)" },
+];
+
+interface HistoryEntry {
+  date: string;
+  price: number;
+}
 
 const GROUPS: { key: "wall_tile" | "column_beam" | "rebar"; label: string }[] =
   [
@@ -51,21 +63,65 @@ type Mode = { kind: "single"; id: string } | { kind: "all-rebar" };
 export default function TrendPage() {
   const t = useTranslations("trend");
   const [mode, setMode] = useState<Mode | null>(null);
+  const [source, setSource] = useState<string>("dit");
+  const [history, setHistory] = useState<HistoryEntry[] | null>(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
+
+  useEffect(() => {
+    if (!mode || mode.kind !== "single") {
+      setHistory(null);
+      return;
+    }
+    let cancelled = false;
+    setHistoryLoading(true);
+    (async () => {
+      try {
+        const r = await fetch(
+          `/api/history/${encodeURIComponent(source)}/${encodeURIComponent(mode.id)}?province=10`,
+          { cache: "no-store" },
+        );
+        if (!r.ok) {
+          if (!cancelled) setHistory([]);
+          return;
+        }
+        const data = (await r.json()) as { series: HistoryEntry[] };
+        if (!cancelled) setHistory(data.series ?? []);
+      } catch {
+        if (!cancelled) setHistory([]);
+      } finally {
+        if (!cancelled) setHistoryLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [mode, source]);
 
   const single = useMemo(() => {
     if (!mode || mode.kind !== "single") return null;
     const m = MATERIALS[mode.id];
-    const data = TRENDS[mode.id] || [];
-    const first = data[0];
-    const last = data[data.length - 1];
+    let chartData: { label: string; price: number }[];
+    let isReal = false;
+    if (history && history.length >= 2) {
+      chartData = history.map((h) => ({
+        label: h.date.slice(5),
+        price: h.price,
+      }));
+      isReal = true;
+    } else {
+      const data = TRENDS[mode.id] ?? [];
+      chartData = MONTH_LABELS.map((label, i) => ({
+        label,
+        price: data[i] ?? 0,
+      }));
+    }
+    if (chartData.length === 0) return null;
+    const first = chartData[0].price;
+    const last = chartData[chartData.length - 1].price;
     const diff = last - first;
-    const pct = (diff / first) * 100;
-    const chartData = MONTH_LABELS.map((label, i) => ({
-      label,
-      price: data[i],
-    }));
-    return { m, first, last, diff, pct, chartData };
-  }, [mode]);
+    const pct = first > 0 ? (diff / first) * 100 : 0;
+    return { m, first, last, diff, pct, chartData, isReal };
+  }, [mode, history]);
 
   const allRebarData = useMemo(() => {
     if (!mode || mode.kind !== "all-rebar") return null;
@@ -107,6 +163,15 @@ export default function TrendPage() {
               ))}
             </Select>
           </Field>
+          <Field label="แหล่งข้อมูล" className="mb-0">
+            <Select value={source} onChange={(e) => setSource(e.target.value)}>
+              {HISTORY_SOURCES.map((s) => (
+                <option key={s.key} value={s.key}>
+                  {s.label}
+                </option>
+              ))}
+            </Select>
+          </Field>
           <Button variant="dark" onClick={() => setMode({ kind: "all-rebar" })}>
             {t("allRebar")}
           </Button>
@@ -136,7 +201,17 @@ export default function TrendPage() {
             />
           </div>
           <Doc tag="CHART-03">
-            <h3 className="mb-3 font-display text-[22px]">▌ {single.m.name}</h3>
+            <h3 className="mb-3 flex flex-wrap items-center gap-2 font-display text-[22px]">
+              <span>▌ {single.m.name}</span>
+              {single.isReal ? (
+                <Badge variant="green">LIVE / {history?.length ?? 0} จุด</Badge>
+              ) : (
+                <Badge variant="amber">FIXTURE / ยังไม่มีข้อมูลย้อนหลัง</Badge>
+              )}
+              {historyLoading && (
+                <span className="font-mono text-[10px] text-ink-3">โหลด…</span>
+              )}
+            </h3>
             <div className="h-[420px] border border-dashed border-line bg-paper p-3">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart

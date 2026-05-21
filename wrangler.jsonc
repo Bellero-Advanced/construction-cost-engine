@@ -32,6 +32,10 @@
   "browser": {
     "binding": "BROWSER"
   }
+  // Cron via GitHub Actions (.github/workflows/refresh-prices.yml) —
+  // OpenNext-Cloudflare wraps the worker entry and doesn't expose
+  // scheduled() cleanly, so we use external GH cron to POST to
+  // /api/admin/refresh-prices. More portable + auditable.
   // Cron trigger removed — Cloudflare's free Workers tier rejected the
   // 5-field schedule. Refresh is performed manually via:
   //   curl -X POST .../api/admin/refresh-prices -H "x-admin-token: $TOKEN"

@@ -2,6 +2,10 @@
  * Build a generic SPA-search retail price provider via Cloudflare Browser
  * Rendering. Pass the URL template + DOM selectors; the helper handles
  * navigation, wait, median-price extraction, and timeout/error -> null.
+ *
+ * Selector resilience: each `productCardSelector` / `priceSelector` is a
+ * comma-separated CSS list. The helper tries each in order until one
+ * yields prices, so DOM tweaks rarely break the scrape.
  */
 
 import type { PriceProvider } from "@/lib/livePrice";
@@ -41,22 +45,37 @@ export function makeRetailProvider(cfg: RetailScraperConfig): PriceProvider {
           };
           return await page.evaluate(
             (cardSel, priceSel) => {
-              const cards = Array.from(
-                document.querySelectorAll(cardSel),
-              ).slice(0, 10);
-              const prices: number[] = [];
-              for (const card of cards) {
-                const priceEl = card.querySelector(priceSel);
-                const txt = priceEl?.textContent ?? "";
-                const m = txt.replace(/,/g, "").match(/(\d+(?:\.\d+)?)/);
-                if (m) {
-                  const n = parseFloat(m[1]);
-                  if (Number.isFinite(n) && n > 0) prices.push(n);
+              // Try each comma-separated selector in turn — first that
+              // yields >0 price hits wins. Resilient to small DOM tweaks.
+              const cardSelectors = cardSel.split(",").map((s) => s.trim());
+              const priceSelectors = priceSel.split(",").map((s) => s.trim());
+              const collect = (cs: string, ps: string): number[] => {
+                const cards = Array.from(document.querySelectorAll(cs)).slice(
+                  0,
+                  10,
+                );
+                const out: number[] = [];
+                for (const card of cards) {
+                  const el = card.querySelector(ps);
+                  const txt = el?.textContent ?? "";
+                  const m = txt.replace(/,/g, "").match(/(\d+(?:\.\d+)?)/);
+                  if (m) {
+                    const n = parseFloat(m[1]);
+                    if (Number.isFinite(n) && n > 0) out.push(n);
+                  }
+                }
+                return out;
+              };
+              for (const cs of cardSelectors) {
+                for (const ps of priceSelectors) {
+                  const prices = collect(cs, ps);
+                  if (prices.length > 0) {
+                    prices.sort((a, b) => a - b);
+                    return prices[Math.floor(prices.length / 2)];
+                  }
                 }
               }
-              if (prices.length === 0) return null;
-              prices.sort((a, b) => a - b);
-              return prices[Math.floor(prices.length / 2)];
+              return null;
             },
             cfg.productCardSelector,
             cfg.priceSelector,

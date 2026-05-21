@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { getLivePrice } from "@/lib/livePrice";
+import { enforceRateLimit } from "@/lib/rateLimit";
 import { MATERIALS } from "@/data/materials";
 import { SOURCES } from "@/data/sources";
 import { PROVINCES } from "@/data/provinces";
 import type { SourceKey } from "@/types";
-
 
 export async function GET(
   _req: Request,
@@ -23,6 +23,9 @@ export async function GET(
   if (!PROVINCES.find((p) => p.id === provinceId)) {
     return NextResponse.json({ error: "unknown province" }, { status: 404 });
   }
+
+  const blocked = await enforceRateLimit(_req, source);
+  if (blocked) return blocked;
 
   const result = await getLivePrice(source as SourceKey, material, provinceId);
   return NextResponse.json(result, {
