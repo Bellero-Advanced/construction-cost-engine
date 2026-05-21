@@ -8,6 +8,7 @@ import { Field, Select } from "@/components/ui/Field";
 import { Badge } from "@/components/ui/Badge";
 import { Th, Td } from "@/components/ui/Stat";
 import { Button } from "@/components/ui/Button";
+import { downloadCsv, toCsv } from "@/lib/csv";
 import { MATERIALS } from "@/data/materials";
 import { PROVINCES } from "@/data/provinces";
 import { SOURCES, SOURCE_KEYS } from "@/data/sources";
@@ -122,10 +123,36 @@ export default function SourcesPage() {
           <Doc tag={`RESPONSE / ${src.short.toUpperCase()}`}>
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b-[1.5px] border-ink pb-3">
               <h3 className="font-display text-[24px]">{t("tableHead")}</h3>
-              <span className="font-mono text-[11px] text-ink-3">
-                SRC: {src.short.toUpperCase()} ({src.type}) / PROV: {prov.name}{" "}
-                / DATE: {fetched.fetchedAt}
-              </span>
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="font-mono text-[11px] text-ink-3">
+                  SRC: {src.short.toUpperCase()} ({src.type}) / PROV:{" "}
+                  {prov.name} / DATE: {fetched.fetchedAt}
+                </span>
+                <Button
+                  variant="dark"
+                  onClick={() => {
+                    const rows = Object.values(MATERIALS).map((m) => ({
+                      material_id: m.id,
+                      name: m.name,
+                      spec: m.spec,
+                      category: m.cat,
+                      unit: m.unit,
+                      price: fetched.prices[m.id] ?? "",
+                      source: src.name,
+                      province: prov.name,
+                      fetched_at: fetched.fetchedAt,
+                    }));
+                    downloadCsv(
+                      `prices_${fetched.srcKey}_${prov.id}_${new Date()
+                        .toISOString()
+                        .slice(0, 10)}.csv`,
+                      toCsv(rows),
+                    );
+                  }}
+                >
+                  Export CSV
+                </Button>
+              </div>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-[13px]">

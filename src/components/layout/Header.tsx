@@ -12,9 +12,11 @@ const NAV = [
   { key: "column_beam", href: "/column-beam" },
   { key: "rebar", href: "/rebar" },
   { key: "compare", href: "/compare" },
+  { key: "compare_sources", href: "/compare-sources" },
   { key: "stores", href: "/stores" },
   { key: "trend", href: "/trend" },
   { key: "source", href: "/sources" },
+  { key: "api_docs", href: "/api-docs" },
 ];
 
 export default function Header() {
