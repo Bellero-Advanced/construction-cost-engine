@@ -14,34 +14,74 @@ import { PROVINCES } from "@/data/provinces";
 import { SOURCES, SOURCE_KEYS } from "@/data/sources";
 import { fmt } from "@/lib/utils";
 
+interface PriceCell {
+  price: number | null;
+  fetchedAt: string | null;
+  ttlSec: number;
+  live: boolean;
+}
+
 interface Fetched {
   srcKey: string;
   province: number;
   fetchedAt: string;
-  prices: Record<string, number | null>;
+  prices: Record<string, PriceCell>;
 }
 
 async function fetchPriceMap(
   source: string,
   provinceId: number,
-): Promise<Record<string, number | null>> {
+): Promise<Record<string, PriceCell>> {
   const ids = Object.keys(MATERIALS);
   const entries = await Promise.all(
     ids.map(async (id) => {
+      const empty: PriceCell = {
+        price: null,
+        fetchedAt: null,
+        ttlSec: 86400,
+        live: false,
+      };
       try {
         const r = await fetch(
           `/api/prices/${encodeURIComponent(source)}/${encodeURIComponent(id)}?province=${provinceId}`,
           { cache: "no-store" },
         );
-        if (!r.ok) return [id, null] as const;
-        const data = (await r.json()) as { price: number | null };
-        return [id, data.price ?? null] as const;
+        if (!r.ok) return [id, empty] as const;
+        const data = (await r.json()) as {
+          price: number | null;
+          fetchedAt?: string;
+          ttlSec?: number;
+          live?: boolean;
+        };
+        return [
+          id,
+          {
+            price: data.price ?? null,
+            fetchedAt: data.fetchedAt ?? null,
+            ttlSec: data.ttlSec ?? 86400,
+            live: data.live ?? false,
+          } as PriceCell,
+        ] as const;
       } catch {
-        return [id, null] as const;
+        return [id, empty] as const;
       }
     }),
   );
   return Object.fromEntries(entries);
+}
+
+function ageBadge(cell: PriceCell): {
+  label: string;
+  variant: "green" | "amber" | "red" | "line";
+} {
+  if (cell.price == null) return { label: "NO DATA", variant: "line" };
+  if (!cell.fetchedAt) return { label: "LIVE", variant: "green" };
+  const ageMs = Date.now() - new Date(cell.fetchedAt).getTime();
+  const ageH = ageMs / 3_600_000;
+  const ttlH = cell.ttlSec / 3600;
+  if (ageH < ttlH * 0.5) return { label: "FRESH", variant: "green" };
+  if (ageH < ttlH) return { label: "OK", variant: "amber" };
+  return { label: "STALE", variant: "red" };
 }
 
 export default function SourcesPage() {
@@ -131,17 +171,22 @@ export default function SourcesPage() {
                 <Button
                   variant="dark"
                   onClick={() => {
-                    const rows = Object.values(MATERIALS).map((m) => ({
-                      material_id: m.id,
-                      name: m.name,
-                      spec: m.spec,
-                      category: m.cat,
-                      unit: m.unit,
-                      price: fetched.prices[m.id] ?? "",
-                      source: src.name,
-                      province: prov.name,
-                      fetched_at: fetched.fetchedAt,
-                    }));
+                    const rows = Object.values(MATERIALS).map((m) => {
+                      const c = fetched.prices[m.id];
+                      return {
+                        material_id: m.id,
+                        name: m.name,
+                        spec: m.spec,
+                        category: m.cat,
+                        unit: m.unit,
+                        price: c?.price ?? "",
+                        live: c?.live ?? false,
+                        fetched_at: c?.fetchedAt ?? "",
+                        ttl_sec: c?.ttlSec ?? "",
+                        source: src.name,
+                        province: prov.name,
+                      };
+                    });
                     downloadCsv(
                       `prices_${fetched.srcKey}_${prov.id}_${new Date()
                         .toISOString()
@@ -163,31 +208,44 @@ export default function SourcesPage() {
                     <Th>{t("cols.category")}</Th>
                     <Th align="center">{t("cols.unit")}</Th>
                     <Th align="right">{t("cols.price")}</Th>
+                    <Th align="center">FRESHNESS</Th>
                   </tr>
                 </thead>
                 <tbody>
-                  {Object.values(MATERIALS).map((m) => (
-                    <tr key={m.id} className="hover:bg-paper-2">
-                      <Td className="font-mono text-[11px] text-ink-3">
-                        {m.id}
-                      </Td>
-                      <Td>
-                        <strong>{m.name}</strong>
-                        <div className="text-[11px] text-ink-3">{m.spec}</div>
-                      </Td>
-                      <Td>
-                        <Badge variant="line">{m.cat}</Badge>
-                      </Td>
-                      <Td align="center" className="text-[11px]">
-                        {m.unit}
-                      </Td>
-                      <Td align="right" mono className="font-bold">
-                        {fetched.prices[m.id] != null
-                          ? fmt(fetched.prices[m.id]!)
-                          : "—"}
-                      </Td>
-                    </tr>
-                  ))}
+                  {Object.values(MATERIALS).map((m) => {
+                    const cell = fetched.prices[m.id];
+                    const ab = cell
+                      ? ageBadge(cell)
+                      : { label: "—", variant: "line" as const };
+                    return (
+                      <tr key={m.id} className="hover:bg-paper-2">
+                        <Td className="font-mono text-[11px] text-ink-3">
+                          {m.id}
+                        </Td>
+                        <Td>
+                          <strong>{m.name}</strong>
+                          <div className="text-[11px] text-ink-3">{m.spec}</div>
+                        </Td>
+                        <Td>
+                          <Badge variant="line">{m.cat}</Badge>
+                        </Td>
+                        <Td align="center" className="text-[11px]">
+                          {m.unit}
+                        </Td>
+                        <Td align="right" mono className="font-bold">
+                          {cell?.price != null ? fmt(cell.price) : "—"}
+                        </Td>
+                        <Td align="center">
+                          <Badge variant={ab.variant}>{ab.label}</Badge>
+                          {cell?.fetchedAt && (
+                            <div className="mt-0.5 font-mono text-[9px] text-ink-3">
+                              {new Date(cell.fetchedAt).toLocaleString("th-TH")}
+                            </div>
+                          )}
+                        </Td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -212,7 +270,7 @@ export default function SourcesPage() {
                       name: m.name,
                       category: m.cat,
                       unit: m.unit,
-                      price: fetched.prices[m.id] ?? null,
+                      price: fetched.prices[m.id]?.price ?? null,
                     })),
                   fetched_at: new Date().toISOString(),
                 },
