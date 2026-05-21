@@ -1,9 +1,7 @@
-import { makeRetailProvider } from "@/lib/scrapers/_retail";
+import { makeSuggestJspProvider } from "@/lib/scrapers/_suggestJsp";
 
-export const megahomeProvider = makeRetailProvider({
+export const megahomeProvider = makeSuggestJspProvider({
   key: "megahome",
+  origin: "https://www.megahome.co.th",
   ttlSec: 60 * 60 * 24,
-  urlTemplate: "https://www.megahome.co.th/search?q={q}",
-  productCardSelector: ".product-item, .product-card, article.product",
-  priceSelector: ".price, .product-price, [itemprop='price']",
 });
