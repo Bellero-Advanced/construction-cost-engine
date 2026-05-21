@@ -85,31 +85,45 @@ export async function GET(req: Request) {
       "Mozilla/5.0 (Macintosh; Intel Mac OS X 12_0) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15",
     );
     await page.goto(targetUrl, { waitUntil: "networkidle2", timeout: 25_000 });
+    // Extra settle for client-side hydration / lazy product render
+    await new Promise((res) => setTimeout(res, 3000));
     const title = await page.title().catch(() => "");
     const html = await page.content();
-    const trimmed =
-      html.length > 60_000 ? html.slice(0, 60_000) + "…[truncated]" : html;
 
-    // Heuristic: harvest any THB-looking number nodes for tuning hint
-    const samplePrices = await page
+    /**
+     * Heuristic: walk the post-hydration DOM for elements that contain
+     * BOTH a Thai price marker (฿/บาท/ราคา) AND a digit run >= 2.
+     * Returns outerHTML snippet + a computed selector hint so a human
+     * can pick the real card class.
+     */
+    const candidates = await page
       .evaluate(() => {
-        const out: { tag: string; cls: string; text: string }[] = [];
-        const re = /\d{2,6}(?:\.\d{1,2})?/;
-        const all = Array.from(document.querySelectorAll("*")).slice(0, 4000);
-        for (const el of all) {
+        const re = /(?:฿|บาท|ราคา)/;
+        const out: { selector: string; price: string; html: string }[] = [];
+        const nodes = Array.from(document.querySelectorAll("*"));
+        for (const el of nodes) {
           const txt = (el.textContent ?? "").trim();
-          if (
-            txt.length < 20 &&
-            re.test(txt) &&
-            txt.replace(/[^0-9.,]/g, "").length >= 2
-          ) {
-            out.push({
-              tag: el.tagName.toLowerCase(),
-              cls: (el as HTMLElement).className?.toString?.() ?? "",
-              text: txt,
-            });
-            if (out.length >= 20) break;
-          }
+          if (txt.length < 6 || txt.length > 200) continue;
+          if (!re.test(txt)) continue;
+          const numMatch = txt
+            .replace(/,/g, "")
+            .match(/(\d{2,6}(?:\.\d{1,2})?)/);
+          if (!numMatch) continue;
+          const tag = el.tagName.toLowerCase();
+          const cls = (el as HTMLElement).className?.toString?.() ?? "";
+          const id = (el as HTMLElement).id ?? "";
+          const sel =
+            tag +
+            (id ? `#${id}` : "") +
+            (cls
+              ? "." + cls.split(/\s+/).filter(Boolean).slice(0, 3).join(".")
+              : "");
+          out.push({
+            selector: sel,
+            price: numMatch[1],
+            html: ((el as HTMLElement).outerHTML ?? "").slice(0, 400),
+          });
+          if (out.length >= 8) break;
         }
         return out;
       })
@@ -121,8 +135,8 @@ export async function GET(req: Request) {
       targetUrl,
       title,
       htmlLength: html.length,
-      htmlPreview: trimmed,
-      samplePrices,
+      htmlSnippet: html.slice(0, 4000),
+      candidates,
     });
   } catch (e) {
     return NextResponse.json(
