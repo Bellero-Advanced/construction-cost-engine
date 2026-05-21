@@ -6,8 +6,16 @@ interface SourceStatus {
   key: string;
   name: string;
   live: boolean;
-  mode: "live" | "mock";
+  mode: "live-headless" | "live-fetch" | "live-pdf" | "live-index" | "off";
 }
+
+const MODE_LABEL: Record<SourceStatus["mode"], string> = {
+  "live-headless": "LIVE · HEADLESS",
+  "live-fetch": "LIVE · FETCH",
+  "live-pdf": "LIVE · PDF",
+  "live-index": "LIVE · INDEX",
+  off: "OFFLINE",
+};
 
 export function DataModeBadge({ source }: { source: string }) {
   const [status, setStatus] = useState<SourceStatus | null>(null);
@@ -39,7 +47,7 @@ export function DataModeBadge({ source }: { source: string }) {
     return (
       <span className="inline-flex items-center gap-1.5 border border-green/40 bg-green/10 px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-green">
         <span className="h-1.5 w-1.5 rounded-full bg-green" />
-        LIVE · {status.name}
+        {MODE_LABEL[status.mode]} · {status.name}
       </span>
     );
   }
@@ -47,10 +55,10 @@ export function DataModeBadge({ source }: { source: string }) {
   return (
     <span
       className="inline-flex items-center gap-1.5 border border-amber/40 bg-amber/10 px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-amber"
-      title="Provider not registered — using deterministic mock prices. See src/lib/scrapers/ to plug in a real source."
+      title="Provider not registered for this source."
     >
       <span className="h-1.5 w-1.5 rounded-full bg-amber" />
-      MOCK · {status.name}
+      OFFLINE · {status.name}
     </span>
   );
 }
