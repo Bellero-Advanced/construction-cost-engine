@@ -110,3 +110,25 @@ curl $WORKER/api/prices/cgd/CEMENT_001?province=10
 3. null
 
 ผู้ใช้ไม่ต้องแก้ code อะไร แค่ `wrangler secret put SCRAPINGBEE_API_KEY` แล้ว redeploy.
+
+---
+
+## Phase 5 — Product surface (2026-05-21)
+
+ใหม่ใน session นี้:
+
+### Endpoints
+- `GET /api/compare/:material?province=N` — fan-out ทุก 10 sources, คืน
+  `{sources:[{source,price,live,available,fetchedAt}], summary:{min,max,avg,median,spreadPct}}`
+- `POST /api/admin/upload-prices` (มีแล้ว) — wired เข้า UI
+- Sitemap (`/sitemap.xml`) + robots (`/robots.txt`) — disallow `/api/admin/`
+
+### Pages
+- `/[locale]/compare-sources` — bar chart + table เทียบราคาวัสดุเดียวกันข้าม
+  10 sources พร้อม Spread % และ Export CSV
+- `/[locale]/api-docs` — public REST reference, sources/materials enums, curl examples
+- `/[locale]/sources` — เพิ่ม **Export CSV** ของตารางราคา + **CsvUploader** (admin bulk ingest)
+
+### Helpers
+- `src/lib/csv.ts` — `toCsv()` + `downloadCsv()` (UTF-8 BOM ให้ Excel ภาษาไทยอ่าน)
+- Header nav: เพิ่ม `compare_sources` + `api_docs`
