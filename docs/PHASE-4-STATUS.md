@@ -141,3 +141,16 @@ curl $WORKER/api/prices/cgd/CEMENT_001?province=10
   - NO DATA (ว่าง)
 - คำนวณจาก `fetchedAt` + `ttlSec` ที่ `/api/prices/...` คืนกลับมา
 - CSV export ของ /sources จะมีคอลัมน์ `live`, `fetched_at`, `ttl_sec` ติดมาด้วย
+
+### Source health dashboard
+- `GET /api/sources/health?province=N` — fan-out KV reads (no scraping cost),
+  คืน per-source counts {fresh, ok, stale, missing} + summary {coverage%}
+- `/[locale]/health` — public dashboard page consume endpoint:
+  5 summary tiles + per-source breakdown table + province selector
+- Nav entry: `health`
+
+### Trend coverage expansion
+- `/api/admin/snapshot-history` snapshot ทุก 10 sources (เดิมเฉพาะ govt 3 ตัว)
+- `/[locale]/trend` source dropdown 3 → 10 entries (เพิ่ม retail ทั้ง 7)
+- เมื่อ cron สะสมข้อมูลครบ ~7 วัน, trend page จะ chart price spread ระหว่าง
+  e-commerce vs official index ได้
