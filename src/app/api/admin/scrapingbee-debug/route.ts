@@ -98,6 +98,28 @@ export async function GET(req: Request) {
   }
 
   const prices = extractPricesFromHtml(html);
+
+  const probes: { pattern: string; matches: string[] }[] = [];
+  const probePatterns: { name: string; re: RegExp }[] = [
+    { name: "price-keyword", re: /price/gi },
+    { name: "baht", re: /฿/g },
+    { name: "thb", re: /THB/gi },
+    { name: "data-price", re: /data-[a-z-]*price[a-z-]*/gi },
+    { name: "json-price", re: /"price[a-zA-Z_]*"\s*:/g },
+    { name: "thai-baht-word", re: /บาท/g },
+    { name: "next-data", re: /__NEXT_DATA__/g },
+  ];
+  for (const p of probePatterns) {
+    const ms: string[] = [];
+    let m: RegExpExecArray | null;
+    while ((m = p.re.exec(html)) !== null && ms.length < 8) {
+      const start = Math.max(0, m.index - 60);
+      const end = Math.min(html.length, m.index + 100);
+      ms.push(html.slice(start, end).replace(/\s+/g, " "));
+    }
+    if (ms.length > 0) probes.push({ pattern: p.name, matches: ms });
+  }
+
   return NextResponse.json({
     source,
     material,
@@ -112,7 +134,10 @@ export async function GET(req: Request) {
       hasJsonLdPrice: /"price"\s*:/i.test(html),
       hasDataPrice: /data-price/i.test(html),
       hasBaht: /฿/.test(html),
+      hasNextData: /__NEXT_DATA__/.test(html),
+      hasBahtWord: /บาท/.test(html),
     },
+    probes,
     pricesExtracted: prices,
     median:
       prices.length > 0
