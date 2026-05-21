@@ -10,6 +10,11 @@
 
 import type { PriceProvider } from "@/lib/livePrice";
 import { headlessScrape, materialQuery } from "@/lib/scrapers/_headless";
+import {
+  extractPricesFromHtml,
+  fetchViaScrapingBee,
+  median,
+} from "@/lib/scrapers/_scrapingbee";
 import type { SourceKey } from "@/types";
 
 export interface RetailScraperConfig {
@@ -31,6 +36,23 @@ export function makeRetailProvider(cfg: RetailScraperConfig): PriceProvider {
     async fetch(materialId: string): Promise<number | null> {
       const q = encodeURIComponent(materialQuery(materialId));
       const url = cfg.urlTemplate.replace("{q}", q);
+
+      // 1) ScrapingBee free-tier first (when key bound) — bypasses the
+      //    Cloudflare bot challenges that block direct egress fetches.
+      const html = await fetchViaScrapingBee({
+        url,
+        renderJs: true,
+        countryCode: "th",
+        waitMs: 2500,
+        timeoutMs: cfg.timeoutMs ?? 30_000,
+      });
+      if (html) {
+        const prices = extractPricesFromHtml(html);
+        const m = median(prices);
+        if (m !== null) return m;
+      }
+
+      // 2) Fall back to direct Cloudflare Browser Rendering.
       return await headlessScrape({
         url,
         waitForSelector: cfg.productCardSelector,

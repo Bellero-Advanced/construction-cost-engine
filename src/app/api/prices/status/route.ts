@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { listRegisteredProviders } from "@/lib/livePrice";
 import { SOURCES, SOURCE_KEYS } from "@/data/sources";
+import { isScrapingBeeEnabled } from "@/lib/scrapers/_scrapingbee";
 import type { SourceKey } from "@/types";
 
 interface SourceStatus {
@@ -60,6 +61,7 @@ async function countCacheKeys(prefix: string): Promise<number | undefined> {
 
 export async function GET() {
   const live = new Set<SourceKey>(listRegisteredProviders());
+  const scrapingBee = await isScrapingBeeEnabled();
   const sources: SourceStatus[] = await Promise.all(
     SOURCE_KEYS.map(async (k): Promise<SourceStatus> => {
       const key = String(k);
@@ -79,7 +81,8 @@ export async function GET() {
     {
       sources,
       registered: Array.from(live),
-      note: "Phase 4 — all 10 Thai sources wired. Retail uses Cloudflare Browser Rendering; govt sources read PDF/HTML directly. No mock fallback.",
+      scrapingBee: { enabled: scrapingBee },
+      note: "Phase 4 — all 10 Thai sources wired. Retail uses ScrapingBee free-tier proxy (when SCRAPINGBEE_API_KEY set) with Cloudflare Browser Rendering fallback; govt sources read PDF/HTML directly. No mock fallback.",
     },
     {
       headers: {

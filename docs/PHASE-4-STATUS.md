@@ -86,7 +86,27 @@ curl $WORKER/api/prices/cgd/CEMENT_001?province=10
 
 ## Next moves (เหลือสำหรับ session ถัดไป)
 
-1. **Reverse-engineer Dohome / SCG Home XHR APIs** — เปิด DevTools network tab, ดู request format → wire เป็น direct fetch
-2. **Residential proxy** สำหรับ ThaiWatsadu/BnB/GlobalHouse — ScrapingBee free 1000 req/mo
+1. **ตั้งค่า ScrapingBee API key** — สมัคร free tier ที่ scrapingbee.com (1000 req/mo) แล้วตั้งเป็น Wrangler secret:
+   ```bash
+   npx wrangler secret put SCRAPINGBEE_API_KEY
+   ```
+   เมื่อ key ถูก bind, retail providers (thaiwatsadu/bnb/globalhouse/dohome/scghome) จะ route ผ่าน ScrapingBee proxy อัตโนมัติ (residential IP + JS render) แทนการยิงตรงจาก CF egress ที่โดน bot block
+2. **Reverse-engineer Dohome / SCG Home XHR APIs** (optional หลังจากมี ScrapingBee แล้ว) — เพื่อลด ScrapingBee credit consumption
 3. **Build CSV uploader UI** ใน admin/sources page → ผู้ใช้อัพ CSV ราคา CGD/DIT รายเดือนได้
 4. **Trend page real history** — รอให้ cron snapshot สะสมข้อมูลย้อนหลัง 7+ วัน
+
+---
+
+## ScrapingBee integration (พร้อมใช้แล้ว — รอ API key)
+
+**Helper:** `src/lib/scrapers/_scrapingbee.ts`
+- `fetchViaScrapingBee({ url, renderJs, countryCode: "th", waitMs })` → returns rendered HTML or null
+- `extractPricesFromHtml(html)` → parse JSON-LD / itemprop / data-price / `.price` patterns (no DOM lib needed)
+- `isScrapingBeeEnabled()` → reflected in `/api/prices/status` payload (`scrapingBee.enabled`)
+
+**Wired in:** `src/lib/scrapers/_retail.ts` — เปลี่ยน flow เป็น
+1. ScrapingBee proxy (ถ้ามี key) → parse HTML
+2. fallback Cloudflare Browser Rendering (เดิม)
+3. null
+
+ผู้ใช้ไม่ต้องแก้ code อะไร แค่ `wrangler secret put SCRAPINGBEE_API_KEY` แล้ว redeploy.
