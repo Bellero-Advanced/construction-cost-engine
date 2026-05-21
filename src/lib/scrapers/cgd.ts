@@ -15,13 +15,17 @@ const CGD_INDEX_PAGE =
   "https://www.cgd.go.th/cs/internet/internet/ราคามาตรฐาน.html";
 const KV_KEY = "cgd:building:latest";
 
+interface CgdResource {
+  format: "PDF" | "XLSX";
+  url: string;
+}
+
 /**
- * data.go.th publishes CGD building-material packages monthly with the
- * pattern `cmicgd<MM><YYYY-BE>` (Buddhist Era, 4-digit year). We
- * auto-discover by walking back up to 12 months from "today" until a
- * package responds 200.
+ * Walk back up to 12 months looking for `cmicgd<MM><YYYY-BE>` packages.
+ * Returns the first PDF or XLSX resource found (preferring PDF since
+ * the parser is more robust against column drift).
  */
-async function fetchLatestCgdPdfUrl(): Promise<string | null> {
+async function fetchLatestCgdResource(): Promise<CgdResource | null> {
   const now = new Date();
   for (let back = 0; back < 12; back++) {
     const d = new Date(now.getFullYear(), now.getMonth() - back, 1);
@@ -40,9 +44,14 @@ async function fetchLatestCgdPdfUrl(): Promise<string | null> {
       const pdf = resources.find((res) =>
         (res.format ?? "").toUpperCase().includes("PDF"),
       );
-      if (pdf?.url) return pdf.url;
+      if (pdf?.url) return { format: "PDF", url: pdf.url };
+      const xlsx = resources.find((res) => {
+        const f = (res.format ?? "").toUpperCase();
+        return f.includes("XLSX") || f.includes("XLS");
+      });
+      if (xlsx?.url) return { format: "XLSX", url: xlsx.url };
     } catch {
-      // try next month back
+      // try next month
     }
   }
   return null;
@@ -118,10 +127,62 @@ export async function parseCgdPdf(
   const { extractText, getDocumentProxy } = await import("unpdf");
   const doc = await getDocumentProxy(buf);
   const { text } = await extractText(doc, { mergePages: true });
+  return rowsToSnapshot(parseRowsFromText(text), parsePeriod(text));
+}
 
-  const rows = parseRowsFromText(text);
+async function parseCgdXlsx(buf: Uint8Array): Promise<CgdSnapshot | null> {
+  const XLSX = await import("xlsx");
+  const wb = XLSX.read(buf, { type: "array" });
+  const rows: Array<{ name: string; price: number }> = [];
+  let periodHint = "";
+  for (const sheetName of wb.SheetNames) {
+    const sheet = wb.Sheets[sheetName];
+    const json = XLSX.utils.sheet_to_json<unknown[]>(sheet, {
+      header: 1,
+      blankrows: false,
+    });
+    for (const row of json) {
+      const cells = (row as unknown[]).map((c) =>
+        c == null ? "" : String(c).trim(),
+      );
+      if (cells.length < 2) continue;
+      // period hint
+      if (!periodHint) {
+        const joined = cells.join(" ");
+        const m = joined.match(/(?:เดือน|ประจำเดือน)\s*(\S+)\s+(\d{4})/u);
+        if (m) periodHint = `${m[1]} ${m[2]}`;
+      }
+      const name = cells[0];
+      if (!name || name.length < 4) continue;
+      // first numeric cell after name
+      for (let i = 1; i < cells.length; i++) {
+        const txt = cells[i].replace(/,/g, "");
+        const pm = txt.match(/^(\d+(?:\.\d+)?)$/);
+        if (pm) {
+          const price = parseFloat(pm[1]);
+          if (Number.isFinite(price) && price > 5 && price < 1_000_000) {
+            rows.push({ name, price });
+            break;
+          }
+        }
+      }
+    }
+  }
+  return rowsToSnapshot(rows, periodHint || todayPeriod());
+}
+
+function todayPeriod(): string {
+  return new Date().toLocaleDateString("th-TH", {
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function rowsToSnapshot(
+  rows: Array<{ name: string; price: number }>,
+  period: string,
+): CgdSnapshot | null {
   if (rows.length === 0) return null;
-
   const prices: Record<string, number> = {};
   for (const [id, matchers] of Object.entries(CGD_NAME_MATCHERS)) {
     const hits = rows
@@ -131,10 +192,9 @@ export async function parseCgdPdf(
     if (hits.length > 0) prices[id] = hits[Math.floor(hits.length / 2)];
   }
   if (Object.keys(prices).length === 0) return null;
-
   return {
     prices,
-    reportPeriod: parsePeriod(text),
+    reportPeriod: period,
     reportUrl: "",
     fetchedAt: new Date().toISOString(),
   };
@@ -143,14 +203,15 @@ export async function parseCgdPdf(
 export async function refreshCgdIndex(
   kv?: KVNamespace,
 ): Promise<CgdSnapshot | null> {
-  const url = await fetchLatestCgdPdfUrl();
-  if (!url) return null;
-  const r = await fetch(url, { signal: AbortSignal.timeout(20_000) });
+  const res = await fetchLatestCgdResource();
+  if (!res) return null;
+  const r = await fetch(res.url, { signal: AbortSignal.timeout(20_000) });
   if (!r.ok) return null;
   const buf = new Uint8Array(await r.arrayBuffer());
-  const snap = await parseCgdPdf(buf);
+  const snap =
+    res.format === "PDF" ? await parseCgdPdf(buf) : await parseCgdXlsx(buf);
   if (!snap) return null;
-  snap.reportUrl = url;
+  snap.reportUrl = res.url;
   if (kv) {
     await kv.put(KV_KEY, JSON.stringify(snap), {
       expirationTtl: 60 * 60 * 24 * 90,
