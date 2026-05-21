@@ -14,7 +14,11 @@ import {
   CalculatorResult,
   CalcPlaceholder,
 } from "@/components/calculator/CalculatorResult";
-import { calcWallTile } from "@/lib/calculators";
+import {
+  calcWallTile,
+  loadLivePrices,
+  WALL_TILE_DEPS,
+} from "@/lib/calculators";
 import type { CalcResult, SourceKey } from "@/types";
 
 export default function WallTilePage() {
@@ -25,14 +29,29 @@ export default function WallTilePage() {
   const [tile, setTile] = useState<string>("TILE_001");
   const [result, setResult] = useState<CalcResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
-  const submit = () => {
+  const submit = async () => {
     if (!area || area <= 0) {
       setError("กรุณากรอกพื้นที่ให้มากกว่า 0 ตารางเมตร");
       return;
     }
     setError(null);
-    setResult(calcWallTile(source as SourceKey, province, area, tile));
+    setBusy(true);
+    try {
+      const prices = await loadLivePrices(
+        source as SourceKey,
+        WALL_TILE_DEPS(tile),
+        province,
+      );
+      setResult(
+        calcWallTile(source as SourceKey, province, area, tile, prices),
+      );
+    } catch (e) {
+      setError(`โหลดราคาไม่สำเร็จ: ${(e as Error).message}`);
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (

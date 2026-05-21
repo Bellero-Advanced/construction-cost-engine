@@ -13,7 +13,11 @@ import {
   CalculatorResult,
   CalcPlaceholder,
 } from "@/components/calculator/CalculatorResult";
-import { calcColumnBeam } from "@/lib/calculators";
+import {
+  calcColumnBeam,
+  loadLivePrices,
+  COLUMN_BEAM_DEPS,
+} from "@/lib/calculators";
 import type { CalcResult, SourceKey } from "@/types";
 
 export default function ColumnBeamPage() {
@@ -23,14 +27,27 @@ export default function ColumnBeamPage() {
   const [vol, setVol] = useState<number>(10);
   const [result, setResult] = useState<CalcResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
-  const submit = () => {
+  const submit = async () => {
     if (!vol || vol <= 0) {
       setError("กรุณากรอกปริมาตรคอนกรีตให้มากกว่า 0 ลูกบาศก์เมตร");
       return;
     }
     setError(null);
-    setResult(calcColumnBeam(source as SourceKey, province, vol));
+    setBusy(true);
+    try {
+      const prices = await loadLivePrices(
+        source as SourceKey,
+        COLUMN_BEAM_DEPS,
+        province,
+      );
+      setResult(calcColumnBeam(source as SourceKey, province, vol, prices));
+    } catch (e) {
+      setError(`โหลดราคาไม่สำเร็จ: ${(e as Error).message}`);
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (

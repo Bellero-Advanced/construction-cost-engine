@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   Bar,
@@ -19,8 +19,8 @@ import { Stat, Th, Td } from "@/components/ui/Stat";
 import { MATERIALS } from "@/data/materials";
 import { PROVINCES } from "@/data/provinces";
 import { SOURCES } from "@/data/sources";
-import { getPrice } from "@/lib/pricing";
 import { fmt, fmtInt } from "@/lib/utils";
+import type { Province, SourceKey } from "@/types";
 
 const MATERIAL_GROUPS: {
   key: "wall_tile" | "column_beam" | "rebar";
@@ -31,23 +31,85 @@ const MATERIAL_GROUPS: {
   { key: "rebar", label: "⛓ งานเหล็กเสริม" },
 ];
 
+interface CompareRow {
+  prov: Province;
+  price: number;
+}
+interface CompareData {
+  rows: CompareRow[];
+  min: number;
+  max: number;
+  avg: number;
+  diffPct: number;
+  noData: boolean;
+}
+
+async function fetchPrice(
+  source: string,
+  material: string,
+  provinceId: number,
+): Promise<number | null> {
+  try {
+    const r = await fetch(
+      `/api/prices/${encodeURIComponent(source)}/${encodeURIComponent(material)}?province=${provinceId}`,
+      { cache: "no-store" },
+    );
+    if (!r.ok) return null;
+    const data = (await r.json()) as { price: number | null };
+    return data.price ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export default function ComparePage() {
   const t = useTranslations("compare");
   const [material, setMaterial] = useState<string>("");
   const [source, setSource] = useState<string>("tpso");
+  const [data, setData] = useState<CompareData | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const data = useMemo(() => {
-    if (!material) return null;
-    const rows = PROVINCES.map((p) => ({
-      prov: p,
-      price: getPrice(source, material, p.id),
-    })).sort((a, b) => a.price - b.price);
-    const prices = rows.map((r) => r.price);
-    const min = Math.min(...prices);
-    const max = Math.max(...prices);
-    const avg = prices.reduce((s, p) => s + p, 0) / prices.length;
-    const diffPct = ((max - min) / min) * 100;
-    return { rows, min, max, avg, diffPct };
+  useEffect(() => {
+    if (!material) {
+      setData(null);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    (async () => {
+      const results = await Promise.all(
+        PROVINCES.map(async (p) => ({
+          prov: p,
+          price: await fetchPrice(source, material, p.id),
+        })),
+      );
+      if (cancelled) return;
+      const rows: CompareRow[] = results
+        .filter((r): r is CompareRow => r.price != null && r.price > 0)
+        .sort((a, b) => a.price - b.price);
+      if (rows.length === 0) {
+        setData({
+          rows: [],
+          min: 0,
+          max: 0,
+          avg: 0,
+          diffPct: 0,
+          noData: true,
+        });
+        setLoading(false);
+        return;
+      }
+      const prices = rows.map((r) => r.price);
+      const min = Math.min(...prices);
+      const max = Math.max(...prices);
+      const avg = prices.reduce((s, p) => s + p, 0) / prices.length;
+      const diffPct = min > 0 ? ((max - min) / min) * 100 : 0;
+      setData({ rows, min, max, avg, diffPct, noData: false });
+      setLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [material, source]);
 
   const srcColor = SOURCES[source].color;
@@ -89,7 +151,20 @@ export default function ComparePage() {
         </div>
       </Doc>
 
-      {data && (
+      {loading && (
+        <div className="border-l-[3px] border-amber bg-paper-2 px-4 py-3 font-mono text-[12px] text-ink-2">
+          กำลังโหลดราคาจาก {SOURCES[source].name}…
+        </div>
+      )}
+
+      {data?.noData && !loading && (
+        <div className="border-l-[3px] border-red bg-red/10 px-4 py-3 font-mono text-[12px] text-red">
+          ไม่มีข้อมูลราคาสดสำหรับวัสดุนี้จาก {SOURCES[source].name} —
+          ลองรีเฟรชแหล่งข้อมูลหรือเลือกแหล่งอื่น
+        </div>
+      )}
+
+      {data && !data.noData && (
         <>
           <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Stat label={t("min")} value={fmtInt(data.min)} accent="green" />

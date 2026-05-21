@@ -23,7 +23,15 @@
       "id": "a738f53806bf4a119665effc487b7f16",
       "preview_id": "be1c2d44e903453ba33524a91e983c20"
     }
-  ]
+  ],
+  // Phase 4 — Cloudflare Browser Rendering binding for headless scraping of
+  // SPA retail sites (HomePro, GlobalHouse, ThaiWatsadu, BnB, SCG Home,
+  // Dohome, MegaHome). Requires Workers Paid plan ($5/mo) + Browser Rendering
+  // enabled on the account. Once enabled, deploy detects the binding
+  // automatically.
+  "browser": {
+    "binding": "BROWSER"
+  }
   // Cron trigger removed — Cloudflare's free Workers tier rejected the
   // 5-field schedule. Refresh is performed manually via:
   //   curl -X POST .../api/admin/refresh-prices -H "x-admin-token: $TOKEN"

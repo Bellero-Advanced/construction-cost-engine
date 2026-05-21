@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { listRegisteredProviders } from "@/lib/livePrice";
 import { refreshTpsoIndex } from "@/lib/scrapers/tpso";
-import type { CmiSnapshot } from "@/lib/scrapers/tpso";
-
+import { refreshCgdIndex } from "@/lib/scrapers/cgd";
+import { refreshDitIndex } from "@/lib/scrapers/dit";
 
 async function getKv(): Promise<KVNamespace | undefined> {
   try {
@@ -24,24 +24,43 @@ async function getExpectedToken(): Promise<string | undefined> {
   }
 }
 
-async function runRefresh(): Promise<{
+interface RefreshResult {
+  provider: string;
   ok: boolean;
-  results: { provider: string; ok: boolean; snapshot?: CmiSnapshot | null }[];
+  snapshot?: unknown;
+  error?: string;
+}
+
+const REFRESHERS: Record<
+  string,
+  (kv: KVNamespace | undefined) => Promise<unknown>
+> = {
+  tpso: (kv) => refreshTpsoIndex(kv),
+  cgd: (kv) => refreshCgdIndex(kv),
+  dit: (kv) => refreshDitIndex(kv),
+};
+
+async function runRefresh(only?: string): Promise<{
+  ok: boolean;
+  results: RefreshResult[];
 }> {
   const kv = await getKv();
-  const out: {
-    provider: string;
-    ok: boolean;
-    snapshot?: CmiSnapshot | null;
-  }[] = [];
+  const targets = only
+    ? [only].filter((k) => k in REFRESHERS)
+    : Object.keys(REFRESHERS);
+  const out: RefreshResult[] = [];
 
-  // TPSO
-  try {
-    const snap = await refreshTpsoIndex(kv);
-    out.push({ provider: "tpso", ok: !!snap, snapshot: snap });
-  } catch (e) {
-    out.push({ provider: "tpso", ok: false, snapshot: null });
-    console.error("tpso refresh failed:", (e as Error).message);
+  for (const name of targets) {
+    try {
+      const snap = await REFRESHERS[name](kv);
+      out.push({ provider: name, ok: !!snap, snapshot: snap });
+    } catch (e) {
+      out.push({
+        provider: name,
+        ok: false,
+        error: (e as Error).message,
+      });
+    }
   }
 
   return { ok: out.some((r) => r.ok), results: out };
@@ -53,7 +72,9 @@ export async function POST(req: Request) {
   if (expected && token !== expected) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
-  const result = await runRefresh();
+  const url = new URL(req.url);
+  const only = url.searchParams.get("source") ?? undefined;
+  const result = await runRefresh(only);
   return NextResponse.json(result);
 }
 
@@ -68,13 +89,15 @@ export async function GET(req: Request) {
     if (expected && token !== expected) {
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
-    const result = await runRefresh();
+    const only = url.searchParams.get("source") ?? undefined;
+    const result = await runRefresh(only);
     return NextResponse.json(result);
   }
 
   return NextResponse.json({
     ok: true,
-    info: "POST or GET ?run=1 with x-admin-token / ?token= to refresh. Configured cron: weekly Sun 03:17 UTC (see wrangler.jsonc).",
+    info: "POST or GET ?run=1 with x-admin-token / ?token= to refresh. Optionally ?source=tpso|cgd|dit to refresh one source. Retail sources (homepro/globalhouse/thaiwatsadu/bnb/scghome/dohome/megahome) refresh on-demand via /api/prices/<source>/<material>.",
+    refreshers: Object.keys(REFRESHERS),
     providers: listRegisteredProviders(),
   });
 }

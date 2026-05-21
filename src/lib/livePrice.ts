@@ -16,15 +16,18 @@
  * `src/lib/scrapers/<source>.ts` and register it in `PROVIDERS` below.
  */
 
-import { getPrice } from "@/lib/pricing";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import type { SourceKey } from "@/types";
 
 export interface PriceResult {
-  price: number;
+  /** Live price in THB. `null` when no live data is available. */
+  price: number | null;
+  /** True when the value came from a real provider (cached or fresh). */
   live: boolean;
+  /** True when the source has any value to return at all (live or stale). */
+  available: boolean;
   source: SourceKey | string;
-  fetchedAt?: string; // ISO; only set when live=true
+  fetchedAt?: string;
   ttlSec: number;
 }
 
@@ -76,21 +79,43 @@ async function kvPut(
 const DEFAULT_TTL: Record<SourceKey, number> = {
   tpso: 60 * 60 * 24 * 7, // weekly (govt monthly index)
   cgd: 60 * 60 * 24 * 30, // monthly (quarterly source)
+  dit: 60 * 60 * 24, // daily (govt daily prices)
   homepro: 60 * 60 * 24, // daily
   globalhouse: 60 * 60 * 24,
   thaiwatsadu: 60 * 60 * 24,
   bnb: 60 * 60 * 24,
+  scghome: 60 * 60 * 24,
+  dohome: 60 * 60 * 24,
+  megahome: 60 * 60 * 24,
 };
 
 /**
- * Registry of live providers. The `tpso` provider parses the latest
- * CMI Report PDF from tpso.go.th and applies the index delta to the
- * deterministic mock baseline.
+ * Provider registry. Every Thai source we ship has a real scraper —
+ * no mock fallback. When a provider returns null the API surfaces
+ * `available: false` and the UI displays "—".
  */
 import { tpsoProvider } from "@/lib/scrapers/tpso";
+import { cgdProvider } from "@/lib/scrapers/cgd";
+import { ditProvider } from "@/lib/scrapers/dit";
+import { homeproProvider } from "@/lib/scrapers/homepro";
+import { globalhouseProvider } from "@/lib/scrapers/globalhouse";
+import { thaiwatsaduProvider } from "@/lib/scrapers/thaiwatsadu";
+import { bnbProvider } from "@/lib/scrapers/bnb";
+import { scghomeProvider } from "@/lib/scrapers/scghome";
+import { dohomeProvider } from "@/lib/scrapers/dohome";
+import { megahomeProvider } from "@/lib/scrapers/megahome";
 
 const PROVIDERS: Partial<Record<SourceKey, PriceProvider>> = {
   tpso: tpsoProvider,
+  cgd: cgdProvider,
+  dit: ditProvider,
+  homepro: homeproProvider,
+  globalhouse: globalhouseProvider,
+  thaiwatsadu: thaiwatsaduProvider,
+  bnb: bnbProvider,
+  scghome: scghomeProvider,
+  dohome: dohomeProvider,
+  megahome: megahomeProvider,
 };
 
 export async function getLivePrice(
@@ -98,13 +123,18 @@ export async function getLivePrice(
   materialId: string,
   provinceId: number,
 ): Promise<PriceResult> {
-  const fallback = getPrice(sourceKey, materialId, provinceId);
   const provider = PROVIDERS[sourceKey as SourceKey];
   const ttlSec =
     provider?.ttlSec ?? DEFAULT_TTL[sourceKey as SourceKey] ?? 86400;
 
   if (!provider) {
-    return { price: fallback, live: false, source: sourceKey, ttlSec };
+    return {
+      price: null,
+      live: false,
+      available: false,
+      source: sourceKey,
+      ttlSec,
+    };
   }
 
   const key = cacheKey(sourceKey, materialId, provinceId);
@@ -115,6 +145,7 @@ export async function getLivePrice(
     return {
       price: cached.price,
       live: true,
+      available: true,
       source: sourceKey,
       fetchedAt: new Date(cached.fetchedAt).toISOString(),
       ttlSec,
@@ -128,26 +159,34 @@ export async function getLivePrice(
       return {
         price: fresh,
         live: true,
+        available: true,
         source: sourceKey,
         fetchedAt: new Date(now).toISOString(),
         ttlSec,
       };
     }
   } catch {
-    // swallow — fall through to mock
+    // fall through
   }
 
-  // Stale cache is still better than mock; otherwise mock.
+  // Stale cache is still real data
   if (cached) {
     return {
       price: cached.price,
       live: true,
+      available: true,
       source: sourceKey,
       fetchedAt: new Date(cached.fetchedAt).toISOString(),
       ttlSec,
     };
   }
-  return { price: fallback, live: false, source: sourceKey, ttlSec };
+  return {
+    price: null,
+    live: false,
+    available: false,
+    source: sourceKey,
+    ttlSec,
+  };
 }
 
 export function listRegisteredProviders(): SourceKey[] {

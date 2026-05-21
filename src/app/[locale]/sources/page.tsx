@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Doc } from "@/components/ui/Doc";
 import { Field, Select } from "@/components/ui/Field";
@@ -10,13 +10,36 @@ import { Button } from "@/components/ui/Button";
 import { MATERIALS } from "@/data/materials";
 import { PROVINCES } from "@/data/provinces";
 import { SOURCES, SOURCE_KEYS } from "@/data/sources";
-import { getPrice } from "@/lib/pricing";
 import { fmt } from "@/lib/utils";
 
 interface Fetched {
   srcKey: string;
   province: number;
   fetchedAt: string;
+  prices: Record<string, number | null>;
+}
+
+async function fetchPriceMap(
+  source: string,
+  provinceId: number,
+): Promise<Record<string, number | null>> {
+  const ids = Object.keys(MATERIALS);
+  const entries = await Promise.all(
+    ids.map(async (id) => {
+      try {
+        const r = await fetch(
+          `/api/prices/${encodeURIComponent(source)}/${encodeURIComponent(id)}?province=${provinceId}`,
+          { cache: "no-store" },
+        );
+        if (!r.ok) return [id, null] as const;
+        const data = (await r.json()) as { price: number | null };
+        return [id, data.price ?? null] as const;
+      } catch {
+        return [id, null] as const;
+      }
+    }),
+  );
+  return Object.fromEntries(entries);
 }
 
 export default function SourcesPage() {
@@ -24,13 +47,22 @@ export default function SourcesPage() {
   const [srcKey, setSrcKey] = useState<string>("tpso");
   const [province, setProvince] = useState<number>(10);
   const [fetched, setFetched] = useState<Fetched | null>(null);
+  const [busy, setBusy] = useState(false);
 
-  const fetchData = () =>
-    setFetched({
-      srcKey,
-      province,
-      fetchedAt: new Date().toLocaleString("th-TH"),
-    });
+  const fetchData = async () => {
+    setBusy(true);
+    try {
+      const prices = await fetchPriceMap(srcKey, province);
+      setFetched({
+        srcKey,
+        province,
+        fetchedAt: new Date().toLocaleString("th-TH"),
+        prices,
+      });
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const src = fetched ? SOURCES[fetched.srcKey] : null;
   const prov = fetched
@@ -77,7 +109,7 @@ export default function SourcesPage() {
               ))}
             </Select>
           </Field>
-          <Button onClick={fetchData}>{t("fetch")}</Button>
+          <Button onClick={fetchData}>{busy ? "…" : t("fetch")}</Button>
         </div>
       </Doc>
 
@@ -122,7 +154,9 @@ export default function SourcesPage() {
                         {m.unit}
                       </Td>
                       <Td align="right" mono className="font-bold">
-                        {fmt(getPrice(fetched.srcKey, m.id, fetched.province))}
+                        {fetched.prices[m.id] != null
+                          ? fmt(fetched.prices[m.id]!)
+                          : "—"}
                       </Td>
                     </tr>
                   ))}
@@ -150,7 +184,7 @@ export default function SourcesPage() {
                       name: m.name,
                       category: m.cat,
                       unit: m.unit,
-                      price: getPrice(fetched.srcKey, m.id, fetched.province),
+                      price: fetched.prices[m.id] ?? null,
                     })),
                   fetched_at: new Date().toISOString(),
                 },

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   Bar,
@@ -19,8 +19,8 @@ import { Stat, Th, Td } from "@/components/ui/Stat";
 import { MATERIALS } from "@/data/materials";
 import { PROVINCES } from "@/data/provinces";
 import { SOURCES, SOURCE_KEYS } from "@/data/sources";
-import { getPrice } from "@/lib/pricing";
 import { fmt, fmtInt } from "@/lib/utils";
+import type { Source } from "@/types";
 
 const GROUPS: { key: "wall_tile" | "column_beam" | "rebar"; label: string }[] =
   [
@@ -29,34 +29,114 @@ const GROUPS: { key: "wall_tile" | "column_beam" | "rebar"; label: string }[] =
     { key: "rebar", label: "⛓ งานเหล็กเสริม" },
   ];
 
+interface StoreRow {
+  key: string;
+  src: Source;
+  price: number;
+}
+interface StoresData {
+  rows: StoreRow[];
+  min: number;
+  max: number;
+  avg: number;
+  save: number;
+  savePct: number;
+  diffGovRetail: number;
+  noData: boolean;
+}
+
+async function fetchPrice(
+  source: string,
+  material: string,
+  provinceId: number,
+): Promise<number | null> {
+  try {
+    const r = await fetch(
+      `/api/prices/${encodeURIComponent(source)}/${encodeURIComponent(material)}?province=${provinceId}`,
+      { cache: "no-store" },
+    );
+    if (!r.ok) return null;
+    const data = (await r.json()) as { price: number | null };
+    return data.price ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export default function StoresPage() {
   const t = useTranslations("stores");
   const [material, setMaterial] = useState<string>("");
   const [province, setProvince] = useState<number>(10);
+  const [data, setData] = useState<StoresData | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const data = useMemo(() => {
-    if (!material) return null;
-    const rows = SOURCE_KEYS.map((key) => ({
-      key: String(key),
-      src: SOURCES[key as string],
-      price: getPrice(key as string, material, province),
-    })).sort((a, b) => a.price - b.price);
-    const min = rows[0].price;
-    const max = rows[rows.length - 1].price;
-    const avg = rows.reduce((s, r) => s + r.price, 0) / rows.length;
-    const save = max - min;
-    const savePct = (save / max) * 100;
-    const govPrices = rows
-      .filter((r) => r.src.type === "Government")
-      .map((r) => r.price);
-    const retailPrices = rows
-      .filter((r) => r.src.type === "Modern Trade")
-      .map((r) => r.price);
-    const govAvg = govPrices.reduce((s, p) => s + p, 0) / govPrices.length;
-    const retailAvg =
-      retailPrices.reduce((s, p) => s + p, 0) / retailPrices.length;
-    const diffGovRetail = ((retailAvg - govAvg) / govAvg) * 100;
-    return { rows, min, max, avg, save, savePct, diffGovRetail };
+  useEffect(() => {
+    if (!material) {
+      setData(null);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    (async () => {
+      const fetched = await Promise.all(
+        SOURCE_KEYS.map(async (key) => ({
+          key: String(key),
+          src: SOURCES[key as string],
+          price: await fetchPrice(String(key), material, province),
+        })),
+      );
+      if (cancelled) return;
+      const rows: StoreRow[] = fetched
+        .filter((r): r is StoreRow => r.price != null && r.price > 0)
+        .sort((a, b) => a.price - b.price);
+      if (rows.length === 0) {
+        setData({
+          rows: [],
+          min: 0,
+          max: 0,
+          avg: 0,
+          save: 0,
+          savePct: 0,
+          diffGovRetail: 0,
+          noData: true,
+        });
+        setLoading(false);
+        return;
+      }
+      const min = rows[0].price;
+      const max = rows[rows.length - 1].price;
+      const avg = rows.reduce((s, r) => s + r.price, 0) / rows.length;
+      const save = max - min;
+      const savePct = max > 0 ? (save / max) * 100 : 0;
+      const govPrices = rows
+        .filter((r) => r.src.type === "Government")
+        .map((r) => r.price);
+      const retailPrices = rows
+        .filter((r) => r.src.type === "Modern Trade")
+        .map((r) => r.price);
+      const govAvg = govPrices.length
+        ? govPrices.reduce((s, p) => s + p, 0) / govPrices.length
+        : 0;
+      const retailAvg = retailPrices.length
+        ? retailPrices.reduce((s, p) => s + p, 0) / retailPrices.length
+        : 0;
+      const diffGovRetail =
+        govAvg > 0 ? ((retailAvg - govAvg) / govAvg) * 100 : 0;
+      setData({
+        rows,
+        min,
+        max,
+        avg,
+        save,
+        savePct,
+        diffGovRetail,
+        noData: false,
+      });
+      setLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [material, province]);
 
   const m = material ? MATERIALS[material] : null;
@@ -101,7 +181,17 @@ export default function StoresPage() {
         </div>
       </Doc>
 
-      {data && m && (
+      {loading && (
+        <div className="border-l-[3px] border-amber bg-paper-2 px-4 py-3 font-mono text-[12px] text-ink-2">
+          กำลังโหลดราคาจากทุกแหล่ง…
+        </div>
+      )}
+      {data?.noData && !loading && (
+        <div className="border-l-[3px] border-red bg-red/10 px-4 py-3 font-mono text-[12px] text-red">
+          ไม่มีข้อมูลราคาสดสำหรับวัสดุนี้ — ลองรีเฟรชแหล่งข้อมูลก่อน
+        </div>
+      )}
+      {data && !data.noData && m && (
         <>
           <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Stat

@@ -13,7 +13,6 @@
 
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import type { PriceProvider } from "@/lib/livePrice";
-import { getPrice as getMockPrice } from "@/lib/pricing";
 
 const TPSO_INDEX_PAGE = "https://tpso.go.th/summary-trade-economy-th";
 const KV_KEY = "tpso:cmi:latest";
@@ -197,22 +196,16 @@ export async function readTpsoIndex(
  * delta versus baseline. Returns null if KV has no snapshot — caller
  * falls back to mock.
  */
+/**
+ * TPSO is an INDEX-only source. CMI publishes a headline price-index for
+ * the entire construction-material basket; it does not provide per-item
+ * prices. Therefore the provider returns null for every material — the
+ * index itself is exposed separately via `/api/sources/tpso/cmi`.
+ */
 export const tpsoProvider: PriceProvider = {
   key: "tpso",
   ttlSec: 60 * 60 * 24 * 7, // weekly
-  async fetch(materialId: string, provinceId: number) {
-    try {
-      const ctx = await getCloudflareContext({ async: true });
-      const kv = (ctx?.env as { PRICES_KV?: KVNamespace } | undefined)
-        ?.PRICES_KV;
-      const snap = await readTpsoIndex(kv);
-      if (!snap || !Number.isFinite(snap.index)) return null;
-      const base = getMockPrice("tpso", materialId, provinceId);
-      if (!base) return null;
-      const ratio = snap.index / TPSO_CMI_BASELINE;
-      return Math.round(base * ratio * 100) / 100;
-    } catch {
-      return null;
-    }
+  async fetch() {
+    return null;
   },
 };

@@ -1,15 +1,45 @@
 import { MATERIALS } from "@/data/materials";
-import { getPrice } from "@/lib/pricing";
 import type { BomItem, CalcResult, SourceKey } from "@/types";
 
+export type PriceMap = Record<string, number | null>;
+
+/**
+ * Batch-load live prices for a set of material ids by calling the
+ * public /api/prices route. Works from both server and client without
+ * pulling Cloudflare bindings into the client bundle.
+ */
+export async function loadLivePrices(
+  source: SourceKey,
+  materialIds: string[],
+  province: number,
+): Promise<PriceMap> {
+  const unique = Array.from(new Set(materialIds));
+  const entries = await Promise.all(
+    unique.map(async (id) => {
+      try {
+        const r = await fetch(
+          `/api/prices/${encodeURIComponent(source)}/${encodeURIComponent(id)}?province=${province}`,
+          { cache: "no-store" },
+        );
+        if (!r.ok) return [id, null] as const;
+        const data = (await r.json()) as { price: number | null };
+        return [id, data.price ?? null] as const;
+      } catch {
+        return [id, null] as const;
+      }
+    }),
+  );
+  return Object.fromEntries(entries);
+}
+
 function buildItem(
+  prices: PriceMap,
   source: SourceKey,
   id: string,
   qty: number,
-  province: number,
 ): BomItem {
   const m = MATERIALS[id];
-  const unitPrice = getPrice(source, id, province);
+  const unitPrice = prices[id] ?? 0;
   return {
     id,
     name: m.name,
@@ -25,36 +55,37 @@ export function calcWallTile(
   province: number,
   area: number,
   tileId: string,
+  prices: PriceMap,
 ): CalcResult {
   const items: BomItem[] = [];
   items.push(
-    buildItem(source, tileId, area * (MATERIALS[tileId].cons ?? 0), province),
+    buildItem(prices, source, tileId, area * (MATERIALS[tileId].cons ?? 0)),
   );
   items.push(
     buildItem(
+      prices,
       source,
       "ADHESIVE_001",
       area * MATERIALS.ADHESIVE_001.cons!,
-      province,
     ),
   );
   items.push(
-    buildItem(source, "GROUT_001", area * MATERIALS.GROUT_001.cons!, province),
+    buildItem(prices, source, "GROUT_001", area * MATERIALS.GROUT_001.cons!),
   );
   items.push(
     buildItem(
+      prices,
       source,
       "PVC_TRIM_001",
       area * MATERIALS.PVC_TRIM_001.cons!,
-      province,
     ),
   );
   items.push(
     buildItem(
+      prices,
       source,
       "WATER_MIX_001",
       area * MATERIALS.WATER_MIX_001.cons!,
-      province,
     ),
   );
   const total = items.reduce((s, i) => s + i.total, 0);
@@ -64,7 +95,7 @@ export function calcWallTile(
     province,
     items,
     total,
-    unitCost: total / area,
+    unitCost: area > 0 ? total / area : 0,
     unitLabel: "บาท / ตร.ม.",
     extraInfo: `พื้นที่ ${area} ตร.ม.`,
   };
@@ -74,10 +105,12 @@ export function calcColumnBeam(
   source: SourceKey,
   province: number,
   vol: number,
+  prices: PriceMap,
 ): CalcResult {
   const items: BomItem[] = [];
   ["CEMENT_001", "SAND_001", "ROCK_001", "WATER_MIX_002"].forEach((id) => {
-    items.push(buildItem(source, id, vol * MATERIALS[id].cons!, province));
+    if (!MATERIALS[id]) return;
+    items.push(buildItem(prices, source, id, vol * MATERIALS[id].cons!));
   });
   const total = items.reduce((s, i) => s + i.total, 0);
   return {
@@ -86,7 +119,7 @@ export function calcColumnBeam(
     province,
     items,
     total,
-    unitCost: total / vol,
+    unitCost: vol > 0 ? total / vol : 0,
     unitLabel: "บาท / ลบ.ม.",
     extraInfo: `ปริมาตร ${vol} ลบ.ม.`,
   };
@@ -101,6 +134,7 @@ export function calcRebar(
   source: SourceKey,
   province: number,
   rows: RebarRow[],
+  prices: PriceMap,
 ): CalcResult {
   const items: BomItem[] = [];
   let totalKg = 0;
@@ -110,7 +144,7 @@ export function calcRebar(
     const kg = r.lengthM * (m.wpm ?? 0);
     totalKg += kg;
     const ton = kg / 1000;
-    const price = getPrice(source, r.id, province);
+    const price = prices[r.id] ?? 0;
     items.push({
       id: r.id,
       name: m.name,
@@ -123,7 +157,7 @@ export function calcRebar(
   });
 
   const wireKg = (totalKg / 1000) * MATERIALS.WIRE_001.consPerTon!;
-  const wirePrice = getPrice(source, "WIRE_001", province);
+  const wirePrice = prices.WIRE_001 ?? 0;
   items.push({
     id: "WIRE_001",
     name: MATERIALS.WIRE_001.name,
@@ -138,7 +172,7 @@ export function calcRebar(
   const formSqm = concM3 * 10;
   const formSheets = formSqm / (1.2 * 2.4);
   const formQty = formSheets / MATERIALS.FORM_WOOD_001.reuse!;
-  const formPrice = getPrice(source, "FORM_WOOD_001", province);
+  const formPrice = prices.FORM_WOOD_001 ?? 0;
   items.push({
     id: "FORM_WOOD_001",
     name: MATERIALS.FORM_WOOD_001.name,
@@ -150,7 +184,7 @@ export function calcRebar(
   });
 
   const nailKg = formSheets * MATERIALS.NAIL_001.consPerForm!;
-  const nailPrice = getPrice(source, "NAIL_001", province);
+  const nailPrice = prices.NAIL_001 ?? 0;
   items.push({
     id: "NAIL_001",
     name: MATERIALS.NAIL_001.name,
@@ -174,3 +208,26 @@ export function calcRebar(
     extraInfo: `น้ำหนักเหล็ก ${totalKg.toFixed(2)} กก. (${ton.toFixed(3)} ตัน)`,
   };
 }
+
+/**
+ * IDs each calculator depends on — used by pages to preload prices.
+ */
+export const WALL_TILE_DEPS = (tileId: string) => [
+  tileId,
+  "ADHESIVE_001",
+  "GROUT_001",
+  "PVC_TRIM_001",
+  "WATER_MIX_001",
+];
+export const COLUMN_BEAM_DEPS = [
+  "CEMENT_001",
+  "SAND_001",
+  "ROCK_001",
+  "WATER_MIX_002",
+];
+export const REBAR_DEPS = (rebarIds: string[]) => [
+  ...rebarIds,
+  "WIRE_001",
+  "FORM_WOOD_001",
+  "NAIL_001",
+];

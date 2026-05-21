@@ -6,7 +6,11 @@ export type SourceKey =
   | "homepro"
   | "globalhouse"
   | "thaiwatsadu"
-  | "bnb";
+  | "bnb"
+  | "dit"
+  | "scghome"
+  | "dohome"
+  | "megahome";
 
 export type SourceType = "Government" | "Modern Trade";
 

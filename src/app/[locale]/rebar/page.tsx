@@ -14,7 +14,12 @@ import {
   CalcPlaceholder,
 } from "@/components/calculator/CalculatorResult";
 import { MATERIALS } from "@/data/materials";
-import { calcRebar, type RebarRow } from "@/lib/calculators";
+import {
+  calcRebar,
+  loadLivePrices,
+  REBAR_DEPS,
+  type RebarRow,
+} from "@/lib/calculators";
 import type { CalcResult, SourceKey } from "@/types";
 
 const REBAR_OPTIONS = Object.values(MATERIALS).filter(
@@ -42,6 +47,7 @@ export default function RebarPage() {
   const [rows, setRows] = useState<Row[]>(initialRows);
   const [result, setResult] = useState<CalcResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
   const updateRow = (uid: number, patch: Partial<Row>) =>
     setRows((rs) => rs.map((r) => (r.uid === uid ? { ...r, ...patch } : r)));
@@ -52,7 +58,7 @@ export default function RebarPage() {
   const addRow = () =>
     setRows((rs) => [...rs, { uid: nextUid++, id: "REBAR_DB12", lengthM: 0 }]);
 
-  const submit = () => {
+  const submit = async () => {
     if (rows.length === 0) {
       setError("กรุณาเพิ่มรายการเหล็กอย่างน้อย 1 รายการ");
       return;
@@ -62,11 +68,20 @@ export default function RebarPage() {
       return;
     }
     setError(null);
-    const data: RebarRow[] = rows.map((r) => ({
-      id: r.id,
-      lengthM: r.lengthM,
-    }));
-    setResult(calcRebar(source as SourceKey, province, data));
+    setBusy(true);
+    try {
+      const data: RebarRow[] = rows.map((r) => ({
+        id: r.id,
+        lengthM: r.lengthM,
+      }));
+      const ids = REBAR_DEPS(data.map((d) => d.id));
+      const prices = await loadLivePrices(source as SourceKey, ids, province);
+      setResult(calcRebar(source as SourceKey, province, data, prices));
+    } catch (e) {
+      setError(`โหลดราคาไม่สำเร็จ: ${(e as Error).message}`);
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
