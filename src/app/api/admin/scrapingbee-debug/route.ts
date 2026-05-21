@@ -49,13 +49,21 @@ export async function GET(req: Request) {
     });
   }
 
+  const wait = url.searchParams.get("wait") ?? "2500";
+  const waitFor = url.searchParams.get("wait_for");
+  const premiumProxy = url.searchParams.get("premium_proxy");
+  const stealthProxy = url.searchParams.get("stealth_proxy");
+
   const params = new URLSearchParams({
     api_key: apiKey,
     url: target,
     render_js: "true",
     country_code: "th",
-    wait: "2500",
+    wait,
   });
+  if (waitFor) params.set("wait_for", waitFor);
+  if (premiumProxy === "true") params.set("premium_proxy", "true");
+  if (stealthProxy === "true") params.set("stealth_proxy", "true");
 
   let sbStatus: number | null = null;
   let sbBody: string | null = null;
