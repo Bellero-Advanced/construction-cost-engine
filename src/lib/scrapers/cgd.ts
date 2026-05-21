@@ -17,17 +17,17 @@ const KV_KEY = "cgd:building:latest";
 
 /**
  * data.go.th publishes CGD building-material packages monthly with the
- * pattern `cmicgd<MMYY>` (Buddhist Era). We auto-discover by walking
- * back up to 12 months from "today" until a package responds 200.
+ * pattern `cmicgd<MM><YYYY-BE>` (Buddhist Era, 4-digit year). We
+ * auto-discover by walking back up to 12 months from "today" until a
+ * package responds 200.
  */
 async function fetchLatestCgdPdfUrl(): Promise<string | null> {
   const now = new Date();
   for (let back = 0; back < 12; back++) {
     const d = new Date(now.getFullYear(), now.getMonth() - back, 1);
     const mm = String(d.getMonth() + 1).padStart(2, "0");
-    const yyBE = (d.getFullYear() + 543) % 100;
-    const yy = String(yyBE).padStart(2, "0");
-    const pkgId = `cmicgd${mm}${yy}`;
+    const yyyyBE = d.getFullYear() + 543;
+    const pkgId = `cmicgd${mm}${yyyyBE}`;
     try {
       const r = await fetch(
         `https://data.go.th/api/3/action/package_show?id=${encodeURIComponent(pkgId)}`,
@@ -35,7 +35,8 @@ async function fetchLatestCgdPdfUrl(): Promise<string | null> {
       );
       if (!r.ok) continue;
       const data = (await r.json()) as CkanPackage;
-      const resources = data.result?.resources ?? [];
+      if (!data.result) continue;
+      const resources = data.result.resources ?? [];
       const pdf = resources.find((res) =>
         (res.format ?? "").toUpperCase().includes("PDF"),
       );
