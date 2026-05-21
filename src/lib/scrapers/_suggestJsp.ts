@@ -87,9 +87,14 @@ export function makeSuggestJspProvider(
           signal: AbortSignal.timeout(10_000),
         });
         if (!r.ok) return null;
-        const ct = r.headers.get("content-type") ?? "";
-        if (!ct.includes("json")) return null;
-        const data = (await r.json()) as SuggestResponse;
+        // Note: MegaHome serves JSON with text/html content-type — don't filter
+        // on content-type; just try to parse.
+        let data: SuggestResponse;
+        try {
+          data = (await r.json()) as SuggestResponse;
+        } catch {
+          return null;
+        }
         const items = data.items ?? [];
         if (items.length === 0) return null;
         return pickPrice(items, q);
