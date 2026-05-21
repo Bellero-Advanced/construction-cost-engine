@@ -154,3 +154,27 @@ curl $WORKER/api/prices/cgd/CEMENT_001?province=10
 - `/[locale]/trend` source dropdown 3 → 10 entries (เพิ่ม retail ทั้ง 7)
 - เมื่อ cron สะสมข้อมูลครบ ~7 วัน, trend page จะ chart price spread ระหว่าง
   e-commerce vs official index ได้
+
+---
+
+## ScrapingBee free-tier verification (2026-05-22)
+
+หลังจาก `SCRAPINGBEE_API_KEY` ถูก set, ทดสอบ 5 retail sites ที่เหลือ:
+
+| Site | upstream | extracted prices | reason |
+|---|---|---|---|
+| thaiwatsadu | 404 | — | URL pattern `/th/search?keyword=` เก่า |
+| bnb | 200 (2.7MB) | 0 | SPA — `price` keyword มีแต่ไม่มี structured data |
+| globalhouse | 301→200 (77KB) | 0 | SPA — `__NEXT_DATA__.pageProps` ว่าง, results โหลดผ่าน XHR หลัง hydrate; ฿ ที่เห็นเป็น price-filter facets ไม่ใช่ product |
+| dohome | 200 (41KB) | 0 | SPA shell ล้วน, ไม่มี data ใน initial HTML |
+| scghome | 403 | — | CF bot-block แม้ผ่าน residential proxy |
+
+**สรุป:** ScrapingBee free tier (2.5-8s wait, residential `country_code=th`) ไม่พอเอาราคา product จาก 5 sites นี้
+เพราะทั้งหมดเป็น **client-side rendering** + บางสีต้อง interaction
+(scroll, click) เพื่อ trigger XHR
+
+**Path:** ใช้ `/api/admin/upload-prices` (CsvUploader UI) เป็น primary
+สำหรับ 5 sites เหล่านี้เหมือนกับ CGD/DIT  — ScrapingBee code path ยังอยู่
+(fallback ฟรี เผื่ออนาคต API ของแต่ละสีเปลี่ยน)
+
+**Debug endpoint:** `GET /api/admin/scrapingbee-debug?source=X&material=Y[&wait=8000][&url=]` (auth) — surfaces upstream status, html length, signals, regex probes, full ScrapingBee response headers สำหรับเช็คเมื่อ retry
