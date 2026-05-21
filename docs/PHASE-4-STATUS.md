@@ -132,3 +132,12 @@ curl $WORKER/api/prices/cgd/CEMENT_001?province=10
 ### Helpers
 - `src/lib/csv.ts` — `toCsv()` + `downloadCsv()` (UTF-8 BOM ให้ Excel ภาษาไทยอ่าน)
 - Header nav: เพิ่ม `compare_sources` + `api_docs`
+
+### Freshness UX
+- `/sources` price table: คอลัมน์ใหม่ **FRESHNESS** ต่อแถว
+  - FRESH (อายุ < 50% ttl, สีเขียว)
+  - OK (< ttl, สีเหลือง)
+  - STALE (≥ ttl, สีแดง)
+  - NO DATA (ว่าง)
+- คำนวณจาก `fetchedAt` + `ttlSec` ที่ `/api/prices/...` คืนกลับมา
+- CSV export ของ /sources จะมีคอลัมน์ `live`, `fetched_at`, `ttl_sec` ติดมาด้วย
