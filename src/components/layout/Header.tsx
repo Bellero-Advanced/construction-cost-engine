@@ -16,6 +16,7 @@ const NAV = [
   { key: "stores", href: "/stores" },
   { key: "trend", href: "/trend" },
   { key: "source", href: "/sources" },
+  { key: "health", href: "/health" },
   { key: "api_docs", href: "/api-docs" },
 ];
 

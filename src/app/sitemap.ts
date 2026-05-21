@@ -12,6 +12,7 @@ const ROUTES = [
   "/stores",
   "/trend",
   "/sources",
+  "/health",
   "/api-docs",
 ];
 
