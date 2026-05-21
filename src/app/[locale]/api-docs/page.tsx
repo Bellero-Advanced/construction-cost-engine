@@ -40,6 +40,13 @@ const ENDPOINTS: {
   },
   {
     method: "GET",
+    path: "/api/sources/health?province=10",
+    desc: "Aggregated freshness across all sources/materials at a province. Counts of fresh/ok/stale/missing per source + overall coverage %.",
+    example:
+      "/api/sources/health?province=10  →  {sources:[{source,fresh,ok,stale,missing,…}], summary:{coverage:62.5,…}}",
+  },
+  {
+    method: "GET",
     path: "/api/sources/tpso/cmi",
     desc: "TPSO CMI construction-material index (extracted from official PDF).",
   },
