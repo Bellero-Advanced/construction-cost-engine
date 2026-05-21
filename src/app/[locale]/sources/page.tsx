@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { CsvUploader } from "@/components/admin/CsvUploader";
 import { Doc } from "@/components/ui/Doc";
 import { Field, Select } from "@/components/ui/Field";
 import { Badge } from "@/components/ui/Badge";
@@ -195,6 +196,7 @@ export default function SourcesPage() {
           </Doc>
         </>
       )}
+      <CsvUploader />
     </div>
   );
 }
