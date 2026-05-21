@@ -77,16 +77,16 @@ async function kvPut(
 
 // Default TTLs by source tier — in seconds.
 const DEFAULT_TTL: Record<SourceKey, number> = {
-  tpso: 60 * 60 * 24 * 7, // weekly (govt monthly index)
-  cgd: 60 * 60 * 24 * 30, // monthly (quarterly source)
-  dit: 60 * 60 * 24, // daily (govt daily prices)
-  homepro: 60 * 60 * 24, // daily
-  globalhouse: 60 * 60 * 24,
-  thaiwatsadu: 60 * 60 * 24,
-  bnb: 60 * 60 * 24,
-  scghome: 60 * 60 * 24,
-  dohome: 60 * 60 * 24,
-  megahome: 60 * 60 * 24,
+  tpso: 60 * 60 * 24 * 30,
+  cgd: 60 * 60 * 24 * 30,
+  dit: 60 * 60 * 24 * 30,
+  homepro: 60 * 60 * 24 * 14,
+  globalhouse: 60 * 60 * 24 * 30,
+  thaiwatsadu: 60 * 60 * 24 * 30,
+  bnb: 60 * 60 * 24 * 30,
+  scghome: 60 * 60 * 24 * 30,
+  dohome: 60 * 60 * 24 * 30,
+  megahome: 60 * 60 * 24 * 14,
 };
 
 /**

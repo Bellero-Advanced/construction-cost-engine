@@ -204,7 +204,7 @@ export async function readTpsoIndex(
  */
 export const tpsoProvider: PriceProvider = {
   key: "tpso",
-  ttlSec: 60 * 60 * 24 * 7, // weekly
+  ttlSec: 60 * 60 * 24 * 30, // monthly (CMI publishes monthly, prices change quarterly)
   async fetch() {
     return null;
   },

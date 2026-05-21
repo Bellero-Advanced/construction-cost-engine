@@ -8,16 +8,16 @@ export const revalidate = 60;
 
 const DEFAULT_PROVINCE = 10;
 const TTL_BY_KEY: Record<string, number> = {
-  tpso: 60 * 60 * 24 * 7,
+  tpso: 60 * 60 * 24 * 30,
   cgd: 60 * 60 * 24 * 30,
-  dit: 60 * 60 * 24,
-  homepro: 60 * 60 * 24,
-  globalhouse: 60 * 60 * 24,
-  thaiwatsadu: 60 * 60 * 24,
-  bnb: 60 * 60 * 24,
-  scghome: 60 * 60 * 24,
-  dohome: 60 * 60 * 24,
-  megahome: 60 * 60 * 24,
+  dit: 60 * 60 * 24 * 30,
+  homepro: 60 * 60 * 24 * 14,
+  globalhouse: 60 * 60 * 24 * 30,
+  thaiwatsadu: 60 * 60 * 24 * 30,
+  bnb: 60 * 60 * 24 * 30,
+  scghome: 60 * 60 * 24 * 30,
+  dohome: 60 * 60 * 24 * 30,
+  megahome: 60 * 60 * 24 * 14,
 };
 
 interface CacheEntry {

@@ -111,7 +111,7 @@ export async function readDitIndex(
 
 export const ditProvider: PriceProvider = {
   key: "dit",
-  ttlSec: 60 * 60 * 24,
+  ttlSec: 60 * 60 * 24 * 30,
   async fetch(materialId: string) {
     try {
       const ctx = await getCloudflareContext({ async: true });

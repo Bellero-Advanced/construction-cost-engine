@@ -1,7 +1,9 @@
 name: refresh-prices
+# Prices change quarterly — weekly cron is plenty. Trigger manually via
+# workflow_dispatch when monthly CGD/DIT data is uploaded out-of-band.
 on:
   schedule:
-    - cron: "17 3 * * *"
+    - cron: "17 3 * * 1"
   workflow_dispatch:
 permissions:
   contents: read
@@ -20,7 +22,7 @@ jobs:
               -H "x-admin-token: $ADMIN_REFRESH_TOKEN" --max-time 60 | head -c 4000
             echo
           done
-      - name: Snapshot daily history
+      - name: Snapshot weekly history
         env:
           WORKER_URL: ${{ secrets.WORKER_URL }}
           ADMIN_REFRESH_TOKEN: ${{ secrets.ADMIN_REFRESH_TOKEN }}

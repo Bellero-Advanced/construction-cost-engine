@@ -30,7 +30,7 @@ export async function GET(
   const result = await getLivePrice(source as SourceKey, material, provinceId);
   return NextResponse.json(result, {
     headers: {
-      "cache-control": `public, s-maxage=${Math.min(result.ttlSec, 86400)}, stale-while-revalidate=600`,
+      "cache-control": `public, s-maxage=${Math.min(result.ttlSec, 60 * 60 * 24 * 7)}, stale-while-revalidate=600`,
     },
   });
 }
