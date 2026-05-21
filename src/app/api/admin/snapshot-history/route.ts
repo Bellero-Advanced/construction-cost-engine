@@ -12,8 +12,11 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getLivePrice } from "@/lib/livePrice";
 import { MATERIALS } from "@/data/materials";
 import { SOURCE_KEYS } from "@/data/sources";
+import type { SourceKey } from "@/types";
 
-const GOVT_SOURCES = ["tpso", "cgd", "dit"] as const;
+// All registered sources — govt + retail. Retail snapshots let the trend
+// page chart price spreads across e-commerce vs official indices.
+const ALL_SOURCES = SOURCE_KEYS as readonly SourceKey[];
 const DEFAULT_PROVINCE = 10;
 const MAX_HISTORY = 365;
 
@@ -49,7 +52,7 @@ export async function POST(req: Request) {
   let written = 0;
   let skipped = 0;
 
-  for (const src of GOVT_SOURCES) {
+  for (const src of ALL_SOURCES) {
     for (const mid of materialIds) {
       const result = await getLivePrice(src, mid, DEFAULT_PROVINCE);
       if (result.price == null) {

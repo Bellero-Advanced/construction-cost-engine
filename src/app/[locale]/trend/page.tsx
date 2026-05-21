@@ -25,6 +25,13 @@ const HISTORY_SOURCES = [
   { key: "dit", label: "DIT (รายวัน)" },
   { key: "cgd", label: "CGD (รายเดือน)" },
   { key: "tpso", label: "TPSO (CMI index)" },
+  { key: "homepro", label: "HomePro (รายปลีก)" },
+  { key: "megahome", label: "MegaHome (รายปลีก)" },
+  { key: "globalhouse", label: "Global House (รายปลีก)" },
+  { key: "thaiwatsadu", label: "Thai Watsadu (รายปลีก)" },
+  { key: "bnb", label: "BnB Home (รายปลีก)" },
+  { key: "scghome", label: "SCG Home (รายปลีก)" },
+  { key: "dohome", label: "Dohome (รายปลีก)" },
 ];
 
 interface HistoryEntry {
