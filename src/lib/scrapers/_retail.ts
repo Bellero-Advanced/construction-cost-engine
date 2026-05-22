@@ -11,10 +11,13 @@
 import type { PriceProvider } from "@/lib/livePrice";
 import { headlessScrape, materialQuery } from "@/lib/scrapers/_headless";
 import {
+  extractNamedPricesFromJsonLd,
   extractPricesFromHtml,
   fetchViaScrapingBee,
   median,
+  pickPriceForMaterial,
 } from "@/lib/scrapers/_scrapingbee";
+import { MATERIALS } from "@/data/materials";
 import type { SourceKey } from "@/types";
 
 export interface RetailScraperConfig {
@@ -29,12 +32,21 @@ export interface RetailScraperConfig {
   timeoutMs?: number;
 }
 
+function searchTermFor(key: SourceKey, materialId: string): string {
+  const m = MATERIALS[materialId];
+  const override = m?.sourceOverrides?.[key]?.searchTerm;
+  if (override) return override;
+  const t = m?.searchTerms?.[0];
+  return t ?? materialQuery(materialId);
+}
+
 export function makeRetailProvider(cfg: RetailScraperConfig): PriceProvider {
   return {
     key: cfg.key,
     ttlSec: cfg.ttlSec,
     async fetch(materialId: string): Promise<number | null> {
-      const q = encodeURIComponent(materialQuery(materialId));
+      const material = MATERIALS[materialId] ?? null;
+      const q = encodeURIComponent(searchTermFor(cfg.key, materialId));
       const url = cfg.urlTemplate.replace("{q}", q);
 
       // 1) ScrapingBee free-tier first (when key bound) — bypasses the
@@ -47,6 +59,13 @@ export function makeRetailProvider(cfg: RetailScraperConfig): PriceProvider {
         timeoutMs: cfg.timeoutMs ?? 30_000,
       });
       if (html) {
+        // Prefer JSON-LD Product blobs (carry name+price, so we can filter
+        // by canonical brand/size). Fallback to blind regex extraction.
+        const named = extractNamedPricesFromJsonLd(html);
+        if (named.length > 0) {
+          const m = pickPriceForMaterial(named, material);
+          if (m !== null) return m;
+        }
         const prices = extractPricesFromHtml(html);
         const m = median(prices);
         if (m !== null) return m;
