@@ -1,8 +1,12 @@
 # Construction Cost Engine — Data Pipeline Deck
 
-> Self-contained HTML presentation. เปิดด้วย browser → `docs/pipeline-deck/index.html` (หรือ `python3 -m http.server` แล้วเปิด `localhost:8000`)
+> Three formats:
+> - **`Construction-Cost-Engine-Pipeline.pptx`** — PowerPoint/Keynote-ready, 16:9, ~55KB
+> - **`index.html`** — self-contained HTML (no deps, exportable to PDF)
+> - **`build_pptx.py`** — generator script (re-run after edits)
 
-**Navigation:** ← →, Space, PageUp/Down, Home/End, ปุ่มล่างขวา.
+**.pptx Navigation:** เปิดด้วย PowerPoint / Keynote / Google Slides ได้เลย — กด F5 เพื่อ present.
+**HTML Navigation:** ← →, Space, PageUp/Down, Home/End.
 
 ---
 
@@ -210,5 +214,16 @@ Component classes ที่ reuse ได้:
 
 ## Files
 
-- `docs/pipeline-deck/index.html` — deck (1 file, no deps)
+- `docs/pipeline-deck/Construction-Cost-Engine-Pipeline.pptx` — PowerPoint deck (10 slides, 16:9)
+- `docs/pipeline-deck/index.html` — HTML deck (mirror, no deps)
+- `docs/pipeline-deck/build_pptx.py` — pptx generator (rerun with `python3 build_pptx.py`)
 - `docs/pipeline-deck/README.md` — this doc
+
+## Regenerating the .pptx
+
+```bash
+pip install python-pptx     # one-time (>=1.0)
+python3 docs/pipeline-deck/build_pptx.py
+```
+
+Edit content/colors in `build_pptx.py` (theme constants ที่ต้นไฟล์ + แต่ละ slide block แยกชัดเจน).
