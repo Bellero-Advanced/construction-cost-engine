@@ -9,6 +9,8 @@ export const MATERIALS: Record<string, Material> = {
     spec: "เกรด A สีพื้น",
     work: "wall_tile",
     cons: 1.05,
+    canonical: { size: "12x12" },
+    searchTerms: ["กระเบื้อง 12x12", "กระเบื้องปูพื้น 12x12", "กระเบื้องเซรามิค"],
   },
   TILE_002: {
     id: "TILE_002",
@@ -18,6 +20,8 @@ export const MATERIALS: Record<string, Material> = {
     spec: "เกรด A สีขาว",
     work: "wall_tile",
     cons: 1.05,
+    canonical: { size: "8x10" },
+    searchTerms: ["กระเบื้องผนัง 8x10", "กระเบื้องบุผนัง"],
   },
   ADHESIVE_001: {
     id: "ADHESIVE_001",
@@ -27,6 +31,8 @@ export const MATERIALS: Record<string, Material> = {
     spec: "TPI/จระเข้",
     work: "wall_tile",
     cons: 0.25,
+    canonical: { size: "20kg" },
+    searchTerms: ["ปูนกาว 20 กก", "ปูนกาวซีเมนต์", "จระเข้เขียว"],
   },
   GROUT_001: {
     id: "GROUT_001",
@@ -36,6 +42,8 @@ export const MATERIALS: Record<string, Material> = {
     spec: "สีเทา/ขาว",
     work: "wall_tile",
     cons: 0.3,
+    canonical: { size: "1kg" },
+    searchTerms: ["ปูนยาแนว 1 กก", "ปูนยาแนวกระเบื้อง"],
   },
   PVC_TRIM_001: {
     id: "PVC_TRIM_001",
@@ -45,6 +53,8 @@ export const MATERIALS: Record<string, Material> = {
     spec: "สีขาว/ครีม 8mm",
     work: "wall_tile",
     cons: 0.4,
+    canonical: { size: "8mm" },
+    searchTerms: ["คิ้ว PVC", "คิ้วปิดมุม"],
   },
   WATER_MIX_001: {
     id: "WATER_MIX_001",
@@ -63,6 +73,12 @@ export const MATERIALS: Record<string, Material> = {
     spec: "มอก. 15-2562",
     work: "column_beam",
     cons: 7.0,
+    canonical: { brand: "ตราเสือ", size: "50kg", grade: "Type I" },
+    searchTerms: [
+      "ปูนซีเมนต์ปอร์ตแลนด์ ตราเสือ 50 กก",
+      "ปูนตราเสือ 50 กก",
+      "ปูนซีเมนต์ Type I 50",
+    ],
   },
   SAND_001: {
     id: "SAND_001",
@@ -72,6 +88,8 @@ export const MATERIALS: Record<string, Material> = {
     spec: "ขนาด 2-5 มม.",
     work: "column_beam",
     cons: 0.5,
+    canonical: { grade: "ทรายหยาบ" },
+    searchTerms: ["ทรายหยาบ", "ทรายแม่น้ำ", "ทรายก่อสร้าง"],
   },
   ROCK_001: {
     id: "ROCK_001",
@@ -81,6 +99,8 @@ export const MATERIALS: Record<string, Material> = {
     spec: "3/4-1 นิ้ว",
     work: "column_beam",
     cons: 1.0,
+    canonical: { size: "3/4-1นิ้ว" },
+    searchTerms: ["หินคลุก", "หินเบอร์ 1", "หินก่อสร้าง"],
   },
   WATER_MIX_002: {
     id: "WATER_MIX_002",
@@ -100,6 +120,8 @@ export const MATERIALS: Record<string, Material> = {
     work: "rebar",
     wpm: 0.222,
     useFor: "ปลอกเสา/คาน",
+    canonical: { size: "RB6", grade: "SR24" },
+    searchTerms: ["เหล็กเส้นกลม RB6", "เหล็ก RB6 SR24", "เหล็กปลอก 6มม"],
   },
   REBAR_RB9: {
     id: "REBAR_RB9",
@@ -110,6 +132,8 @@ export const MATERIALS: Record<string, Material> = {
     work: "rebar",
     wpm: 0.499,
     useFor: "ปลอกคานใหญ่/พื้น",
+    canonical: { size: "RB9", grade: "SR24" },
+    searchTerms: ["เหล็กเส้นกลม RB9", "เหล็ก RB9 SR24"],
   },
   REBAR_DB10: {
     id: "REBAR_DB10",
@@ -120,6 +144,8 @@ export const MATERIALS: Record<string, Material> = {
     work: "rebar",
     wpm: 0.617,
     useFor: "ยืน คานเล็ก/พื้น",
+    canonical: { size: "DB10", grade: "SD40" },
+    searchTerms: ["เหล็กข้ออ้อย DB10", "เหล็ก DB10 SD40"],
   },
   REBAR_DB12: {
     id: "REBAR_DB12",
@@ -130,6 +156,8 @@ export const MATERIALS: Record<string, Material> = {
     work: "rebar",
     wpm: 0.888,
     useFor: "ยืน เสา/คาน บ้าน",
+    canonical: { size: "DB12", grade: "SD40" },
+    searchTerms: ["เหล็กข้ออ้อย DB12", "เหล็ก DB12 SD40", "เหล็กเส้น 12มม"],
   },
   REBAR_DB16: {
     id: "REBAR_DB16",
@@ -140,6 +168,8 @@ export const MATERIALS: Record<string, Material> = {
     work: "rebar",
     wpm: 1.578,
     useFor: "ยืนหลัก เสาอาคาร 2-3 ชั้น",
+    canonical: { size: "DB16", grade: "SD40" },
+    searchTerms: ["เหล็กข้ออ้อย DB16", "เหล็ก DB16 SD40"],
   },
   REBAR_DB20: {
     id: "REBAR_DB20",
@@ -150,6 +180,8 @@ export const MATERIALS: Record<string, Material> = {
     work: "rebar",
     wpm: 2.466,
     useFor: "ยืนหลัก อาคารพาณิชย์",
+    canonical: { size: "DB20", grade: "SD40" },
+    searchTerms: ["เหล็กข้ออ้อย DB20", "เหล็ก DB20 SD40"],
   },
   REBAR_DB25: {
     id: "REBAR_DB25",
@@ -160,6 +192,8 @@ export const MATERIALS: Record<string, Material> = {
     work: "rebar",
     wpm: 3.853,
     useFor: "งานสะพาน/อาคารสูง",
+    canonical: { size: "DB25", grade: "SD40" },
+    searchTerms: ["เหล็กข้ออ้อย DB25", "เหล็ก DB25 SD40"],
   },
   WIRE_001: {
     id: "WIRE_001",
@@ -169,6 +203,8 @@ export const MATERIALS: Record<string, Material> = {
     spec: "ลวดอบดำ",
     work: "rebar",
     consPerTon: 15,
+    canonical: { size: "#18" },
+    searchTerms: ["ลวดผูกเหล็ก #18", "ลวดอบดำ", "ลวดผูกเหล็ก เบอร์ 18"],
   },
   FORM_WOOD_001: {
     id: "FORM_WOOD_001",
@@ -178,6 +214,8 @@ export const MATERIALS: Record<string, Material> = {
     spec: "ไม้อัด หนา 15 มม.",
     work: "rebar",
     reuse: 4,
+    canonical: { size: "15mm" },
+    searchTerms: ["ไม้อัด 15 มม", "ไม้แบบก่อสร้าง", "ไม้อัดยาง 15"],
   },
   NAIL_001: {
     id: "NAIL_001",
@@ -187,5 +225,7 @@ export const MATERIALS: Record<string, Material> = {
     spec: "เคลือบสังกะสี",
     work: "rebar",
     consPerForm: 0.5,
+    canonical: { size: "2-3นิ้ว" },
+    searchTerms: ["ตะปู 3 นิ้ว", "ตะปูตอกไม้", "ตะปูเคลือบสังกะสี"],
   },
 };

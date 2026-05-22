@@ -169,6 +169,46 @@ export default function CompareSourcesPage() {
 
       {data && !loading && (
         <>
+          {(() => {
+            const mat = MATERIALS[material];
+            const c = mat?.canonical;
+            const specChips: string[] = [];
+            if (c?.brand) specChips.push(c.brand);
+            if (c?.size) specChips.push(c.size);
+            if (c?.grade) specChips.push(c.grade);
+            const highSpread =
+              data.summary.spreadPct != null && data.summary.spreadPct > 30;
+            return (
+              <Doc tag="MATCHING / TRUST">
+                <div className="flex flex-wrap items-center gap-2 text-[12px]">
+                  <span className="font-mono text-ink-3">
+                    Canonical spec:
+                  </span>
+                  {specChips.length > 0 ? (
+                    specChips.map((t) => (
+                      <Badge key={t} variant="line">
+                        {t}
+                      </Badge>
+                    ))
+                  ) : (
+                    <span className="text-ink-3">— (no canonical filter)</span>
+                  )}
+                  <span className="ml-auto font-mono text-[11px] text-ink-3">
+                    Government = Official BoQ · Modern Trade = Market price
+                  </span>
+                </div>
+                {highSpread && (
+                  <p className="mt-3 border-l-2 border-amber-bright bg-paper-2 p-2 font-mono text-[11px] text-ink-2">
+                    ⚠ Spread &gt; 30% — ราคาที่ได้เป็น{" "}
+                    <strong>Indicative range</strong> เท่านั้น แต่ละแหล่งอาจ
+                    match สินค้าต่าง brand/size; ใช้คอลัมน์ TYPE
+                    เป็นตัวตัดสินใจ (Government = ราคาประเมินทางการ).
+                  </p>
+                )}
+              </Doc>
+            );
+          })()}
+
           <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             <Stat
               label="LIVE / ทั้งหมด"

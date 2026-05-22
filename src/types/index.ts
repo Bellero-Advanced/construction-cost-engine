@@ -34,6 +34,17 @@ export interface Province {
   region: string;
 }
 
+export interface MaterialSpec {
+  brand?: string; // canonical brand keyword e.g. "ตราเสือ", "TPI", "SCG"
+  size?: string; // canonical size token e.g. "50kg", "DB12", "12x12"
+  grade?: string; // grade/standard e.g. "Type I", "SD40", "มอก.20-2559"
+}
+
+export interface SourceOverride {
+  url?: string;
+  searchTerm?: string;
+}
+
 export interface Material {
   id: string;
   name: string;
@@ -47,6 +58,10 @@ export interface Material {
   consPerTon?: number; // for wire
   consPerForm?: number; // for nails
   reuse?: number; // for formwork
+  // --- Canonicalization (Option B) ---
+  canonical?: MaterialSpec; // brand+size+grade we want to match across sources
+  searchTerms?: string[]; // multi-keyword fallback for retail search
+  sourceOverrides?: Partial<Record<SourceKey, SourceOverride>>;
 }
 
 export interface BomItem {
