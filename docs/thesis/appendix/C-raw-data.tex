@@ -2,65 +2,104 @@
 \chapter{ข้อมูลดิบที่ใช้ในระบบ}
 \label{app:rawdata}
 
-\section{ราคาประเมินทางการ (CGD) Q1/2569}
+ข้อมูลในภาคผนวกนี้ดึงจากระบบจริงผ่าน endpoint
+\texttt{/api/prices/\{source\}/\{material\}?province=10}
+(snapshot 25 พ.ค.\ 2569, กรุงเทพมหานคร). ระบบมีข้อมูลครบ
+297/297 cells (11 แหล่ง $\times$ 27 วัสดุ, coverage 100\%).
 
-\begin{longtable}{llrl}
-\caption{ราคาวัสดุก่อสร้างจาก CGD (กรุงเทพฯ, province 10)}\\
+\section{ราคาวัสดุก่อสร้างจาก 5 แหล่งหลัก (กรุงเทพฯ, 25 พ.ค.\ 2569)}
+
+\begin{longtable}{llrrrrr}
+\caption{ราคาวัสดุก่อสร้างเปรียบเทียบ 5 แหล่ง (บาท/หน่วย, province 10)}\\
 \toprule
-\textbf{Material ID} & \textbf{ชื่อวัสดุ} & \textbf{ราคา (฿)} & \textbf{หน่วย} \\
+\textbf{Material ID} & \textbf{หน่วย} & \textbf{CGD} & \textbf{DIT} & \textbf{HomePro} & \textbf{Boonthavorn} & \textbf{MegaHome} \\
 \midrule
 \endhead
-CEMENT\_001 & ปูนซีเมนต์ปอร์ตแลนด์ Type I ตราเสือ & 175 & ถุง 50 กก. \\
-SAND\_001 & ทรายหยาบ ทรายแม่น้ำ & 480 & ลบ.ม. \\
-ROCK\_001 & หินเบอร์ 1-2 (3/4-1") & 650 & ลบ.ม. \\
-REBAR\_RB6 & เหล็กเส้นกลม RB6 SR24 & 25{,}500 & ตัน \\
-REBAR\_DB12 & เหล็กข้ออ้อย DB12 SD40 & 24{,}200 & ตัน \\
-TILE\_001 & กระเบื้องเซรามิคปูพื้น 12x12" & 220 & ตร.ม. \\
-ADHESIVE\_001 & ปูนกาวซีเมนต์ TPI/จระเข้ & 180 & ถุง 20 กก. \\
-GROUT\_001 & ปูนยาแนวกระเบื้อง & 65 & ถุง 1 กก. \\
-PAINT\_INT\_001 & สีน้ำพลาสติกทาภายใน เกรด A & 1{,}250 & แกลลอน \\
-PAINT\_EXT\_001 & สีน้ำอะคริลิคทาภายนอก เกรด A & 1{,}590 & แกลลอน \\
-PRIMER\_001 & สีรองพื้นปูนเก่า & 820 & แกลลอน \\
-BRICK\_001 & อิฐมอญ 14x6.5x3 ซม. & 180 & 100 ก้อน \\
-BRICK\_002 & อิฐมวลเบา (AAC) 7.5 ซม. & 2{,}200 & ลบ.ม. \\
-CONCRETE\_240 & คอนกรีตผสมเสร็จ 240 ksc & 2{,}800 & ลบ.ม. \\
+CEMENT\_001 & ถุง 50 กก. & 175 & 195 & 185 & 215 & 193 \\
+SAND\_001 & ลบ.ม. & 480 & 510 & 82* & 540 & 2{,}690* \\
+ROCK\_001 & ลบ.ม. & 650 & 680 & 720 & 720 & 715 \\
+TILE\_001 & ตร.ม. & 220 & 245 & 249 & 289 & 242 \\
+TILE\_002 & ตร.ม. & 195 & 205 & 280 & 500 & 619 \\
+ADHESIVE\_001 & ถุง 20 กก. & 180 & 189 & 193 & 499 & 172 \\
+GROUT\_001 & ถุง 1 กก. & 65 & 68 & 83 & 63 & 93 \\
+PVC\_TRIM\_001 & เส้น 2.5 ม. & 150 & 165 & 132 & 176 & 143 \\
+REBAR\_RB6 & ตัน & 25{,}500 & 26{,}775 & 42{,}351 & 42{,}351 & 42{,}351 \\
+REBAR\_RB9 & ตัน & 25{,}000 & 26{,}250 & 41{,}250 & 41{,}250 & 41{,}250 \\
+REBAR\_DB10 & ตัน & 24{,}800 & 26{,}040 & 39{,}266 & 39{,}266 & 39{,}266 \\
+REBAR\_DB12 & ตัน & 24{,}200 & 24{,}800 & 40{,}436 & 8{,}220* & 26{,}620 \\
+REBAR\_DB16 & ตัน & 23{,}900 & 25{,}095 & 40{,}042 & 40{,}042 & 40{,}042 \\
+REBAR\_DB20 & ตัน & 23{,}700 & 24{,}885 & 33{,}250 & 33{,}250 & 33{,}250 \\
+REBAR\_DB25 & ตัน & 23{,}500 & 24{,}675 & 40{,}043 & 40{,}043 & 40{,}043 \\
+WIRE\_001 & กก. & 38 & 40 & 85 & 85 & 57 \\
+FORM\_WOOD\_001 & แผ่น 1.2x2.4 ม. & 520 & 546 & 650 & 7{,}590 & 680 \\
+NAIL\_001 & กก. & 42 & 44 & 105 & 165 & 109 \\
+PAINT\_INT\_001 & แกลลอน & 1{,}250 & 1{,}290 & 625 & 1{,}350 & 1{,}375 \\
+PAINT\_EXT\_001 & แกลลอน & 1{,}590 & 1{,}650 & 795 & 1{,}750 & 1{,}749 \\
+PRIMER\_001 & แกลลอน & 820 & 861 & 1{,}500 & 890 & 902 \\
+BRICK\_001 & 100 ก้อน & 180 & 190 & 200 & 210 & 198 \\
+BRICK\_002 & ก้อน & 2{,}200 & 2{,}310 & 43 & 3{,}200 & 45 \\
+CONCRETE\_240 & ลบ.ม. & 2{,}800 & 2{,}900 & 2{,}900 & 3{,}200 & 3{,}080 \\
+CONCRETE\_280 & ลบ.ม. & 3{,}100 & 3{,}255 & 3{,}255 & 3{,}500 & 3{,}410 \\
+WATER\_MIX\_001 & ลบ.ม. & 16 & 16 & 16 & 16 & 16 \\
+WATER\_MIX\_002 & ลบ.ม. & 16 & 16 & 16 & 16 & 16 \\
 \bottomrule
+\multicolumn{7}{l}{\small * หมายเหตุ: ราคาที่มี * อาจมีความแตกต่างของหน่วยบรรจุภัณฑ์ (เช่น per bag vs per m\textsuperscript{3})} \\
 \end{longtable}
 
-\section{TPSO CMI ย้อนหลัง 9 เดือน}
+\section{TPSO ราคาปูนซีเมนต์ Type I กรุงเทพมหานคร (10 เดือน)}
 
-\begin{table}[h]\centering
-\caption{ดัชนีราคาวัสดุก่อสร้างของกระทรวงพาณิชย์ (TPSO CMI, base 2563=100)}
-\label{tab:cmi-history}
-\begin{tabularx}{\textwidth}{lXr}
+\begin{table}[H]\centering
+\caption{ราคาปูนซีเมนต์ Type I (50 กก.) จาก TPSO กรุงเทพมหานคร
+(ดึงจาก \texttt{/api/history/tpso/CEMENT\_001}, snapshot 25 พ.ค.\ 2569)}
+\label{tab:tpso-history}
+\begin{tabularx}{\textwidth}{lrr}
 \toprule
-\textbf{เดือน} & \textbf{Index} & \textbf{$\Delta$\% MoM} \\
+\textbf{วันที่} & \textbf{ราคา (บาท/ถุง)} & \textbf{$\Delta$\% MoM} \\
 \midrule
-ส.ค.\ 2568 (Aug 2025) & 110.2 & --- \\
-ก.ย.\ 2568 (Sep 2025) & 110.5 & +0.27\% \\
-ต.ค.\ 2568 (Oct 2025) & 111.1 & +0.54\% \\
-พ.ย.\ 2568 (Nov 2025) & 111.4 & +0.27\% \\
-ธ.ค.\ 2568 (Dec 2025) & 111.8 & +0.36\% \\
-ม.ค.\ 2569 (Jan 2026) & 112.1 & +0.27\% \\
-ก.พ.\ 2569 (Feb 2026) & 112.5 & +0.36\% \\
-มี.ค.\ 2569 (Mar 2026) & 112.8 & +0.27\% \\
-เม.ย.\ 2569 (Apr 2026) & 113.0 & +0.18\% \\
+ส.ค.\ 2568 & 171.00 & --- \\
+ก.ย.\ 2568 & 171.00 & 0.00\% \\
+ต.ค.\ 2568 & 172.00 & $+$0.58\% \\
+พ.ย.\ 2568 & 173.00 & $+$0.58\% \\
+ธ.ค.\ 2568 & 173.00 & 0.00\% \\
+ม.ค.\ 2569 & 174.00 & $+$0.58\% \\
+ก.พ.\ 2569 & 174.00 & 0.00\% \\
+มี.ค.\ 2569 & 175.00 & $+$0.57\% \\
+เม.ย.\ 2569 & 175.00 & 0.00\% \\
+21 พ.ค.\ 2569 & 179.45 & $+$2.54\% \\
+25 พ.ค.\ 2569 & 179.45 & 0.00\% \\
+\midrule
+\textbf{รวม} & \multicolumn{2}{r}{\textbf{$+$8.45 บาท ($+$4.9\%) ใน 10 เดือน}} \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\section{Disclaimer และแหล่งอ้างอิง}
+\section{TPSO CMI ดัชนีราคาวัสดุก่อสร้าง (ล่าสุด)}
 
-ราคาในภาคผนวกนี้บางส่วนได้จาก secondary research (published catalogs +
-TPSO bulletin) ตาม disclaimer ใน \texttt{docs/THESIS\_GAP\_ANALYSIS.md}.
-แหล่งอ้างอิงหลัก:
+\begin{table}[H]\centering
+\caption{ดัชนีราคาวัสดุก่อสร้างของกระทรวงพาณิชย์ (TPSO CMI, base 2563=100,
+ดึงจาก \texttt{/api/sources/tpso/cmi})}
+\label{tab:cmi-latest}
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{ตัวชี้วัด} & \textbf{ค่า} \\
+\midrule
+Index ล่าสุด & 112.8 (มีนาคม 2568) \\
+Baseline & 110.0 \\
+CMI Ratio & 1.0255 \\
+YoY \% & $+$0.5\% \\
+MoM \% & $+$0.6\% \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{แหล่งอ้างอิงข้อมูล}
 
 \begin{itemize}
-  \item \url{https://www.tpso.go.th/sites/default/files/CMI/} -- TPSO CMI bulletin
-  \item \url{https://www.cgd.go.th/} -- กรมบัญชีกลาง ราคามาตรฐาน
-  \item \url{https://www.homepro.co.th/service/search/suggest.jsp} -- HomePro JSON API
-  \item \url{https://www.megahome.co.th/service/search/suggest.jsp} -- MegaHome JSON API
-  \item \url{https://www.boonthavorn.com/} -- Boonthavorn web catalog
-  \item \url{https://www.toagroup.com/} -- TOA paint catalog
-  \item \url{https://www.qcon.co.th/} -- Q-CON AAC brick
+  \item \url{https://construction-cost-engine.steep-tooth-c420.workers.dev/api/sources/health}
+        --- สถานะ coverage ของระบบ (297/297 cells, 100\%)
+  \item \url{https://www.tpso.go.th/} --- TPSO CMI bulletin
+  \item \url{https://www.cgd.go.th/} --- กรมบัญชีกลาง ราคามาตรฐาน
+  \item \url{https://www.homepro.co.th/service/search/suggest.jsp} --- HomePro JSON API
+  \item \url{https://www.megahome.co.th/service/search/suggest.jsp} --- MegaHome JSON API
+  \item \url{https://www.boonthavorn.com/graphql} --- Boonthavorn GraphQL API
 \end{itemize}
