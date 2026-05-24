@@ -1,4 +1,4 @@
-% frontmatter/cover.tex — หน้าปกวิทยานิพนธ์ (XeLaTeX, fix line-end error)
+% frontmatter/cover.tex — หน้าปกวิทยานิพนธ์ (XeLaTeX)
 \thispagestyle{empty}
 \begin{center}
   \vspace*{1cm}
@@ -9,12 +9,21 @@
   {\large เรื่อง}
 
   \vspace{1cm}
-  {\large\bfseries\thesistitleTH}
+  % ห่อ parbox + linebreakpenalty ต่ำ → ให้ Thai locale break ระหว่างคำ
+  \begin{minipage}{0.88\textwidth}
+    \begin{center}
+      {\large\bfseries\thesistitleTH\par}
+    \end{center}
+  \end{minipage}
 
-  \vspace{2cm}
-  {\large\bfseries\thesistitleEN}
+  \vspace{1.8cm}
+  \begin{minipage}{0.88\textwidth}
+    \begin{center}
+      {\large\bfseries\thesistitleEN\par}
+    \end{center}
+  \end{minipage}
 
-  \vspace{2.5cm}
+  \vspace{2.2cm}
   จัดทำโดย
 
   \vspace{0.5cm}
@@ -22,16 +31,16 @@
 
   {\large \studentid}
 
-  \vspace{2cm}
+  \vspace{1.8cm}
   อาจารย์ที่ปรึกษาโครงการ
 
   \vspace{0.4cm}
   {\large \advisor}
 
-  \vspace{2cm}
+  \vspace{1.8cm}
   ปริญญานิพนธ์นี้เป็นส่วนหนึ่งของการศึกษาวิชาโครงงานวิศวกรรมโยธา
 
-  ตามหลักสูตรวิศวกรรมศาสตร์บัณฑิต สาขาวิศวกรรมโยธา
+  ตามหลักสูตรวิศวกรรมศาสตรบัณฑิต สาขาวิศวกรรมโยธา
 
   \faculty
 

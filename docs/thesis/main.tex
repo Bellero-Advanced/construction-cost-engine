@@ -42,6 +42,16 @@
 % Mono font — ต้อง set ไม่งั้น polyglossia error
 \setmonofont[Scale=0.9]{Latin Modern Mono}
 
+% ── Thai line breaking (XeLaTeX) ──────────────────────
+% บังคับให้ XeTeX รู้จัก locale ไทย → break ระหว่างคำได้ ไม่ตัดกลางคำ
+\XeTeXlinebreaklocale "th"
+\XeTeXlinebreakskip = 0pt plus 1pt minus 0.1pt
+% ลด hyphenation aggression สำหรับภาษาไทย
+\tolerance=2000
+\emergencystretch=3em
+\hyphenpenalty=5000
+\exhyphenpenalty=5000
+
 % ── Page geometry ─────────────────────────────────────
 \usepackage[a4paper,top=3cm,bottom=2.5cm,left=3.5cm,right=2.5cm]{geometry}
 \usepackage{setspace}

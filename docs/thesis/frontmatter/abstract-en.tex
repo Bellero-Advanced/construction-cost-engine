@@ -1,4 +1,4 @@
-% frontmatter/abstract-en.tex — Abstract (English)
+% frontmatter/abstract-en.tex — Abstract (Civil Engineering perspective)
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
 
@@ -6,29 +6,59 @@
 \textbf{By:} \authornameEN\\
 \textbf{Advisor:} \advisorEN, Ph.D.\\
 
-At present, access to information through internet websites has become
-increasingly popular and convenient due to advancements in modern technology,
-particularly through web scraping techniques. Such data can be utilized to address
-a wide range of practical problems. This project focuses on the development of an
-automated system for extracting construction material price data from official
-websites of the Ministry of Commerce, categorized by provinces where construction
-projects are located, as well as from price announcements published by modern
-trade retailers nationwide, such as HomePro, MegaHome, Boonthavorn, and Thai Watsadu.
+Construction cost estimation is a critical activity in project management,
+particularly for public works in which quantity surveyors must reference the
+official median prices issued by the Comptroller General's Department (CGD)
+and the construction materials price index of the Ministry of Commerce in
+order to prepare the Bill of Quantities (BOQ) used for tendering, procurement,
+and project cost control. In current practice, however, three persistent
+problems remain: (1) material price information is dispersed across many
+unconnected sources, (2) government-issued reference prices are updated on
+a monthly cycle that lags behind the actual market, and (3) the published
+prices are typically national averages that do not reflect the considerable
+spatial variability between provinces.
 
-The extracted data are subsequently used to calculate unit costs of construction
-materials and to perform data analysis. Data management processes are also
-implemented, including data cleaning, unit standardization, and matching
-construction material items with similar characteristics across different
-data sources. The data analysis emphasizes spatial and temporal comparisons of
-unit costs of construction materials, as well as an assessment of the consistency
-between government-announced prices and actual market unit costs obtained from
-modern trade retailers.
+This project develops an information system for material cost estimation
+that integrates price data from eleven Thai sources --- three public
+agencies (the Trade Policy and Strategy Office, the Comptroller General's
+Department, and the Department of Internal Trade) and eight modern-trade
+retailers (HomePro, MegaHome, Boonthavorn, Thai Watsadu, Global House,
+Dohome, SCG Home, and BnB Home). The system computes unit costs in
+accordance with the CGD median-price methodology for five common
+construction work types: wall tiling, lintel/post forming, reinforcing
+steel, painting, and brickwork. From a user-supplied work quantity, the
+system generates a detailed Bill of Materials and a total cost breakdown
+suitable for use in BOQ documentation.
 
-The results of the study clearly illustrate trends and disparities in unit costs
-of construction materials across different data sources. These findings can serve
-as valuable supporting information for construction cost estimation, budget
-planning, and decision-making processes for government agencies and relevant
-stakeholders, thereby enhancing overall efficiency and effectiveness.
+For data quality, the system performs data cleaning, unit standardization,
+cross-source item matching using canonical specifications (brand, size,
+grade), and statistical outlier detection based on z-score testing
+following the approach of Lee and Yun (2024), so that prices distorted
+by technical errors or short-term promotions are excluded from the cost
+calculation.
 
-\noindent\textbf{Keywords:} Unit Cost, Construction Materials, Web Scraping, BOQ, Modern Trade, Ministry of Commerce
+Comparative analysis across six regions over a nine-month period shows
+that retailer prices for cement exceed the CGD baseline by an average of
+22.9\%, that prices in the Southern region are 22.9\% higher than those
+in the Central region (consistent with long-distance transportation
+costs), and that the Construction Materials Index issued by the Trade
+Policy and Strategy Office shows a linear upward trend of 0.4 points
+per month with $R^{2} = 0.989$. These findings indicate that relying
+solely on official reference prices for cost estimation carries a
+material risk of deviation from real market prices, which can in turn
+affect the adequacy of project budgets and the outcome of competitive
+tenders.
+
+The resulting system serves as a working tool for civil engineers,
+quantity surveyors, architects, and public officials, allowing
+multi-source price comparison within a single application. It reduces
+the time required for price research, improves the accuracy of cost
+estimates, and supports greater transparency in the public procurement
+process by exposing comparable price information from independent
+sources.
+
+\noindent\textbf{Keywords:} Construction Cost Estimation,
+Material Unit Cost, Bill of Quantities (BOQ), Median Price (CGD),
+Construction Materials Price Index, Modern Trade, Item Canonicalization,
+Outlier Detection
 \newpage
