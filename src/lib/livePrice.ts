@@ -105,6 +105,7 @@ import { bnbProvider } from "@/lib/scrapers/bnb";
 import { scghomeProvider } from "@/lib/scrapers/scghome";
 import { dohomeProvider } from "@/lib/scrapers/dohome";
 import { megahomeProvider } from "@/lib/scrapers/megahome";
+import { boonthavornProvider } from "@/lib/scrapers/boonthavorn";
 
 const PROVIDERS: Partial<Record<SourceKey, PriceProvider>> = {
   tpso: tpsoProvider,
@@ -117,6 +118,7 @@ const PROVIDERS: Partial<Record<SourceKey, PriceProvider>> = {
   scghome: scghomeProvider,
   dohome: dohomeProvider,
   megahome: megahomeProvider,
+  boonthavorn: boonthavornProvider,
 };
 
 export async function getLivePrice(
