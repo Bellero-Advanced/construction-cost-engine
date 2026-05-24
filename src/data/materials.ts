@@ -84,6 +84,7 @@ export const MATERIALS: Record<string, Material> = {
       "ปูนตราเสือ 50 กก",
       "ปูนซีเมนต์ Type I 50",
     ],
+    sourceOverrides: { megahome: { searchTerm: "cement" } },
   },
   SAND_001: {
     id: "SAND_001",
@@ -95,6 +96,7 @@ export const MATERIALS: Record<string, Material> = {
     cons: 0.5,
     canonical: { grade: "ทรายหยาบ" },
     searchTerms: ["ทรายหยาบ", "ทรายแม่น้ำ", "ทรายก่อสร้าง"],
+    sourceOverrides: { megahome: { searchTerm: "sand" } },
   },
   ROCK_001: {
     id: "ROCK_001",
@@ -106,6 +108,7 @@ export const MATERIALS: Record<string, Material> = {
     cons: 1.0,
     canonical: { size: "3/4-1นิ้ว" },
     searchTerms: ["หินคลุก", "หินเบอร์ 1", "หินก่อสร้าง"],
+    sourceOverrides: { megahome: { searchTerm: "rock aggregate" } },
   },
   WATER_MIX_002: {
     id: "WATER_MIX_002",
@@ -245,6 +248,7 @@ export const MATERIALS: Record<string, Material> = {
     cons: 0.031,
     canonical: { grade: "เกรด A" },
     searchTerms: ["สีน้ำพลาสติก ภายใน", "สีทาภายใน เกรด A", "interior paint"],
+    sourceOverrides: { megahome: { searchTerm: "primer" } },
   },
   PAINT_EXT_001: {
     id: "PAINT_EXT_001",
@@ -261,6 +265,7 @@ export const MATERIALS: Record<string, Material> = {
       "สีทาภายนอก เกรด A",
       "exterior paint",
     ],
+    sourceOverrides: { megahome: { searchTerm: "primer" } },
   },
   PRIMER_001: {
     id: "PRIMER_001",
@@ -273,6 +278,7 @@ export const MATERIALS: Record<string, Material> = {
     cons: 0.025,
     canonical: { grade: "รองพื้น" },
     searchTerms: ["สีรองพื้น", "primer ปูน", "wall primer"],
+    sourceOverrides: { megahome: { searchTerm: "primer" } },
   },
   // ===== BRICK =====
   BRICK_001: {
@@ -286,6 +292,7 @@ export const MATERIALS: Record<string, Material> = {
     cons: 145,
     canonical: { size: "14x6.5x3" },
     searchTerms: ["อิฐมอญ", "อิฐแดง 14x6.5", "clay brick"],
+    sourceOverrides: { megahome: { searchTerm: "brick" } },
   },
   BRICK_002: {
     id: "BRICK_002",
@@ -298,6 +305,7 @@ export const MATERIALS: Record<string, Material> = {
     cons: 8.3,
     canonical: { size: "7.5cm", brand: "Q-CON" },
     searchTerms: ["อิฐมวลเบา 7.5", "Q-CON", "Superblock", "AAC block"],
+    sourceOverrides: { megahome: { searchTerm: "AAC block" } },
   },
   // ===== CONCRETE =====
   CONCRETE_240: {
@@ -311,6 +319,7 @@ export const MATERIALS: Record<string, Material> = {
     cons: 1.0,
     canonical: { grade: "240ksc" },
     searchTerms: ["คอนกรีตผสมเสร็จ 240", "ready-mix 240 ksc"],
+    sourceOverrides: { megahome: { searchTerm: "concrete" } },
   },
   CONCRETE_280: {
     id: "CONCRETE_280",
