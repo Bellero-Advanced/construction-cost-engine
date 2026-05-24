@@ -223,11 +223,12 @@ Rendering (\texttt{@cloudflare/puppeteer}) ที่เปิด headless Chrome
 SPA ที่โหลดราคาผ่าน XHR) ระบบใช้ AI agent ที่อาศัย LLM (Large Language
 Model) เป็นแกนหลักในการสืบค้นข้อมูล. AI agent จะเปิดเว็บไซต์ต้นทางผ่าน
 headless browser session ที่ถูกควบคุม อ่านหน้าสินค้า สกัดราคาและรายละเอียด
-ของวัสดุ จากนั้นบันทึกผ่าน admin endpoint
-\texttt{POST /api/admin/upload-prices} อัตโนมัติ ผลลัพธ์ที่ได้จะถูก
-ตรวจสอบด้วย canonicalization และ outlier filter เช่นเดียวกับข้อมูลที่
-มาจากกลยุทธ์อื่น. แนวทางนี้แทนที่การป้อนข้อมูลด้วยมือของผู้ดูแลระบบ
-ลดเวลาและความคลาดเคลื่อนของการบันทึก. การ authenticate ของ AI agent
+ของวัสดุ จากนั้นบันทึกผ่าน endpoint \texttt{POST /api/admin/ai-agent}
+ที่ออกแบบมาเฉพาะสำหรับการรับข้อมูลจาก AI agent. Endpoint นี้เขียนราคา
+ลงทั้ง live price KV key และ history time-series key พร้อมกัน ทำให้
+ข้อมูลที่ AI agent รวบรวมสามารถปรากฏในหน้าเปรียบเทียบราคาและหน้าแนวโน้ม
+ได้ทันที. ผลลัพธ์ที่ได้จะถูกตรวจสอบด้วย canonicalization และ outlier filter
+เช่นเดียวกับข้อมูลที่มาจากกลยุทธ์อื่น. การ authenticate ของ AI agent
 กับ endpoint ใช้ \texttt{x-admin-token} header.
 
 \subsection{การจับคู่รายการวัสดุข้ามแหล่ง (Canonicalization)}
