@@ -5,23 +5,15 @@
 % =====================================================
 \documentclass[12pt,a4paper,oneside]{report}
 
-% ── Fonts (Thai + English) ─────────────────────────────
-% XeLaTeX is required. polyglossia handles Thai; fontspec selects fonts.
+% ── Fonts (Thai + English via XeLaTeX) ─────────────────
 \usepackage{fontspec}
 \usepackage{polyglossia}
 \setdefaultlanguage{thai}
 \setotherlanguage{english}
 
-% Use TH Sarabun New if available; fall back to Norasi (ships with TeX Live).
-% Overleaf has both. Garuda also works.
-\IfFontExistsTF{TH Sarabun New}
-  {\setmainfont[Scale=1.0]{TH Sarabun New}}
-  {\IfFontExistsTF{Norasi}
-    {\setmainfont[Scale=1.0]{Norasi}}
-    {\setmainfont{Garuda}}}
-
-\newfontfamily\thaifont{TH Sarabun New}[Scale=1.0]
-\newfontfamily\englishfont{Latin Modern Roman}
+% Norasi ships with every TeX Live distribution incl. Overleaf — no IfFontExistsTF needed.
+\setmainfont[Ligatures=TeX,Scale=1.0]{Norasi}
+\setmonofont[Scale=0.9]{Latin Modern Mono}
 
 % ── Page geometry ─────────────────────────────────────
 \usepackage[a4paper,top=3cm,bottom=2.5cm,left=3.5cm,right=2.5cm]{geometry}
@@ -46,11 +38,11 @@
 \usepackage{hyperref}
 \hypersetup{colorlinks=true, linkcolor=black, citecolor=blue, urlcolor=blue}
 
-% ── Bibliography (numeric style, robust) ─────────────
-\usepackage[backend=biber,style=numeric,sorting=nyt]{biblatex}
+% ── Bibliography (numeric, Thai not supported by biblatex → use english-apa) ──
+\usepackage[backend=biber,style=numeric,sorting=nyt,language=english]{biblatex}
 \addbibresource{references.bib}
 
-% ── Code listing style ────────────────────────────────
+% ── Code listings ─────────────────────────────────────
 \definecolor{codebg}{rgb}{0.96,0.96,0.96}
 \definecolor{codekey}{rgb}{0.0,0.4,0.7}
 \definecolor{codecom}{rgb}{0.4,0.55,0.4}
@@ -74,10 +66,11 @@
   \renewcommand{\chaptername}{บทที่}%
   \renewcommand{\figurename}{รูปที่}%
   \renewcommand{\tablename}{ตารางที่}%
+  \renewcommand{\abstractname}{บทคัดย่อ}%
 }
 
 % ── Thesis metadata ────────────────────────────────────
-\newcommand{\thesistitleTH}{การพัฒนาระบบอัตโนมัติสำหรับการคำนวณต้นทุนต่อหน่วย\\ของวัสดุก่อสร้างจากข้อมูลของกระทรวงพาณิชย์\\และสถานประกอบการค้าปลีกสมัยใหม่ทั่วประเทศ}
+\newcommand{\thesistitleTH}{การพัฒนาระบบอัตโนมัติสำหรับการคำนวณต้นทุนต่อหน่วยของวัสดุก่อสร้างจากข้อมูลของกระทรวงพาณิชย์และสถานประกอบการค้าปลีกสมัยใหม่ทั่วประเทศ}
 \newcommand{\thesistitleEN}{Development of an Automated System for Calculating Unit Costs of Construction Materials Using Data from the Ministry of Commerce and Nationwide Modern Retailers}
 \newcommand{\authorname}{นาย พัชรพงษ์ จิวสืบพงษ์}
 \newcommand{\authornameEN}{Mr.\ Patcharapong Jewsubpong}

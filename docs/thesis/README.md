@@ -60,12 +60,12 @@ docs/thesis/
 4. **Set Compiler: XeLaTeX** (สำคัญมาก)
 
 ### 2. Verify Thai font (Overleaf)
-Overleaf มี TH Sarabun New ติดตั้งไว้ allowwy. ถ้า compile แล้วฟอนต์
+Overleaf มี Norasi ติดตั้งไว้แล้ว (ทุก TeX Live distribution มี). ถ้า compile แล้วฟอนต์
 ไม่สวยให้ลองเปลี่ยนใน `main.tex`:
 ```latex
-\setmainfont{Norasi}        % ตัวเลือก 1 — มี TeX Live
-\setmainfont{TH Sarabun New} % ตัวเลือก 2 — Overleaf
-\setmainfont{Garuda}         % ตัวเลือก 3 — fallback
+\setmainfont[Ligatures=TeX]{Norasi}        % default — ทำงานทุก distribution
+\setmainfont[Ligatures=TeX]{Garuda}         % alternative — มีในหลาย distribution
+% \setmainfont{TH Sarabun New}              % ⚠ ห้ามใช้ — Overleaf TeX Live 2025 ไม่มี
 ```
 
 ### 3. Compile
