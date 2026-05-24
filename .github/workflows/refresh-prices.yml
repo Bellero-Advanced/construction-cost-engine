@@ -1,9 +1,9 @@
 name: refresh-prices
-# Prices change quarterly — weekly cron is plenty. Trigger manually via
-# workflow_dispatch when monthly CGD/DIT data is uploaded out-of-band.
+# Daily refresh: govt sources update monthly, retail TTL is 14-30 days.
+# Running daily ensures fresh data is always available.
 on:
   schedule:
-    - cron: "17 3 * * 1"
+    - cron: "23 2 * * *"
   workflow_dispatch:
 permissions:
   contents: read
