@@ -1,44 +1,7 @@
-% figures/screenshot-compare.tex — UI mockup of /compare-sources
+% figures/screenshot-compare.tex — production screenshot of /compare-sources
 \begin{figure}[H]
   \centering
-  \begin{tikzpicture}[font=\scriptsize]
-    \draw[draw=gray!50,fill=gray!3,rounded corners=4pt] (0,0) rectangle (12,8);
-    % Title bar
-    \draw[fill=blue!25,draw=blue!50] (0,7.3) rectangle (12,8);
-    \node[anchor=west,font=\bfseries] at (0.3,7.65) {เปรียบเทียบราคา: ปูนซีเมนต์ปอร์ตแลนด์ Type I (50 กก.)};
-
-    % Filter row
-    \draw[fill=white,draw=gray!50] (0.3,6.5) rectangle (11.7,7.1);
-    \node[anchor=west] at (0.5,6.8) {วัสดุ: \texttt{CEMENT\_001}\quad|\quad จังหวัด: นครราชสีมา\quad|\quad ภูมิภาค: อีสาน};
-
-    % Comparison table header
-    \draw[fill=gray!20,draw=gray!50] (0.3,5.9) rectangle (11.7,6.4);
-    \node[font=\bfseries\scriptsize] at (1.2,6.15) {แหล่ง};
-    \node[font=\bfseries\scriptsize] at (4.5,6.15) {ราคา (บาท)};
-    \node[font=\bfseries\scriptsize] at (7.0,6.15) {ส่วนต่างจาก CGD};
-    \node[font=\bfseries\scriptsize] at (9.7,6.15) {อัปเดต};
-
-    % Rows
-    \foreach \i/\src/\price/\diff/\time/\hl in {
-      0/CGD baseline/162/{0.0\%}/24 ชม./gray!10,
-      1/HomePro/195/{$+$20.4\%}/2 ชม./white,
-      2/MegaHome/188/{$+$16.0\%}/3 ชม./white,
-      3/บุญถาวร/182/{$+$12.3\%}/1 ชม./white,
-      4/ไทวัสดุ/198/{$+$22.2\%}/4 ชม./white,
-      5/โกลบอลเฮ้าส์/192/{$+$18.5\%}/2 ชม./white,
-      6/ดูโฮม/176/{$+$8.6\%}/5 ชม./yellow!20,
-      7/เอสซีจีโฮม/205/{$+$26.5\%}/1 ชม./white,
-      8/บีเอ็นบีโฮม/190/{$+$17.3\%}/2 ชม./white
-    } {
-      \draw[fill=\hl,draw=gray!30] (0.3,5.4 - \i*0.5) rectangle (11.7,5.9 - \i*0.5);
-      \node[anchor=west] at (0.5,5.65 - \i*0.5) {\src};
-      \node[anchor=east,font=\bfseries] at (5.5,5.65 - \i*0.5) {\price};
-      \node[anchor=east] at (8.0,5.65 - \i*0.5) {\diff};
-      \node[anchor=east,gray!70] at (10.5,5.65 - \i*0.5) {\time};
-    }
-    % Legend for outlier
-    \node[anchor=west,font=\scriptsize\itshape,yellow!50!black] at (0.3,0.6) {\textbf{หมายเหตุ:} ราคาที่ flag (ดูโฮม) อยู่ในช่วง flash sale — ระบบเตือนก่อนนำไปใช้คำนวณ};
-  \end{tikzpicture}
-  \caption{หน้าเปรียบเทียบราคา (\texttt{/compare-sources}) สำหรับวัสดุ \texttt{CEMENT\_001} ในจังหวัดนครราชสีมา. ตารางแสดงราคาเทียบกับ CGD baseline และเวลา freshness ของข้อมูลแต่ละแหล่ง พร้อม flag ราคาที่อาจเป็น outlier.}
+  \includegraphics[width=0.95\textwidth]{figures/screen-compare.png}
+  \caption{หน้าเปรียบเทียบราคา (\texttt{/compare-sources}). ตารางแสดงราคาเทียบจาก 11 แหล่งข้อมูล ทั้งภาครัฐและภาคค้าปลีกสมัยใหม่ พร้อมเวลา freshness และ flag ราคาที่อาจเป็น outlier.}
   \label{fig:scr-compare}
 \end{figure}

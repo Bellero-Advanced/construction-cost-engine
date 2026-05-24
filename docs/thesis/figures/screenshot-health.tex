@@ -1,49 +1,7 @@
-% figures/screenshot-health.tex — UI mockup of /health (system status)
+% figures/screenshot-health.tex — production screenshot of /health
 \begin{figure}[H]
   \centering
-  \begin{tikzpicture}[font=\scriptsize]
-    \draw[draw=gray!50,fill=gray!3,rounded corners=4pt] (0,0) rectangle (12,7.5);
-    \draw[fill=blue!25,draw=blue!50] (0,6.8) rectangle (12,7.5);
-    \node[anchor=west,font=\bfseries] at (0.3,7.15) {สถานะระบบ — System Health};
-
-    % Overall status badge
-    \draw[fill=green!30,draw=green!60,rounded corners=4pt] (0.3,5.9) rectangle (3.5,6.5);
-    \node[font=\bfseries] at (1.9,6.2) {\textcolor{green!50!black}{$\bullet$ ปกติ (Healthy)}};
-
-    % Stats summary row
-    \foreach \x/\v/\l in {0.3/9/{แหล่ง online}, 3.2/2/{แหล่ง degraded}, 6.1/0/{แหล่ง offline}, 9.0/4.7\%/{outlier rate}} {
-      \draw[fill=white,draw=gray!40,rounded corners=2pt] (\x,4.9) rectangle (\x+2.7,5.6);
-      \node[font=\bfseries] at (\x+1.35,5.35) {\v};
-      \node[font=\scriptsize,gray!70] at (\x+1.35,5.05) {\l};
-    }
-
-    % Per-source table
-    \node[anchor=west,font=\bfseries] at (0.3,4.5) {รายแหล่ง (cron job last run)};
-    \draw[fill=gray!15] (0.3,3.95) rectangle (11.7,4.3);
-    \node[anchor=west,font=\bfseries] at (0.5,4.13) {Source};
-    \node[anchor=west,font=\bfseries] at (4.0,4.13) {Status};
-    \node[anchor=west,font=\bfseries] at (6.5,4.13) {Last update};
-    \node[anchor=west,font=\bfseries] at (9.5,4.13) {Records};
-
-    \foreach \i/\src/\st/\time/\rec/\c in {
-      0/TPSO/{$\bullet$ ok}/{2 ชม.}/{216}/green,
-      1/CGD/{$\bullet$ ok}/{6 ชม.}/{ 24}/green,
-      2/DIT/{$\bullet$ ok}/{24 ชม.}/{ 18}/green,
-      3/HomePro/{$\bullet$ ok}/{1 ชม.}/{120}/green,
-      4/MegaHome/{$\bullet$ ok}/{1 ชม.}/{ 96}/green,
-      5/บุญถาวร/{$\bullet$ ok}/{2 ชม.}/{ 48}/green,
-      6/ไทวัสดุ/{$\bullet$ ok}/{2 ชม.}/{ 72}/green,
-      7/โกลบอลเฮ้าส์/{$\bullet$ degraded}/{14 ชม.}/{ 18}/orange!50!black,
-      8/ดูโฮม/{$\bullet$ ok}/{3 ชม.}/{ 24}/green,
-      9/เอสซีจีโฮม/{$\bullet$ ok}/{1 ชม.}/{ 12}/green,
-      10/บีเอ็นบีโฮม/{$\bullet$ degraded}/{18 ชม.}/{  6}/orange!50!black
-    } {
-      \node[anchor=west] at (0.5,3.7 - \i*0.30) {\src};
-      \node[anchor=west,\c] at (4.0,3.7 - \i*0.30) {\st};
-      \node[anchor=west] at (6.5,3.7 - \i*0.30) {\time};
-      \node[anchor=west,font=\ttfamily] at (9.5,3.7 - \i*0.30) {\rec};
-    }
-  \end{tikzpicture}
-  \caption{หน้า \texttt{/health} แสดงสถานะระบบและความสดของข้อมูลแต่ละแหล่ง. คอลัมน์ ``Last update'' เป็นข้อมูลที่วิศวกรประมาณราคาใช้ตัดสินว่าราคาในระบบปัจจุบันเชื่อถือได้สำหรับโครงการเร่งด่วนหรือไม่ — แหล่งที่ \texttt{degraded} จะแสดงราคาล่าสุดที่ดึงสำเร็จพร้อม timestamp.}
+  \includegraphics[width=0.95\textwidth]{figures/screen-health.png}
+  \caption{หน้า \texttt{/health} แสดงสถานะระบบและความสดของข้อมูลแต่ละแหล่ง. คอลัมน์เวลาอัปเดตเป็นข้อมูลที่วิศวกรประมาณราคาใช้ตัดสินว่าราคาในระบบปัจจุบันเชื่อถือได้สำหรับโครงการเร่งด่วนหรือไม่.}
   \label{fig:scr-health}
 \end{figure}

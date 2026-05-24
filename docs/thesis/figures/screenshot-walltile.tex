@@ -1,57 +1,7 @@
-% figures/screenshot-walltile.tex — UI mockup of /wall-tile (BOQ calculator)
+% figures/screenshot-walltile.tex — production screenshot of /wall-tile
 \begin{figure}[H]
   \centering
-  \begin{tikzpicture}[font=\scriptsize]
-    \draw[draw=gray!50,fill=gray!3,rounded corners=4pt] (0,0) rectangle (12,8);
-    \draw[fill=blue!25,draw=blue!50] (0,7.3) rectangle (12,8);
-    \node[anchor=west,font=\bfseries] at (0.3,7.65) {คำนวณ BOQ — งานบุกระเบื้องผนัง};
-
-    % Input panel (left)
-    \draw[fill=white,draw=gray!50,rounded corners=2pt] (0.3,1.0) rectangle (5.7,7.0);
-    \node[anchor=west,font=\bfseries] at (0.5,6.7) {ข้อมูลงาน};
-    \node[anchor=west] at (0.5,6.2) {พื้นที่ผนัง (ตร.ม.):};
-    \draw[fill=gray!10] (3.0,6.0) rectangle (5.5,6.4); \node[font=\bfseries] at (4.25,6.2) {50};
-    \node[anchor=west] at (0.5,5.6) {ขนาดกระเบื้อง:};
-    \draw[fill=gray!10] (3.0,5.4) rectangle (5.5,5.8); \node at (4.25,5.6) {30 $\times$ 30 ซม.};
-    \node[anchor=west] at (0.5,5.0) {เกรด:};
-    \draw[fill=gray!10] (3.0,4.8) rectangle (5.5,5.2); \node at (4.25,5.0) {เกรด A};
-    \node[anchor=west] at (0.5,4.4) {ปูนกาว:};
-    \draw[fill=gray!10] (3.0,4.2) rectangle (5.5,4.6); \node at (4.25,4.4) {กาวซีเมนต์ 20 กก.};
-    \node[anchor=west] at (0.5,3.8) {ภูมิภาค:};
-    \draw[fill=gray!10] (3.0,3.6) rectangle (5.5,4.0); \node at (4.25,3.8) {ภาคตะวันออกเฉียงเหนือ};
-    \node[anchor=west] at (0.5,3.2) {แหล่งราคา:};
-    \draw[fill=gray!10] (3.0,3.0) rectangle (5.5,3.4); \node at (4.25,3.2) {Modern Trade เฉลี่ย};
-
-    \draw[fill=blue!60,draw=blue!80,rounded corners=2pt] (1.0,1.5) rectangle (5.0,2.2);
-    \node[white,font=\bfseries] at (3.0,1.85) {คำนวณต้นทุน};
-
-    % Result panel (right)
-    \draw[fill=green!5,draw=green!50,rounded corners=2pt] (6.1,1.0) rectangle (11.7,7.0);
-    \node[anchor=west,font=\bfseries] at (6.3,6.7) {Bill of Materials};
-    \draw[draw=gray!40] (6.3,6.5) -- (11.5,6.5);
-    \foreach \i/\m/\q/\u/\p in {
-      0/{กระเบื้อง 30$\times$30}/55/แผ่น/{8\,250},
-      1/ปูนกาว 20 กก./4/ถุง/{1\,720},
-      2/ยาแนว/2/ถุง/{420},
-      3/spacer 3 มม./1/ถุง/{180}
-    } {
-      \node[anchor=west] at (6.3,6.0 - \i*0.45) {\m};
-      \node[anchor=east] at (8.5,6.0 - \i*0.45) {\q};
-      \node[anchor=west,gray!70] at (8.6,6.0 - \i*0.45) {\u};
-      \node[anchor=east,font=\bfseries] at (11.5,6.0 - \i*0.45) {\p};
-    }
-    \draw[draw=gray!40] (6.3,3.9) -- (11.5,3.9);
-    \node[anchor=west,font=\bfseries] at (6.3,3.6) {รวมต้นทุนวัสดุ};
-    \node[anchor=east,font=\bfseries] at (11.5,3.6) {10\,570 บาท};
-    \node[anchor=west,gray!70,font=\scriptsize] at (6.3,3.2) {ราคาเฉลี่ย/ตร.ม.};
-    \node[anchor=east,font=\bfseries,gray!70] at (11.5,3.2) {211 บาท};
-
-    % Export buttons
-    \draw[fill=gray!20,draw=gray!50,rounded corners=2pt] (6.3,1.4) rectangle (8.3,2.0);
-    \node[font=\scriptsize\bfseries] at (7.3,1.7) {Export Excel};
-    \draw[fill=gray!20,draw=gray!50,rounded corners=2pt] (8.6,1.4) rectangle (10.6,2.0);
-    \node[font=\scriptsize\bfseries] at (9.6,1.7) {Export PDF};
-  \end{tikzpicture}
-  \caption{หน้าคำนวณ BOQ งานบุกระเบื้องผนัง (\texttt{/wall-tile}). ผู้ใช้ป้อนพื้นที่งาน ขนาดกระเบื้อง และเลือกแหล่งราคา ระบบจะคำนวณ Bill of Materials ตามหลักเกณฑ์การคำนวณราคากลางของกรมบัญชีกลาง พร้อมรองรับการ export เป็น Excel/PDF เพื่อใช้ในเอกสารโครงการ.}
+  \includegraphics[width=0.95\textwidth]{figures/screen-walltile.png}
+  \caption{หน้าคำนวณ BOQ งานบุกระเบื้องผนัง (\texttt{/wall-tile}). ผู้ใช้ป้อนพื้นที่งาน ขนาดกระเบื้อง และเลือกแหล่งราคา ระบบจะคำนวณ Bill of Materials ตามหลักเกณฑ์การคำนวณราคากลางของกรมบัญชีกลาง พร้อมรองรับการ export เพื่อใช้ในเอกสารโครงการ.}
   \label{fig:scr-walltile}
 \end{figure}

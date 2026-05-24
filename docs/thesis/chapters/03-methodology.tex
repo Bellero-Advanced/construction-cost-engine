@@ -211,21 +211,26 @@ Rendering (\texttt{@cloudflare/puppeteer}) ที่เปิด headless Chrome
 
 ลำดับ fallback ของ retail provider:
 \begin{enumerate}[leftmargin=2em,itemsep=0.2em]
-  \item ScrapingBee + JSON-LD canonical extraction
-  \item ScrapingBee + RegEx price extraction
-  \item Cloudflare Browser Rendering (Puppeteer) + DOM scraping
-  \item คืน null และรอ manual upload
+  \item ScrapingBee $+$ JSON-LD canonical extraction
+  \item ScrapingBee $+$ RegEx price extraction
+  \item Cloudflare Browser Rendering (Puppeteer) $+$ DOM scraping
+  \item คืน null และส่งต่อให้ AI agent research
 \end{enumerate}
 
-\subsubsection{กลยุทธ์ที่ 4: Manual Upload}
+\subsubsection{กลยุทธ์ที่ 4: AI Agent Research}
 
-สำหรับแหล่งที่ scrape ไม่ได้เลย (CGD anti-bot, DIT URL deprecated,
-SPA ที่โหลดราคาผ่าน XHR) ระบบเปิด admin endpoint
-\texttt{POST /api/admin/upload-prices} ที่รับ payload JSON หรือ CSV
-จาก admin โดยตรง เพื่อบันทึกราคาเข้า KV. การ authenticate ใช้
-\texttt{x-admin-token} header.
+สำหรับแหล่งที่ scrape ไม่ได้ทั้งหมด (CGD anti-bot, DIT URL deprecated,
+SPA ที่โหลดราคาผ่าน XHR) ระบบใช้ AI agent ที่อาศัย LLM (Large Language
+Model) เป็นแกนหลักในการสืบค้นข้อมูล. AI agent จะเปิดเว็บไซต์ต้นทางผ่าน
+headless browser session ที่ถูกควบคุม อ่านหน้าสินค้า สกัดราคาและรายละเอียด
+ของวัสดุ จากนั้นบันทึกผ่าน admin endpoint
+\texttt{POST /api/admin/upload-prices} อัตโนมัติ ผลลัพธ์ที่ได้จะถูก
+ตรวจสอบด้วย canonicalization และ outlier filter เช่นเดียวกับข้อมูลที่
+มาจากกลยุทธ์อื่น. แนวทางนี้แทนที่การป้อนข้อมูลด้วยมือของผู้ดูแลระบบ
+ลดเวลาและความคลาดเคลื่อนของการบันทึก. การ authenticate ของ AI agent
+กับ endpoint ใช้ \texttt{x-admin-token} header.
 
-\subsection{Canonicalization (Option B)}
+\subsection{การจับคู่รายการวัสดุข้ามแหล่ง (Canonicalization)}
 
 \input{figures/canonicalization-diagram}
 

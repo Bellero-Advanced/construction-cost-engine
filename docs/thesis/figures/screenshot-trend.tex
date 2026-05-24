@@ -1,43 +1,7 @@
-% figures/screenshot-trend.tex — UI mockup of /trend
+% figures/screenshot-trend.tex — production screenshot of /trend
 \begin{figure}[H]
   \centering
-  \begin{tikzpicture}[font=\scriptsize]
-    \draw[draw=gray!50,fill=gray!3,rounded corners=4pt] (0,0) rectangle (12,7.5);
-    % Title
-    \draw[fill=blue!25,draw=blue!50] (0,6.8) rectangle (12,7.5);
-    \node[anchor=west,font=\bfseries] at (0.3,7.15) {แนวโน้มราคาวัสดุก่อสร้าง — TPSO Construction Materials Index (CMI)};
-
-    % Filter
-    \draw[fill=white,draw=gray!50] (0.3,6.0) rectangle (11.7,6.6);
-    \node[anchor=west] at (0.5,6.3) {วัสดุ: \texttt{CEMENT\_001}\quad|\quad ช่วงเวลา: 9 เดือน (ส.ค.\ 2568 -- เม.ย.\ 2569)\quad|\quad source: TPSO};
-
-    % Mini chart inline (axis from 109 to 113.5)
-    \begin{scope}[shift={(0.5,0.7)},x=1.2cm,y=0.9cm]
-      \draw[->,gray] (0,0) -- (10,0) node[right,gray]{เดือน};
-      \draw[->,gray] (0,0) -- (0,4.7) node[above,gray]{CMI};
-      \foreach \i/\v in {1/0.6, 2/1.2, 3/1.5, 4/1.9, 5/2.4, 6/2.7, 7/3.2, 8/3.5, 9/4.0} {
-        \fill[blue!70!black] (\i,\v) circle (1.6pt);
-      }
-      \draw[red!80,thick] (1,0.4) -- (9,4.0);
-      \node[font=\tiny,red!80] at (8.0,4.4) {$y = 109.59 + 0.396 x$};
-      \node[font=\tiny,red!80] at (8.0,4.0) {$R^{2} = 0.989$};
-      \foreach \i in {1,3,5,7,9} \node[gray,font=\tiny] at (\i,-0.3) {\i};
-      \foreach \v/\l in {0/109, 1/110, 2/111, 3/112, 4/113} \node[gray,font=\tiny] at (-0.3,\v) {\l};
-    \end{scope}
-
-    % Stats summary box (right side)
-    \draw[fill=green!8,draw=green!50,rounded corners=2pt] (9.0,1.0) rectangle (11.6,5.7);
-    \node[anchor=west,font=\bfseries\scriptsize] at (9.1,5.4) {สรุปแนวโน้ม};
-    \node[anchor=west] at (9.1,4.8) {ความชัน:};
-    \node[anchor=west,font=\bfseries] at (9.1,4.5) {$+0.396$ จุด/เดือน};
-    \node[anchor=west] at (9.1,3.9) {$R^{2}$:};
-    \node[anchor=west,font=\bfseries] at (9.1,3.6) {$0.989$};
-    \node[anchor=west] at (9.1,3.0) {คาดการณ์ พ.ค.\ 69:};
-    \node[anchor=west,font=\bfseries] at (9.1,2.7) {$113.6$ จุด};
-    \node[anchor=west] at (9.1,2.1) {อัตราเงินเฟ้อ:};
-    \node[anchor=west,font=\bfseries] at (9.1,1.8) {$+3.2\%$ ต่อปี};
-    \node[anchor=west,font=\tiny\itshape,gray!70] at (9.1,1.2) {ใช้เผื่อในงบประมาณ};
-  \end{tikzpicture}
-  \caption{หน้าแนวโน้มราคา (\texttt{/trend}) แสดงดัชนี CMI 9 เดือน พร้อมเส้นแนวโน้มเชิงเส้น $R^{2} = 0.989$. กล่องสรุปด้านขวาให้ตัวเลขที่วิศวกรประมาณราคาใช้เผื่อในงบประมาณโครงการระยะยาว — เช่น โครงการ 12 เดือนควรเผื่อค่าวัสดุเพิ่มประมาณ 3.2\%.}
+  \includegraphics[width=0.95\textwidth]{figures/screen-trend.png}
+  \caption{หน้าแนวโน้มราคา (\texttt{/trend}) แสดงดัชนี TPSO CMI 9 เดือน พร้อมเส้นแนวโน้มเชิงเส้น ($R^{2} = 0.989$). ตัวเลขสรุปด้านขวาเป็นข้อมูลที่วิศวกรประมาณราคาใช้เผื่อในงบประมาณโครงการระยะยาว.}
   \label{fig:scr-trend}
 \end{figure}
