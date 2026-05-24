@@ -42,6 +42,20 @@
 % Mono font — ต้อง set ไม่งั้น polyglossia error
 \setmonofont[Scale=0.9]{Latin Modern Mono}
 
+% Thai mono font — polyglossia ต้องการ \thaifonttt เพราะ Latin Modern Mono ไม่มี Thai script
+% ใช้ font หลัก (Sarabun ถ้ามี / Norasi ถ้าไม่มี) เป็น mono สำหรับ Thai text
+\IfFontExistsTF{[./fonts/THSarabunNew.ttf]}{
+  \newfontfamily\thaifonttt[
+    Path=./fonts/,
+    UprightFont=THSarabunNew.ttf,
+    BoldFont=THSarabunNew-Bold.ttf,
+    Scale=1.3,
+    Ligatures=TeX
+  ]{THSarabunNew}
+}{
+  \newfontfamily\thaifonttt[Scale=1.0,Ligatures=TeX]{Norasi}
+}
+
 % ── Thai line breaking (XeLaTeX) ──────────────────────
 % บังคับให้ XeTeX รู้จัก locale ไทย → break ระหว่างคำได้ ไม่ตัดกลางคำ
 \XeTeXlinebreaklocale "th"
@@ -83,6 +97,11 @@
 \definecolor{codebg}{rgb}{0.96,0.96,0.96}
 \definecolor{codekey}{rgb}{0.0,0.4,0.7}
 \definecolor{codecom}{rgb}{0.4,0.55,0.4}
+% TypeScript ไม่มีใน listings — define เป็น JavaScript dialect
+\lstdefinelanguage{TypeScript}[]{JavaScript}{
+  morekeywords={interface,type,enum,readonly,implements,namespace,declare,public,private,protected,abstract,as,is,keyof,satisfies,unknown,never,async,await,export,import,from,let,const},
+  sensitive=true
+}
 \lstset{
   backgroundcolor=\color{codebg},
   basicstyle=\ttfamily\footnotesize,
@@ -90,7 +109,8 @@
   commentstyle=\color{codecom}\itshape,
   numbers=left, numberstyle=\tiny, frame=single,
   breaklines=true, captionpos=b, tabsize=2,
-  showstringspaces=false
+  showstringspaces=false,
+  inputencoding=utf8, extendedchars=true
 }
 
 % ── Captions in Thai ──────────────────────────────────
