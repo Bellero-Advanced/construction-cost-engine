@@ -131,6 +131,19 @@ export const SOURCES: Record<string, Source> = {
     coverage: "16+ สาขา",
     updateFreq: "Real-time",
   },
+  boonthavorn: {
+    key: "boonthavorn",
+    name: "Boonthavorn (บุญถาวร)",
+    short: "Boonthavorn",
+    type: "Modern Trade",
+    color: "#0066cc",
+    mult: 1.03,
+    url: "https://www.boonthavorn.com",
+    desc: "บุญถาวร — ศูนย์รวมวัสดุก่อสร้างและของแต่งบ้าน เน้นงานวิศวกรรม",
+    badge: "RETAIL",
+    coverage: "20+ สาขาทั่วประเทศ",
+    updateFreq: "Manual",
+  },
 };
 
 export const SOURCE_KEYS = Object.keys(SOURCES) as Array<keyof typeof SOURCES>;

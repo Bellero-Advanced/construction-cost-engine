@@ -87,6 +87,7 @@ const DEFAULT_TTL: Record<SourceKey, number> = {
   scghome: 60 * 60 * 24 * 30,
   dohome: 60 * 60 * 24 * 30,
   megahome: 60 * 60 * 24 * 14,
+  boonthavorn: 60 * 60 * 24 * 30,
 };
 
 /**

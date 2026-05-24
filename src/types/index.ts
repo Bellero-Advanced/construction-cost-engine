@@ -1,4 +1,10 @@
-export type WorkType = "wall_tile" | "column_beam" | "rebar";
+export type WorkType =
+  | "wall_tile"
+  | "column_beam"
+  | "rebar"
+  | "paint"
+  | "brick"
+  | "concrete";
 
 export type SourceKey =
   | "tpso"
@@ -10,7 +16,8 @@ export type SourceKey =
   | "dit"
   | "scghome"
   | "dohome"
-  | "megahome";
+  | "megahome"
+  | "boonthavorn";
 
 export type SourceType = "Government" | "Modern Trade";
 
@@ -35,9 +42,9 @@ export interface Province {
 }
 
 export interface MaterialSpec {
-  brand?: string; // canonical brand keyword e.g. "ตราเสือ", "TPI", "SCG"
-  size?: string; // canonical size token e.g. "50kg", "DB12", "12x12"
-  grade?: string; // grade/standard e.g. "Type I", "SD40", "มอก.20-2559"
+  brand?: string;
+  size?: string;
+  grade?: string;
 }
 
 export interface SourceOverride {
@@ -51,16 +58,16 @@ export interface Material {
   unit: string;
   cat: string;
   spec: string;
+  mocCode?: string; // รหัสมาตรฐานกระทรวงพาณิชย์
   work: WorkType;
-  cons?: number; // consumption per work-unit
-  wpm?: number; // weight per meter (for rebar, ตัน/ม.? actually kg/m)
+  cons?: number;
+  wpm?: number;
   useFor?: string;
-  consPerTon?: number; // for wire
-  consPerForm?: number; // for nails
-  reuse?: number; // for formwork
-  // --- Canonicalization (Option B) ---
-  canonical?: MaterialSpec; // brand+size+grade we want to match across sources
-  searchTerms?: string[]; // multi-keyword fallback for retail search
+  consPerTon?: number;
+  consPerForm?: number;
+  reuse?: number;
+  canonical?: MaterialSpec;
+  searchTerms?: string[];
   sourceOverrides?: Partial<Record<SourceKey, SourceOverride>>;
 }
 
