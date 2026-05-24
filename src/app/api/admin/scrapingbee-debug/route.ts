@@ -9,6 +9,8 @@ const URL_TEMPLATES: Record<string, string> = {
   globalhouse: "https://www.globalhouse.co.th/search?q={q}",
   dohome: "https://www.dohome.co.th/c/search?q={q}",
   scghome: "https://www.scghome.com/search?keyword={q}",
+  boonthavorn: "https://www.boonthavorn.com/search?q={q}",
+  megahome: "https://www.megahome.co.th/search?q={q}",
 };
 
 export async function GET(req: Request) {
