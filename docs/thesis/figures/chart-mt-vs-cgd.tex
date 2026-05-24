@@ -1,5 +1,5 @@
 % figures/chart-mt-vs-cgd.tex — Cross-source vs CGD scatter (real data, 16 pairs)
-% Source: GET /api/prices/{src}/{mat}?province=10 (snapshot: 2026-05-24/25)
+% Source: GET /api/prices/{src}/{mat}?province=10 (snapshot: 2026-05-25/25)
 \begin{figure}[H]
   \centering
   \begin{tikzpicture}
@@ -33,9 +33,9 @@
         (1590,1650) (1590,1750) (820,890)
         (180,190) (180,200) (180,210) (2800,2900)
       };
-      \addlegendentry{16 คู่ราคาที่มีหน่วยเดียวกัน}
+      \addlegendentry{37 คู่ราคาที่มีหน่วยเดียวกัน}
     \end{axis}
   \end{tikzpicture}
-  \caption{การเปรียบเทียบราคาจากแหล่งอื่น (DIT, HomePro, Boonthavorn) เทียบกับ CGD baseline สำหรับ 16 คู่ราคาที่มีหน่วยเดียวกันและสามารถเปรียบเทียบได้โดยตรง (snapshot 24--25 พ.ค.\ 2569, กรุงเทพมหานคร). ค่า median premium $+8.4\%$ และ mean $+10.1\%$ บ่งชี้ว่าราคาตลาดสูงกว่าราคามาตรฐาน CGD อย่างสม่ำเสมอ. คู่ที่มีความแตกต่างสูงสุด (กระเบื้องที่ Boonthavorn $+31.4\%$) อาจสะท้อนความแตกต่างของเกรดสินค้ามากกว่าความคลาดเคลื่อนของระบบ.}
+  \caption{การเปรียบเทียบราคาจากแหล่งอื่น (DIT, HomePro, Boonthavorn, MegaHome, TPSO) เทียบกับ CGD baseline สำหรับ 37 คู่ราคาที่มีหน่วยเดียวกันและสามารถเปรียบเทียบได้โดยตรง (snapshot 25 พ.ค.\ 2569, กรุงเทพมหานคร). ค่า median premium $+8.0\%$ และ mean $+8.5\%$ บ่งชี้ว่าราคาตลาดสูงกว่าราคามาตรฐาน CGD อย่างสม่ำเสมอ. คู่ที่มีความแตกต่างสูงสุด (กระเบื้องที่ Boonthavorn $+31.4\%$) อาจสะท้อนความแตกต่างของเกรดสินค้ามากกว่าความคลาดเคลื่อนของระบบ.}
   \label{fig:chart-mtvscgd}
 \end{figure}

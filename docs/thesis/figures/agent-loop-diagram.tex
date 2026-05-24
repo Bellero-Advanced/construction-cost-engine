@@ -16,12 +16,12 @@
     \node[box,below=of plan] (act) {เรียก Tool};
     \node[decision,below=0.8cm of act] (valid) {ราคาสมเหตุ\\สมผล?};
     \node[box,below=0.9cm of valid,fill=green!20] (submit) {POST /api/admin/ai-agent\\(บันทึก live + history)};
-    \node[box,right=2.5cm of valid,fill=red!10] (retry) {ปรับคำค้น\\หรือแหล่งอื่น};
+    \node[box,right=3.5cm of valid,fill=red!10] (retry) {ปรับคำค้น\\หรือแหล่งอื่น};
 
     % Tool nodes (right side)
     \node[tool,right=2.5cm of act] (t1) {web\_search(query)};
     \node[tool,below=0.3cm of t1] (t2) {browse\_url(url)};
-    \node[tool,below=0.3cm of t2] (t3) {extract\_price(html)};
+    \node[tool,below=1.5cm of t2] (t3) {extract\_price(html)};
 
     % Arrows
     \draw[arr] (task) -- (plan);

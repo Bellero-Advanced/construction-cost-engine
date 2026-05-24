@@ -13,8 +13,8 @@
 (6) ตัวอย่างการคำนวณ BOQ.
 
 ข้อมูลที่ใช้ในการทดสอบมาจากการดึงผ่านระบบจริงตั้งแต่เดือนสิงหาคม 2568
-ถึงเมษายน 2569 รวม 9 เดือน บวกกับการ seed ราคา baseline ของ CGD,
-DIT, และ Boonthavorn ผ่าน \texttt{/api/admin/upload-prices} ตาม
+ถึงพฤษภาคม 2569 รวม 10 เดือน บวกกับการ seed ราคา baseline ของ CGD,
+DIT, และ Boonthavorn ผ่าน \texttt{/api/admin/ai-agent} ตาม
 ข้อมูลที่อ้างอิงจาก published catalog ของแต่ละผู้ค้า.
 
 \section{สรุปขอบเขตข้อมูลที่ระบบครอบคลุม}
@@ -42,7 +42,7 @@ DIT, และ Boonthavorn ผ่าน \texttt{/api/admin/upload-prices} ตา
 รายการวัสดุ (คอนกรีต)     & CONCRETE\_240, CONCRETE\_280                          & 2 \\
 จังหวัด                   & ทั่วประเทศไทย                                          & 77 \\
 ภูมิภาค                   & เหนือ/อีสาน/กลาง/ตะวันออก/ใต้/ตะวันตก                 & 6 \\
-ช่วงเวลา (TPSO CMI)        & ส.ค.\ 2568 -- เม.ย.\ 2569                            & 9 เดือน \\
+ช่วงเวลา (TPSO CMI)        & ส.ค.\ 2568 -- พ.ค.\ 2569                            & 10 เดือน \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -156,11 +156,11 @@ MegaHome    & Modern Trade & 26{,}620 & $+$10.0\% \\
 
 จากข้อมูลที่ระบบดึงจาก TPSO ผ่าน endpoint \texttt{/api/history/tpso/CEMENT\_001}
 ได้ series ราคาปูนซีเมนต์ Type I (50 กก.) ในกรุงเทพมหานคร จำนวน 11 จุด
-ตั้งแต่ ส.ค.\ 2568 ถึง 24 พ.ค.\ 2569 ดังตารางที่ \ref{tab:cmi-mom}.
+ตั้งแต่ ส.ค.\ 2568 ถึง 25 พ.ค.\ 2569 ดังตารางที่ \ref{tab:cmi-mom}.
 
 \begin{table}[H]
 \centering
-\caption{ราคาปูนซีเมนต์ Type I (50 กก.) จาก TPSO กรุงเทพมหานคร (ดึงจากระบบ 24 พ.ค.\ 2569)}
+\caption{ราคาปูนซีเมนต์ Type I (50 กก.) จาก TPSO กรุงเทพมหานคร (ดึงจากระบบ 25 พ.ค.\ 2569)}
 \label{tab:cmi-mom}
 \begin{tabularx}{\textwidth}{l c c}
 \toprule
@@ -176,7 +176,7 @@ MegaHome    & Modern Trade & 26{,}620 & $+$10.0\% \\
 มี.ค.\ 2569   & 175.00 & $+$0.57\% \\
 เม.ย.\ 2569   & 175.00 & 0.00\% \\
 21 พ.ค.\ 2569 & 179.45 & $+$2.54\% \\
-24 พ.ค.\ 2569 & 179.45 & 0.00\% \\
+25 พ.ค.\ 2569 & 179.45 & 0.00\% \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -208,7 +208,7 @@ Y = 169.35 + 0.819 \cdot X, \qquad R^2 = 0.871
 
 \begin{table}[H]
 \centering
-\caption{ราคาปูนซีเมนต์ Type I 50 กก.\ ตามภูมิภาค (CGD, ดึงจาก \texttt{/api/regional/CEMENT\_001?source=cgd} เมื่อ 24 พ.ค.\ 2569)}
+\caption{ราคาปูนซีเมนต์ Type I 50 กก.\ ตามภูมิภาค (CGD, ดึงจาก \texttt{/api/regional/CEMENT\_001?source=cgd} เมื่อ 25 พ.ค.\ 2569)}
 \label{tab:regional}
 \begin{tabularx}{\textwidth}{l l r}
 \toprule
@@ -283,7 +283,7 @@ $\approx 507.58$ บาท/ตร.ม.
 
 \begin{table}[H]
 \centering
-\caption{สรุปต้นทุนต่อหน่วยของ 5 ประเภทงาน (คำนวณจากราคา CGD จริง ณ 24 พ.ค.\ 2569)}
+\caption{สรุปต้นทุนต่อหน่วยของ 5 ประเภทงาน (คำนวณจากราคา CGD จริง ณ 25 พ.ค.\ 2569)}
 \label{tab:boq-summary}
 \begin{tabularx}{\textwidth}{l X r}
 \toprule
@@ -298,7 +298,7 @@ $\approx 507.58$ บาท/ตร.ม.
 \end{tabularx}
 \end{table}
 
-\textbf{หมายเหตุ:} ต้นทุนข้างต้นคำนวณจากราคา CGD จริงที่ระบบดึงได้ (snapshot 24 พ.ค.\ 2569) ตามสูตรอัตราส่วนวัสดุของกรมบัญชีกลาง \cite{cgd2569}. ต้นทุนนี้เป็นเฉพาะค่าวัสดุ ไม่รวมค่าแรงงาน ค่าดำเนินการ และกำไรผู้รับเหมา.
+\textbf{หมายเหตุ:} ต้นทุนข้างต้นคำนวณจากราคา CGD จริงที่ระบบดึงได้ (snapshot 25 พ.ค.\ 2569) ตามสูตรอัตราส่วนวัสดุของกรมบัญชีกลาง \cite{cgd2569}. ต้นทุนนี้เป็นเฉพาะค่าวัสดุ ไม่รวมค่าแรงงาน ค่าดำเนินการ และกำไรผู้รับเหมา.
 
 \subsection{การบันทึก fact\_calculations}
 
@@ -318,7 +318,7 @@ $\approx 507.58$ บาท/ตร.ม.
   "total": 15379,
   "unitCost": 307.58,
   "unitLabel": "บาท / ตร.ม.",
-  "savedAt": "2026-05-24T07:30:15.234Z"
+  "savedAt": "2026-05-25T07:30:15.234Z"
 }
 \end{lstlisting}
 

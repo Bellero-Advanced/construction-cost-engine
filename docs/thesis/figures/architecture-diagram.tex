@@ -13,13 +13,13 @@
     \node[layer,fill=orange!10] (L1) at (0,0)
       {TPSO (CMI) \quad CGD (PDF) \quad DIT (JSP) \quad HomePro \quad MegaHome \quad Boonthavorn \quad +5 แหล่ง};
     \node[lbl,right=0.2cm of L1.north west,yshift=-0.35cm]
-      {ชั้นที่ 1: แหล่งข้อมูล (11 sources)};
+      {ชั้นที่ 1: แหล่งข้อมูล};
 
     % Layer 2
     \node[layer,fill=blue!8,below=0.5cm of L1] (L2)
       {PDF Parser (unpdf) \quad JSON API (suggest.jsp) \quad ScrapingBee Proxy \quad AI Agent Research};
     \node[lbl,right=0.2cm of L2.north west,yshift=-0.35cm]
-      {ชั้นที่ 2: การดึงข้อมูล (4 strategies)};
+      {ชั้นที่ 2: การดึงข้อมูล};
 
     % Layer 3
     \node[layer,fill=green!8,below=0.5cm of L2] (L3)
@@ -31,7 +31,7 @@
     \node[layer,fill=red!8,below=0.5cm of L3] (L4)
       {Cloudflare KV — price snapshots \quad\quad history time-series \quad\quad fact\_calculations (BOQ log)};
     \node[lbl,right=0.2cm of L4.north west,yshift=-0.35cm]
-      {ชั้นที่ 4: จัดเก็บข้อมูล (Cloudflare KV)};
+      {ชั้นที่ 4: จัดเก็บข้อมูล};
 
     % Layer 5
     \node[layer,fill=violet!8,below=0.5cm of L4] (L5)

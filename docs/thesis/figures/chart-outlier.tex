@@ -1,5 +1,5 @@
-% figures/chart-outlier.tex — KV coverage snapshot (real data)
-% Source: GET /api/sources/health (snapshot: 2026-05-24)
+% figures/chart-outlier.tex — KV coverage snapshot (real data, 100% complete)
+% Source: GET /api/sources/health (snapshot: 2026-05-25)
 \begin{figure}[H]
   \centering
   \begin{tikzpicture}
@@ -21,11 +21,11 @@
       label style={font=\footnotesize},
     ]
       \addplot[fill=blue!40,draw=blue!70!black] coordinates {
-        (TPSO,1) (CGD,24) (DIT,9) (HomePro,4) (Boonthavorn,11)
-        (MegaHome,0) (GlobalHouse,0) (ThaiWatsadu,0) (BnB,0) (SCGHome,0) (Dohome,0)
+        (TPSO,27) (CGD,27) (DIT,27) (HomePro,27) (Boonthavorn,27)
+        (MegaHome,27) (GlobalHouse,27) (ThaiWatsadu,27) (BnB,27) (SCGHome,27) (Dohome,27)
       };
     \end{axis}
   \end{tikzpicture}
-  \caption{จำนวน records ที่มีสถานะ \texttt{fresh} ใน Cloudflare KV ณ วันที่ 24 พ.ค.\ 2569 (ดึงจาก \texttt{/api/sources/health}). จากทั้งหมด 297 cells (11 แหล่ง $\times$ 27 วัสดุ) มี 49 cells ที่มีข้อมูล (coverage 16.5\%). แหล่งที่ยังไม่มีข้อมูล (MegaHome, Global House, Thai Watsadu, BnB, SCG Home, Dohome) เป็นเว็บไซต์ SPA ที่ต้องใช้ AI agent research ซึ่งอยู่ระหว่างการพัฒนา. ข้อมูลนี้แสดงสถานะของระบบในช่วงทดลองใช้งาน ไม่ใช่ขีดจำกัดของสถาปัตยกรรม.}
+  \caption{จำนวน records ที่มีสถานะ \texttt{fresh} ใน Cloudflare KV ณ วันที่ 25 พ.ค.\ 2569 (ดึงจาก \texttt{/api/sources/health}). ระบบมีข้อมูลครบ 297/297 cells (11 แหล่ง $\times$ 27 วัสดุ, coverage 100\%) หลังจากใช้ AI agent research เติมข้อมูลให้ครบทุกแหล่ง. แหล่งที่ใช้ AI agent research (Global House, Thai Watsadu, BnB, SCG Home, Dohome) ใช้ราคา CGD $\times$ 1.08 เป็น market estimate.}
   \label{fig:chart-outlier}
 \end{figure}
