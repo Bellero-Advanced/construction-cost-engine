@@ -231,3 +231,69 @@ export const REBAR_DEPS = (rebarIds: string[]) => [
   "FORM_WOOD_001",
   "NAIL_001",
 ];
+
+// ── Paint (งานทาสี) ──────────────────────────────────────────────────────
+// Consumption: primer 1 coat (0.025 gal/m²) + paint 2 coats (0.031 gal/m² each)
+export function calcPaint(
+  source: SourceKey,
+  province: number,
+  area: number,
+  paintId: string,
+  prices: PriceMap,
+): CalcResult {
+  const items: BomItem[] = [];
+  items.push(
+    buildItem(prices, source, "PRIMER_001", area * MATERIALS.PRIMER_001.cons!),
+  );
+  items.push(
+    buildItem(prices, source, paintId, area * MATERIALS[paintId].cons! * 2),
+  );
+  const total = items.reduce((s, i) => s + i.total, 0);
+  return {
+    workName: "งานทาสี",
+    source,
+    province,
+    items,
+    total,
+    unitCost: area > 0 ? total / area : 0,
+    unitLabel: "บาท / ตร.ม.",
+    extraInfo: `พื้นที่ ${area} ตร.ม. (รองพื้น 1 รอบ + สีจริง 2 รอบ)`,
+  };
+}
+
+// ── Brick (งานก่ออิฐ) ────────────────────────────────────────────────────
+// Mortar: cement 0.25 ถุง/ตร.ม. + sand 0.03 ลบ.ม./ตร.ม. + water 0.01 ลบ.ม./ตร.ม.
+export function calcBrick(
+  source: SourceKey,
+  province: number,
+  area: number,
+  brickId: string,
+  prices: PriceMap,
+): CalcResult {
+  const items: BomItem[] = [];
+  items.push(
+    buildItem(prices, source, brickId, area * MATERIALS[brickId].cons!),
+  );
+  items.push(buildItem(prices, source, "CEMENT_001", area * 0.25));
+  items.push(buildItem(prices, source, "SAND_001", area * 0.03));
+  items.push(buildItem(prices, source, "WATER_MIX_001", area * 0.01));
+  const total = items.reduce((s, i) => s + i.total, 0);
+  return {
+    workName: "งานก่ออิฐ",
+    source,
+    province,
+    items,
+    total,
+    unitCost: area > 0 ? total / area : 0,
+    unitLabel: "บาท / ตร.ม.",
+    extraInfo: `พื้นที่ ${area} ตร.ม.`,
+  };
+}
+
+export const PAINT_DEPS = (paintId: string) => ["PRIMER_001", paintId];
+export const BRICK_DEPS = (brickId: string) => [
+  brickId,
+  "CEMENT_001",
+  "SAND_001",
+  "WATER_MIX_001",
+];
