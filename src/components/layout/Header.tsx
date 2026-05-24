@@ -11,6 +11,8 @@ const NAV = [
   { key: "wall_tile", href: "/wall-tile" },
   { key: "column_beam", href: "/column-beam" },
   { key: "rebar", href: "/rebar" },
+  { key: "paint", href: "/paint" },
+  { key: "brick", href: "/brick" },
   { key: "compare", href: "/compare" },
   { key: "compare_sources", href: "/compare-sources" },
   { key: "stores", href: "/stores" },
