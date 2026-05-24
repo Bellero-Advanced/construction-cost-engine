@@ -6,6 +6,7 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -20,6 +21,7 @@ import { MATERIALS } from "@/data/materials";
 import { PROVINCES } from "@/data/provinces";
 import { SOURCES } from "@/data/sources";
 import { downloadCsv, toCsv } from "@/lib/csv";
+import { detectOutliers } from "@/lib/stats/outlier";
 import { fmt, fmtInt } from "@/lib/utils";
 
 interface CompareSourceRow {
@@ -47,12 +49,17 @@ interface CompareResponse {
   };
 }
 
-const GROUPS: { key: "wall_tile" | "column_beam" | "rebar"; label: string }[] =
-  [
-    { key: "wall_tile", label: "🧱 งานผนัง-กระเบื้อง" },
-    { key: "column_beam", label: "🏛 งานเสา-คาน" },
-    { key: "rebar", label: "⛓ งานเหล็กเสริม" },
-  ];
+const GROUPS: {
+  key: "wall_tile" | "column_beam" | "rebar" | "paint" | "brick" | "concrete";
+  label: string;
+}[] = [
+  { key: "wall_tile", label: "🧱 งานผนัง-กระเบื้อง" },
+  { key: "column_beam", label: "🏛 งานเสา-คาน" },
+  { key: "rebar", label: "⛓ งานเหล็กเสริม" },
+  { key: "paint", label: "🎨 งานสี" },
+  { key: "brick", label: "🧱 งานก่ออิฐ" },
+  { key: "concrete", label: "🏗 งานคอนกรีต" },
+];
 
 export default function CompareSourcesPage() {
   const [material, setMaterial] = useState<string>("CEMENT_001");
@@ -83,6 +90,19 @@ export default function CompareSourcesPage() {
       cancelled = true;
     };
   }, [material, province]);
+
+  const outlierMap = useMemo(() => {
+    if (!data) return new Map<string, boolean>();
+    const prices = data.sources
+      .filter((s) => s.price != null)
+      .map((s) => s.price as number);
+    const results = detectOutliers(prices);
+    const map = new Map<string, boolean>();
+    data.sources.forEach((s, i) => {
+      if (s.price != null) map.set(s.source, results[i]?.isOutlier ?? false);
+    });
+    return map;
+  }, [data]);
 
   const chartData = useMemo(() => {
     if (!data) return [];
@@ -181,9 +201,7 @@ export default function CompareSourcesPage() {
             return (
               <Doc tag="MATCHING / TRUST">
                 <div className="flex flex-wrap items-center gap-2 text-[12px]">
-                  <span className="font-mono text-ink-3">
-                    Canonical spec:
-                  </span>
+                  <span className="font-mono text-ink-3">Canonical spec:</span>
                   {specChips.length > 0 ? (
                     specChips.map((t) => (
                       <Badge key={t} variant="line">
@@ -201,8 +219,8 @@ export default function CompareSourcesPage() {
                   <p className="mt-3 border-l-2 border-amber-bright bg-paper-2 p-2 font-mono text-[11px] text-ink-2">
                     ⚠ Spread &gt; 30% — ราคาที่ได้เป็น{" "}
                     <strong>Indicative range</strong> เท่านั้น แต่ละแหล่งอาจ
-                    match สินค้าต่าง brand/size; ใช้คอลัมน์ TYPE
-                    เป็นตัวตัดสินใจ (Government = ราคาประเมินทางการ).
+                    match สินค้าต่าง brand/size; ใช้คอลัมน์ TYPE เป็นตัวตัดสินใจ
+                    (Government = ราคาประเมินทางการ).
                   </p>
                 )}
               </Doc>
@@ -288,6 +306,7 @@ export default function CompareSourcesPage() {
                   <Th>SOURCE</Th>
                   <Th>TYPE</Th>
                   <Th align="right">PRICE</Th>
+                  <Th align="center">OUTLIER</Th>
                   <Th align="center">STATUS</Th>
                   <Th>FETCHED AT</Th>
                 </tr>
@@ -307,6 +326,13 @@ export default function CompareSourcesPage() {
                     </Td>
                     <Td align="right" mono className="font-bold">
                       {s.price != null ? fmtInt(s.price) : "—"}
+                    </Td>
+                    <Td align="center">
+                      {s.price != null && outlierMap.get(s.source) ? (
+                        <Badge variant="red">OUTLIER</Badge>
+                      ) : (
+                        <span className="text-ink-3 text-[10px]">—</span>
+                      )}
                     </Td>
                     <Td align="center">
                       {s.price != null ? (

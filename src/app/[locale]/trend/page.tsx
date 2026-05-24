@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { MATERIALS } from "@/data/materials";
 import { MONTH_LABELS, TRENDS } from "@/data/prices";
+import { linearTrend, percentageChange } from "@/lib/stats/linearTrend";
 import { fmt, fmtInt } from "@/lib/utils";
 
 const HISTORY_SOURCES = [
@@ -127,7 +128,23 @@ export default function TrendPage() {
     const last = chartData[chartData.length - 1].price;
     const diff = last - first;
     const pct = first > 0 ? (diff / first) * 100 : 0;
-    return { m, first, last, diff, pct, chartData, isReal };
+    const trend = linearTrend(chartData.map((d) => d.price));
+    const pctChanges = percentageChange(chartData.map((d) => d.price));
+    const chartWithTrend = chartData.map((d, i) => ({
+      ...d,
+      trendLine: trend ? +trend.forecast(i).toFixed(0) : undefined,
+      pctChange: pctChanges[i],
+    }));
+    return {
+      m,
+      first,
+      last,
+      diff,
+      pct,
+      chartData: chartWithTrend,
+      isReal,
+      trend,
+    };
   }, [mode, history]);
 
   const allRebarData = useMemo(() => {
@@ -256,6 +273,17 @@ export default function TrendPage() {
                     }}
                     activeDot={{ r: 6 }}
                   />
+                  {single.trend && (
+                    <Line
+                      type="linear"
+                      dataKey="trendLine"
+                      stroke="#5eead4"
+                      strokeWidth={1.5}
+                      strokeDasharray="6 3"
+                      dot={false}
+                      name={`Trend (b=${single.trend.b > 0 ? "+" : ""}${single.trend.b} ฿/period, R²=${single.trend.r2})`}
+                    />
+                  )}
                 </LineChart>
               </ResponsiveContainer>
             </div>
