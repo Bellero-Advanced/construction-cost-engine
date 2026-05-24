@@ -11,31 +11,35 @@
 \setdefaultlanguage{thai}
 \setotherlanguage{english}
 
-% Option A — TH Sarabun New (ต้อง upload .ttf เข้า fonts/ ก่อน)
-% ─────────────────────────────────────────────────────────
-% ดาวน์โหลด 4 ไฟล์จาก https://www.f0nt.com/release/th-sarabun-new/
-% หรือ https://github.com/SIPA-CTH/THFonts (THSarabunNew)
-% แล้วใส่ใน fonts/ ของ Overleaf project:
-%   fonts/THSarabunNew.ttf
-%   fonts/THSarabunNew Bold.ttf
-%   fonts/THSarabunNew Italic.ttf
-%   fonts/THSarabunNew BoldItalic.ttf
+% Auto-detect TH Sarabun New: ถ้ามีไฟล์ใน fonts/ → ใช้ Sarabun, ไม่มี → Norasi
+% ──────────────────────────────────────────────────────────────────────────
+% เพื่อใช้ TH Sarabun New:
+%   1. ดาวน์โหลดจาก https://www.f0nt.com/release/th-sarabun-new/
+%   2. สร้าง folder fonts/ ใน Overleaf project
+%   3. upload 4 ไฟล์ — ชื่อต้องตรงตามนี้ (ห้ามมีช่องว่าง):
+%        fonts/THSarabunNew.ttf
+%        fonts/THSarabunNew-Bold.ttf
+%        fonts/THSarabunNew-Italic.ttf
+%        fonts/THSarabunNew-BoldItalic.ttf
+%   4. ถ้าชื่อไฟล์มีช่องว่าง ให้ rename เป็นชื่อด้านบนก่อน (มี dash คั่น)
 %
-% Uncomment 7 บรรทัดนี้ + comment Option B ด้านล่าง:
-% \setmainfont[
-%   Path=./fonts/,
-%   Extension=.ttf,
-%   UprightFont=THSarabunNew,
-%   BoldFont=THSarabunNew Bold,
-%   ItalicFont=THSarabunNew Italic,
-%   BoldItalicFont=THSarabunNew BoldItalic,
-%   Scale=1.4
-% ]{THSarabunNew}
+% ระบบจะ auto-detect — ถ้าไฟล์ไม่อยู่ จะ fallback ไป Norasi อัตโนมัติ
+\IfFontExistsTF{[./fonts/THSarabunNew.ttf]}{
+  \setmainfont[
+    Path=./fonts/,
+    UprightFont=THSarabunNew.ttf,
+    BoldFont=THSarabunNew-Bold.ttf,
+    ItalicFont=THSarabunNew-Italic.ttf,
+    BoldItalicFont=THSarabunNew-BoldItalic.ttf,
+    Scale=1.4,
+    Ligatures=TeX
+  ]{THSarabunNew}
+}{
+  % Fallback — Norasi ships with TeX Live
+  \setmainfont[Ligatures=TeX,Scale=1.0]{Norasi}
+}
 
-% Option B — Norasi (default, ทำงานทุก distribution ไม่ต้อง upload)
-% ─────────────────────────────────────────────────────────
-\setmainfont[Ligatures=TeX,Scale=1.0]{Norasi}
-
+% Mono font — ต้อง set ไม่งั้น polyglossia error
 \setmonofont[Scale=0.9]{Latin Modern Mono}
 
 % ── Page geometry ─────────────────────────────────────
