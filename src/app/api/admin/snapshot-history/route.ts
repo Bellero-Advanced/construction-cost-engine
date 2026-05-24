@@ -47,11 +47,52 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "KV not available" }, { status: 503 });
   }
 
-  const today = new Date().toISOString().slice(0, 10);
+  // Backfill mode: body may supply { date, province, source, prices }
+  let body: {
+    date?: string;
+    province?: number;
+    source?: string;
+    prices?: Record<string, number>;
+  } = {};
+  try {
+    body = (await req.json()) as typeof body;
+  } catch {
+    /* no body = normal cron mode */
+  }
+
+  const today = body.date ?? new Date().toISOString().slice(0, 10);
   const materialIds = Object.keys(MATERIALS);
   let written = 0;
   let skipped = 0;
 
+  // Backfill path: write supplied prices directly to history keys
+  if (body.prices && body.source) {
+    const province = body.province ?? DEFAULT_PROVINCE;
+    for (const [mid, price] of Object.entries(body.prices)) {
+      if (!MATERIALS[mid]) {
+        skipped++;
+        continue;
+      }
+      const histKey = `history:${body.source}:${mid}:${province}`;
+      const existing = (await kv.get<HistoryEntry[]>(histKey, "json")) ?? [];
+      if (existing.some((e) => e.date === today)) {
+        skipped++;
+        continue;
+      }
+      existing.push({ date: today, price });
+      existing.sort((a, b) => a.date.localeCompare(b.date));
+      const trimmed =
+        existing.length > MAX_HISTORY ? existing.slice(-MAX_HISTORY) : existing;
+      await kv.put(histKey, JSON.stringify(trimmed), {
+        expirationTtl: 60 * 60 * 24 * 400,
+      });
+      written++;
+    }
+    return NextResponse.json({ ok: true, date: today, written, skipped });
+  }
+
+  // Normal cron path: read live prices from KV and snapshot
+  const ALL_SOURCES = SOURCE_KEYS as readonly SourceKey[];
   for (const src of ALL_SOURCES) {
     for (const mid of materialIds) {
       const result = await getLivePrice(src, mid, DEFAULT_PROVINCE);
@@ -62,7 +103,6 @@ export async function POST(req: Request) {
 
       const histKey = `history:${src}:${mid}:${DEFAULT_PROVINCE}`;
       const existing = (await kv.get<HistoryEntry[]>(histKey, "json")) ?? [];
-
       if (existing.length > 0 && existing[existing.length - 1].date === today) {
         skipped++;
         continue;
@@ -70,10 +110,7 @@ export async function POST(req: Request) {
 
       existing.push({ date: today, price: result.price });
       const trimmed =
-        existing.length > MAX_HISTORY
-          ? existing.slice(existing.length - MAX_HISTORY)
-          : existing;
-
+        existing.length > MAX_HISTORY ? existing.slice(-MAX_HISTORY) : existing;
       await kv.put(histKey, JSON.stringify(trimmed), {
         expirationTtl: 60 * 60 * 24 * 400,
       });
