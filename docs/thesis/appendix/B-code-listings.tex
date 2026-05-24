@@ -1,0 +1,74 @@
+% appendix/B-code-listings.tex
+\chapter{ตัวอย่างโค้ดสำคัญของระบบ}
+\label{app:code}
+
+\section{Outlier Detection (Z-score)}
+\begin{lstlisting}[language=TypeScript,caption={src/lib/stats/outlier.ts}]
+export function detectOutliers(values: number[], threshold = 2.0) {
+  if (values.length < 3) return values.map(v => ({value: v, zScore: 0, isOutlier: false}));
+  const mean = values.reduce((s, v) => s + v, 0) / values.length;
+  const std = Math.sqrt(values.reduce((s, v) => s + (v - mean) ** 2, 0) / values.length);
+  if (std === 0) return values.map(v => ({value: v, zScore: 0, isOutlier: false}));
+  return values.map(v => {
+    const z = Math.abs((v - mean) / std);
+    return { value: v, zScore: +z.toFixed(2), isOutlier: z > threshold };
+  });
+}
+\end{lstlisting}
+
+\section{Linear Trend Y = a + bX}
+\begin{lstlisting}[language=TypeScript,caption={src/lib/stats/linearTrend.ts}]
+export function linearTrend(values: number[]) {
+  const n = values.length;
+  if (n < 2) return null;
+  const xs = values.map((_, i) => i);
+  const meanX = (n - 1) / 2;
+  const meanY = values.reduce((s, v) => s + v, 0) / n;
+  let ssXY = 0, ssXX = 0, ssYY = 0;
+  for (let i = 0; i < n; i++) {
+    ssXY += (xs[i] - meanX) * (values[i] - meanY);
+    ssXX += (xs[i] - meanX) ** 2;
+    ssYY += (values[i] - meanY) ** 2;
+  }
+  const b = ssXX === 0 ? 0 : ssXY / ssXX;
+  const a = meanY - b * meanX;
+  const r2 = ssYY === 0 ? 1 : (ssXY ** 2) / (ssXX * ssYY);
+  return { a, b, r2, forecast: (x: number) => a + b * x };
+}
+\end{lstlisting}
+
+\section{BoQ Calculator (Wall Tile)}
+\begin{lstlisting}[language=TypeScript,caption={src/lib/calculators.ts (excerpt)}]
+export function calcWallTile(source, province, area, tileId, prices) {
+  const items = [];
+  items.push(buildItem(prices, source, tileId, area * MATERIALS[tileId].cons));
+  items.push(buildItem(prices, source, "ADHESIVE_001", area * 0.25));
+  items.push(buildItem(prices, source, "GROUT_001",    area * 0.30));
+  items.push(buildItem(prices, source, "PVC_TRIM_001", area * 0.40));
+  items.push(buildItem(prices, source, "WATER_MIX_001",area * 0.005));
+  const total = items.reduce((s, i) => s + i.total, 0);
+  return { workName: "งานผนัง-กระเบื้อง", source, province, items,
+           total, unitCost: total / area, unitLabel: "บาท / ตร.ม." };
+}
+\end{lstlisting}
+
+\section{Cross-source comparison API (\texttt{/api/compare/[material]})}
+\begin{lstlisting}[language=TypeScript,caption={Endpoint สำหรับ fan-out 11 แหล่ง}]
+export async function GET(req, { params }) {
+  const { material } = await params;
+  const province = +new URL(req.url).searchParams.get("province") || 10;
+  const sources = await Promise.all(
+    SOURCE_KEYS.map(async k => {
+      const r = await getLivePrice(k, material, province);
+      return { source: k, price: r.price, fetchedAt: r.fetchedAt };
+    })
+  );
+  const live = sources.filter(s => s.price != null).map(s => s.price);
+  const summary = {
+    min: Math.min(...live), max: Math.max(...live),
+    median: median(live), avg: live.reduce((s, x) => s + x, 0) / live.length,
+    spreadPct: ((Math.max(...live) - Math.min(...live)) / Math.min(...live)) * 100,
+  };
+  return NextResponse.json({ material, province, sources, summary });
+}
+\end{lstlisting}

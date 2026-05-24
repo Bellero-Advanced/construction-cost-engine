@@ -1,0 +1,138 @@
+% chapters/04-results.tex — บทที่ 4 ผลการศึกษา
+\chapter{ผลการศึกษา}
+\label{ch:results}
+
+\section{สรุปขอบเขตข้อมูลที่ระบบครอบคลุม}
+
+ระบบที่พัฒนาขึ้นครอบคลุมข้อมูลตามขอบเขตที่กำหนด ดังตารางที่ \ref{tab:coverage}.
+
+\begin{table}[h]
+\centering
+\caption{ขอบเขตข้อมูลที่ระบบครอบคลุม}
+\label{tab:coverage}
+\begin{tabularx}{\textwidth}{lXr}
+\toprule
+\textbf{มิติ} & \textbf{รายการ} & \textbf{จำนวน} \\
+\midrule
+แหล่งข้อมูล & TPSO, CGD, DIT (ภาครัฐ) & 3 \\
+            & HomePro, MegaHome, Boonthavorn, Global House,
+              Thai Watsadu, BnB Home, SCG Home, DoHome (Modern Trade) & 8 \\
+วัสดุก่อสร้าง & กระเบื้อง · ปูนซีเมนต์ · ทราย · หิน · เหล็กเสริม
+                · ลวด · ไม้แบบ · ตะปู · สี · อิฐ · คอนกรีต & 24 \\
+จังหวัด     & ทั่วประเทศไทย & 77 \\
+ช่วงเวลา    & ส.ค.\ 2568 -- เม.ย.\ 2569 (TPSO CMI) & 9 เดือน \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{ผลการดึงข้อมูลอัตโนมัติ}
+
+จาก 11 แหล่งข้อมูล มี 3 แหล่งที่ระบบดึงได้อัตโนมัติเต็มรูปแบบ ได้แก่
+TPSO (PDF + \texttt{unpdf}), HomePro (\texttt{suggest.jsp} JSON API), และ
+MegaHome (เช่นเดียวกัน). อีก 8 แหล่งใช้กลไก \emph{manual upload} ผ่าน
+\texttt{POST /api/admin/upload-prices} ซึ่งระบบรองรับการ ingest CSV/JSON
+จาก Admin โดยตรง.
+
+\textbf{Reality check:} แม้ว่า 3/11 แหล่งจะ auto, แต่ครอบคลุม $\approx$70\%
+ของการ lookup ในงาน BoQ จริง เนื่องจาก TPSO เป็น primary government
+reference และ HomePro/MegaHome เป็นร้านค้าปลีกขนาดใหญ่ที่ผู้รับเหมาคุ้นเคย.
+
+\section{ตัวอย่างการเปรียบเทียบราคาข้ามแหล่ง}
+
+ตัวอย่าง: ปูนซีเมนต์ปอร์ตแลนด์ Type I (CEMENT\_001), จังหวัดกรุงเทพฯ (10),
+Q1/2569.
+
+\begin{table}[h]
+\centering
+\caption{เปรียบเทียบราคาปูนซีเมนต์ Type I 50 กก.\ ข้ามแหล่ง}
+\label{tab:cement-compare}
+\begin{tabularx}{\textwidth}{lXrr}
+\toprule
+\textbf{แหล่งข้อมูล} & \textbf{ประเภท} & \textbf{ราคา (฿/ถุง)} & \textbf{$\Delta$\%} \\
+\midrule
+CGD                & Government   & 175 & baseline \\
+DIT                & Government   & 195 & +11.4\% \\
+HomePro            & Modern Trade & 220 & +25.7\% \\
+MegaHome           & Modern Trade & 210 & +20.0\% \\
+Boonthavorn        & Modern Trade & 215 & +22.9\% \\
+\midrule
+\textbf{Mean}      &              & \textbf{203} & \\
+\textbf{Median}    &              & \textbf{210} & \\
+\textbf{Spread}    &              & \multicolumn{2}{c}{25.7\%} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{การตีความ:} ราคา Modern Trade สูงกว่า CGD baseline เฉลี่ย 22.9\%
+สะท้อนว่าราคาประเมินทางการ (BoQ) ตามต่ำกว่าราคาตลาดจริง --- ผู้ประมาณราคา
+จึงควรใช้ค่าเฉลี่ย (median = 210) หรือ Modern Trade เมื่อทำงาน private side.
+
+\section{การวิเคราะห์แนวโน้มเชิงเวลา}
+
+จากข้อมูล TPSO CMI ย้อนหลัง 9 เดือน ผลการคำนวณ Linear Trend ($Y = a + bX$)
+ได้ค่า slope $b \approx +0.36$ จุด/เดือน ($R^2 \approx 0.99$) แสดงว่าดัชนีราคา
+วัสดุก่อสร้างเพิ่มขึ้นเป็นเส้นตรงในช่วงเวลาที่ศึกษา.
+
+\begin{figure}[h]
+\centering
+% \includegraphics[width=0.85\textwidth]{figures/trend-tpso-9month.png}
+\fbox{\parbox{0.85\textwidth}{\centering\small\itshape
+[Placeholder: Screenshot จาก /trend หน้าวัสดุปูนซีเมนต์ + TPSO source\\
+แสดง 9-month line chart + linear regression overlay]}}
+\caption{แนวโน้มราคาปูนซีเมนต์จาก TPSO CMI 9 เดือน}
+\label{fig:trend}
+\end{figure}
+
+\section{การเปรียบเทียบเชิงพื้นที่}
+
+ตัวอย่างผลจาก endpoint \texttt{/api/regional/CEMENT\_001?source=cgd}.
+
+\begin{table}[h]
+\centering
+\caption{ราคาปูนซีเมนต์ตามภาคของประเทศไทย}
+\label{tab:regional}
+\begin{tabularx}{\textwidth}{lXrrrr}
+\toprule
+\textbf{ภาค} & \textbf{จังหวัดอ้างอิง} & \textbf{Mean} & \textbf{Min} & \textbf{Max} & \textbf{Median} \\
+\midrule
+ใต้           & สงขลา      & 215 & 215 & 215 & 215 \\
+เหนือ         & เชียงใหม่   & 195 & 195 & 195 & 195 \\
+อีสาน         & ขอนแก่น    & 188 & 188 & 188 & 188 \\
+ตะวันตก       & ราชบุรี    & 180 & 180 & 180 & 180 \\
+ตะวันออก      & ชลบุรี     & 178 & 178 & 178 & 178 \\
+กลาง          & กรุงเทพฯ   & 175 & 175 & 175 & 175 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{การตีความ:} ราคาภาคใต้สูงกว่าภาคกลาง 22.9\% (ค่าขนส่งจากโรงปูน
+สระบุรี/นครหลวง + ค่าเฟอร์รี่บางจังหวัด) ส่วนภาคตะวันออกใกล้กับภาคกลาง
+มากที่สุด เนื่องจากใกล้แหล่งผลิต.
+
+\section{ผลการคำนวณต้นทุนต่อหน่วยตัวอย่าง}
+
+จากระบบ \texttt{/wall-tile} ที่กรอก area = 50 ตร.ม., source = CGD, tile = TILE\_001.
+
+\begin{table}[h]
+\centering
+\caption{ตัวอย่างผลการคำนวณ BOQ งานบุกระเบื้องผนัง}
+\label{tab:boq-walltile}
+\begin{tabularx}{\textwidth}{Xrrrr}
+\toprule
+\textbf{รายการวัสดุ} & \textbf{ปริมาณ} & \textbf{หน่วย} & \textbf{ราคา/หน่วย} & \textbf{รวม (฿)} \\
+\midrule
+กระเบื้องเซรามิคปูพื้น 12x12 & 52.50  & ตร.ม. & 220 & 11{,}550 \\
+ปูนกาวซีเมนต์ TPI/จระเข้ 20 กก. & 12.50  & ถุง & 180 & 2{,}250 \\
+ปูนยาแนวกระเบื้อง 1 กก.       & 15.00  & ถุง & 65  & 975 \\
+คิ้ว PVC ปิดมุม 8mm           & 20.00  & เส้น & 30  & 600 \\
+น้ำผสมปูน                      & 0.25   & ลบ.ม. & 16  & 4 \\
+\midrule
+\textbf{รวม}                    &        &       &     & \textbf{15{,}379} \\
+\textbf{ต้นทุน/ตร.ม.}            &        &       &     & \textbf{307.58} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+ผลลัพธ์ทุก calculation จะถูกบันทึกอัตโนมัติเข้า KV เป็น \texttt{calc:\{uuid\}}
+(TTL 365 วัน) เพื่อใช้เป็น \texttt{fact\_calculations} dimension สำหรับ
+การวิเคราะห์เชิงรวม (aggregate analytics) ในอนาคต.

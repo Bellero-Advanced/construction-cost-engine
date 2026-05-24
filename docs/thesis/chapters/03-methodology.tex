@@ -1,0 +1,122 @@
+% chapters/03-methodology.tex — บทที่ 3 วิธีการดำเนินงาน
+\chapter{วิธีการดำเนินงาน}
+\label{ch:method}
+
+\section{ภาพรวมระบบ}
+\label{sec:overview}
+
+ระบบที่พัฒนาขึ้นใช้ระเบียบวิธีวิจัยและพัฒนา (Research and Development: R\&D)
+ผสมผสานกับการวิจัยเชิงปริมาณ โดยแบ่งกระบวนการออกเป็น 5 ขั้น ได้แก่
+(1) Input -- รับข้อมูลจาก 11 แหล่ง (3 ภาครัฐ + 8 ค้าปลีก)
+(2) Acquire -- ใช้ 4 กลยุทธ์ดึงราคา (PDF, JSON API, Headless Browser, Manual Upload)
+(3) Normalize -- canonicalization (brand/size/grade) และ unit standardization
+(4) Store -- Cloudflare KV (live cache + history snapshot)
+(5) Serve -- REST API + UI สำหรับการเปรียบเทียบและคำนวณ.
+
+\begin{table}[h]
+\centering
+\caption{สถาปัตยกรรมระบบและเทคโนโลยีที่ใช้}
+\label{tab:tech-stack}
+\begin{tabularx}{\textwidth}{lXX}
+\toprule
+\textbf{ส่วน} & \textbf{เทคโนโลยี} & \textbf{เหตุผล} \\
+\midrule
+Frontend & Next.js 16 + TypeScript + Tailwind CSS 4 & SSR ที่ edge, SEO ดี, type-safe \\
+Backend  & Next.js Route Handlers (Cloudflare Workers) & Edge runtime, 0 cold start \\
+Database & Cloudflare KV (key-value) & Lookup เร็ว, scale-to-zero \\
+Scraping & \texttt{@cloudflare/puppeteer}, ScrapingBee, \texttt{unpdf} & รองรับ SPA, anti-bot, PDF \\
+Scheduler & GitHub Actions cron & ทุกจันทร์ 03:17 UTC \\
+Hosting   & Cloudflare Workers & 300+ edge locations \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{การออกแบบฐานข้อมูล}
+
+โครงสร้างข้อมูลใช้รูปแบบ key-value แทน relational schema เนื่องจากการเข้าถึง
+หลักคือ lookup ด้วย $\langle$ source, material, province $\rangle$ ไม่จำเป็น
+ต้องทำ JOIN ซับซ้อน และการเก็บใน Cloudflare KV ทำให้ตอบกลับได้ภายใน 5--20ms ทั่วโลก.
+
+\begin{table}[h]
+\centering
+\caption{โครงสร้าง KV keys}
+\label{tab:kv-schema}
+\begin{tabularx}{\textwidth}{lXX}
+\toprule
+\textbf{ประเภท} & \textbf{Key pattern} & \textbf{Value} \\
+\midrule
+Live cache & \texttt{\{source\}:\{materialId\}:\{province\}} & \{price, fetchedAt\} \\
+History    & \texttt{history:\{src\}:\{mat\}:\{prov\}}        & [\{date, price\}, ...] \\
+Calculations & \texttt{calc:\{uuid\}}                         & CalcResult + savedAt \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{การดึงและจัดการข้อมูล}
+
+\subsection{4 กลยุทธ์การดึงราคา}
+
+\begin{enumerate}
+  \item \textbf{PDF parsing} (\texttt{unpdf}) -- ใช้กับ TPSO และ CGD ที่ส่งราคา
+        ในรูปแบบ PDF rate report
+  \item \textbf{JSON API} (\texttt{suggest.jsp}) -- HomePro และ MegaHome เปิด
+        endpoint \texttt{/service/search/suggest.jsp?q=} ที่ส่งข้อมูล structured
+  \item \textbf{ScrapingBee proxy} -- ผ่าน residential IP จากประเทศไทย เพื่อ
+        เลี่ยง bot challenge ของเว็บที่ block CF egress; พร้อม fallback ไป
+        Cloudflare Browser Rendering
+  \item \textbf{Manual upload} -- \texttt{POST /api/admin/upload-prices} สำหรับ
+        แหล่งที่ scrape ไม่ได้ (CGD anti-bot, DIT URL deprecated, retail SPA)
+\end{enumerate}
+
+\subsection{Canonicalization (Option B)}
+
+ทุก material ในระบบถูก tag ด้วย canonical spec \{brand, size, grade\} และ
+\texttt{searchTerms[]} เพื่อกรองผลลัพธ์จาก JSON API ให้ตรงสินค้าเดียวกัน
+ข้ามแหล่ง โดยใช้ 3-tier filter: \emph{tight} (ขนาด+brand match), \emph{loose}
+(ขนาดอย่างเดียว), \emph{legacy} (median ทั้งหมด).
+
+\subsection{Unit Standardization}
+
+ระบบมี \texttt{src/lib/units/converter.ts} แปลงหน่วยข้ามโดเมน:
+\begin{itemize}
+  \item \textbf{มวล:} ตัน $\leftrightarrow$ กก. $\leftrightarrow$ ถุง50กก. $\leftrightarrow$ ถุง20กก.
+  \item \textbf{ปริมาตร:} ลบ.ม. $\leftrightarrow$ ลิตร $\leftrightarrow$ แกลลอน
+  \item \textbf{เหล็กเส้น:} \texttt{rebarPerTon}(price/bar, length, wpm) คำนวณ
+        ราคา/ตัน จากราคา/เส้น โดยใช้ weight-per-meter
+\end{itemize}
+
+ตัวอย่าง: เหล็กราคา 25,000 บาท/ตัน $\Rightarrow$ 25 บาท/กก.
+
+\subsection{Outlier Detection}
+
+ใช้ z-score test ตามวิธีของ \textcite{lee2024}:
+\[
+z = \frac{|x - \bar{x}|}{\sigma}, \qquad \text{outlier ถ้า } z > 2.0
+\]
+ค่าที่ผ่านการกรองจะถูกใช้ในการคำนวณ summary และ chart; ค่าที่เป็น outlier
+จะถูก flag เป็น badge สีแดงในหน้า \texttt{/compare-sources}.
+
+\section{การคำนวณต้นทุนต่อหน่วย}
+
+ระบบรองรับ 5 ประเภทงานตามหลักเกณฑ์การคำนวณราคากลาง ตุลาคม 2560:
+\texttt{wall\_tile}, \texttt{column\_beam}, \texttt{rebar}, \texttt{paint},
+\texttt{brick}. ทุกการคำนวณจะถูกบันทึกเป็น \texttt{calc:\{uuid\}} ใน KV
+(TTL 365 วัน) เพื่อใช้เป็น \texttt{fact\_calculations} dimension.
+
+\subsection{การวิเคราะห์เชิงสถิติ}
+
+\textbf{Linear Trend Analysis (\textcite{ashworth2015}):}
+\[
+Y = a + bX, \qquad b = \frac{\sum(x_i - \bar{x})(y_i - \bar{y})}{\sum(x_i - \bar{x})^2}, \quad a = \bar{y} - b\bar{x}
+\]
+\[
+R^2 = \frac{\left(\sum(x_i-\bar{x})(y_i-\bar{y})\right)^2}{\sum(x_i-\bar{x})^2 \sum(y_i-\bar{y})^2}
+\]
+
+\textbf{Percentage Change:}
+\[
+\Delta\% = \frac{Y_t - Y_{t-1}}{Y_{t-1}} \times 100
+\]
+
+\textbf{Regional Aggregator:} median ราคาต่อภาค (เหนือ, อีสาน, กลาง,
+ตะวันออก, ใต้, ตะวันตก) เผยให้เห็นการกระจายของราคาเชิงพื้นที่.

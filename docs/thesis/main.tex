@@ -1,0 +1,91 @@
+% main.tex — Chulalongkorn Civil Engineering Thesis
+% =====================================================
+% สำหรับใช้ใน Overleaf — paste class file `chulaengthesis.cls` ก่อน compile
+% Class file ดาวน์โหลดได้จาก: https://github.com/CUEEThesis/CUEEThesis-Template
+% หรือใช้ class ของคณะวิศวฯ ที่ภาควิชาให้
+%
+% ถ้ายังไม่มี chulaengthesis.cls สามารถ compile ด้วย report class ตาม fallback
+% ที่ตั้งไว้ใน \documentclass บรรทัดถัดไป
+\documentclass[12pt,a4paper,oneside]{report}
+
+% ── Packages ────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english,thai]{babel}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{amsmath,amssymb}
+\usepackage{geometry}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{longtable}
+\usepackage[backend=biber,style=apa]{biblatex}
+
+\geometry{a4paper, top=3cm, bottom=2.5cm, left=3.5cm, right=2.5cm}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=blue,
+  urlcolor=blue
+}
+\addbibresource{references.bib}
+
+% ── Code listing style ─────────────────────────────────
+\definecolor{codebg}{rgb}{0.96,0.96,0.96}
+\definecolor{codekey}{rgb}{0.0,0.4,0.7}
+\definecolor{codecom}{rgb}{0.4,0.5,0.4}
+\lstset{
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{codekey}\bfseries,
+  commentstyle=\color{codecom}\itshape,
+  numbers=left, numberstyle=\tiny, frame=single,
+  breaklines=true, captionpos=b, tabsize=2
+}
+
+% ── Thesis metadata ────────────────────────────────────
+\newcommand{\thesistitleTH}{การพัฒนาระบบอัตโนมัติสำหรับการคำนวณต้นทุนต่อหน่วย\\ของวัสดุก่อสร้างจากข้อมูลของกระทรวงพาณิชย์\\และสถานประกอบการค้าปลีกสมัยใหม่ทั่วประเทศ}
+\newcommand{\thesistitleEN}{Development of an Automated System for Calculating Unit Costs of Construction Materials Using Data from the Ministry of Commerce and Nationwide Modern Retailers}
+\newcommand{\authorname}{นาย พัชรพงษ์ จิวสืบพงษ์}
+\newcommand{\authornameEN}{Mr.\ Patcharapong Jewsubpong}
+\newcommand{\studentid}{6330357521}
+\newcommand{\advisor}{รศ.ดร.\ วัชระ เพียรสุภาพ}
+\newcommand{\advisorEN}{Assoc.\ Prof.\ Dr.\ Vachara Peansupap}
+\newcommand{\academicyear}{2568}
+\newcommand{\faculty}{ภาควิชาวิศวกรรมโยธา คณะวิศวกรรมศาสตร์}
+\newcommand{\university}{จุฬาลงกรณ์มหาวิทยาลัย}
+
+\begin{document}
+
+% ── Front matter ───────────────────────────────────────
+\input{frontmatter/cover}
+\input{frontmatter/abstract-th}
+\input{frontmatter/abstract-en}
+\input{frontmatter/acknowledgement}
+
+\tableofcontents
+\listoffigures
+\listoftables
+
+% ── Main chapters ──────────────────────────────────────
+\input{chapters/01-introduction}
+\input{chapters/02-literature-review}
+\input{chapters/03-methodology}
+\input{chapters/04-results}
+\input{chapters/05-conclusion}
+
+% ── References ─────────────────────────────────────────
+\printbibliography[title=บรรณานุกรม]
+
+% ── Appendices ─────────────────────────────────────────
+\appendix
+\input{appendix/A-system-screenshots}
+\input{appendix/B-code-listings}
+\input{appendix/C-raw-data}
+
+\end{document}

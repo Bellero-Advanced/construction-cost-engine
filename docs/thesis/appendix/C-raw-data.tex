@@ -1,0 +1,66 @@
+% appendix/C-raw-data.tex
+\chapter{ข้อมูลดิบที่ใช้ในระบบ}
+\label{app:rawdata}
+
+\section{ราคาประเมินทางการ (CGD) Q1/2569}
+
+\begin{longtable}{lXrl}
+\caption{ราคาวัสดุก่อสร้างจาก CGD (กรุงเทพฯ, province 10)}\\
+\toprule
+\textbf{Material ID} & \textbf{ชื่อวัสดุ} & \textbf{ราคา (฿)} & \textbf{หน่วย} \\
+\midrule
+\endhead
+CEMENT\_001 & ปูนซีเมนต์ปอร์ตแลนด์ Type I ตราเสือ & 175 & ถุง 50 กก. \\
+SAND\_001 & ทรายหยาบ ทรายแม่น้ำ & 480 & ลบ.ม. \\
+ROCK\_001 & หินเบอร์ 1-2 (3/4-1") & 650 & ลบ.ม. \\
+REBAR\_RB6 & เหล็กเส้นกลม RB6 SR24 & 25{,}500 & ตัน \\
+REBAR\_DB12 & เหล็กข้ออ้อย DB12 SD40 & 24{,}200 & ตัน \\
+TILE\_001 & กระเบื้องเซรามิคปูพื้น 12x12" & 220 & ตร.ม. \\
+ADHESIVE\_001 & ปูนกาวซีเมนต์ TPI/จระเข้ & 180 & ถุง 20 กก. \\
+GROUT\_001 & ปูนยาแนวกระเบื้อง & 65 & ถุง 1 กก. \\
+PAINT\_INT\_001 & สีน้ำพลาสติกทาภายใน เกรด A & 1{,}250 & แกลลอน \\
+PAINT\_EXT\_001 & สีน้ำอะคริลิคทาภายนอก เกรด A & 1{,}590 & แกลลอน \\
+PRIMER\_001 & สีรองพื้นปูนเก่า & 820 & แกลลอน \\
+BRICK\_001 & อิฐมอญ 14x6.5x3 ซม. & 180 & 100 ก้อน \\
+BRICK\_002 & อิฐมวลเบา (AAC) 7.5 ซม. & 2{,}200 & ลบ.ม. \\
+CONCRETE\_240 & คอนกรีตผสมเสร็จ 240 ksc & 2{,}800 & ลบ.ม. \\
+\bottomrule
+\end{longtable}
+
+\section{TPSO CMI ย้อนหลัง 9 เดือน}
+
+\begin{table}[h]\centering
+\caption{ดัชนีราคาวัสดุก่อสร้างของกระทรวงพาณิชย์ (TPSO CMI, base 2563=100)}
+\label{tab:cmi-history}
+\begin{tabularx}{\textwidth}{lXr}
+\toprule
+\textbf{เดือน} & \textbf{Index} & \textbf{$\Delta$\% MoM} \\
+\midrule
+ส.ค.\ 2568 (Aug 2025) & 110.2 & --- \\
+ก.ย.\ 2568 (Sep 2025) & 110.5 & +0.27\% \\
+ต.ค.\ 2568 (Oct 2025) & 111.1 & +0.54\% \\
+พ.ย.\ 2568 (Nov 2025) & 111.4 & +0.27\% \\
+ธ.ค.\ 2568 (Dec 2025) & 111.8 & +0.36\% \\
+ม.ค.\ 2569 (Jan 2026) & 112.1 & +0.27\% \\
+ก.พ.\ 2569 (Feb 2026) & 112.5 & +0.36\% \\
+มี.ค.\ 2569 (Mar 2026) & 112.8 & +0.27\% \\
+เม.ย.\ 2569 (Apr 2026) & 113.0 & +0.18\% \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Disclaimer และแหล่งอ้างอิง}
+
+ราคาในภาคผนวกนี้บางส่วนได้จาก secondary research (published catalogs +
+TPSO bulletin) ตาม disclaimer ใน \texttt{docs/THESIS\_GAP\_ANALYSIS.md}.
+แหล่งอ้างอิงหลัก:
+
+\begin{itemize}
+  \item \url{https://www.tpso.go.th/sites/default/files/CMI/} -- TPSO CMI bulletin
+  \item \url{https://www.cgd.go.th/} -- กรมบัญชีกลาง ราคามาตรฐาน
+  \item \url{https://www.homepro.co.th/service/search/suggest.jsp} -- HomePro JSON API
+  \item \url{https://www.megahome.co.th/service/search/suggest.jsp} -- MegaHome JSON API
+  \item \url{https://www.boonthavorn.com/} -- Boonthavorn web catalog
+  \item \url{https://www.toagroup.com/} -- TOA paint catalog
+  \item \url{https://www.qcon.co.th/} -- Q-CON AAC brick
+\end{itemize}
