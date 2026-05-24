@@ -1,14 +1,15 @@
-% figures/chart-tpso-trend.tex — TPSO CMI 9-month linear trend
+% figures/chart-tpso-trend.tex — TPSO history for CEMENT_001 Bangkok (real data)
+% Source: GET /api/history/tpso/CEMENT_001 (snapshot: 2026-05-24)
 \begin{figure}[H]
   \centering
   \begin{tikzpicture}
     \begin{axis}[
       width=12cm, height=6.5cm,
-      xlabel={เดือน (เดือนที่ 1 = ส.ค.\ 2568)},
-      ylabel={CMI (จุด, ฐาน 2563 $=$ 100)},
-      xmin=0.5, xmax=9.5,
-      ymin=108, ymax=115,
-      xtick={1,2,3,4,5,6,7,8,9},
+      xlabel={จุดเก็บข้อมูล (เดือน, $i = 1$ คือ ส.ค.\ 2568)},
+      ylabel={ราคาปูนซีเมนต์ Type I (บาท/ถุง 50 กก.)},
+      xmin=0.5, xmax=11.5,
+      ymin=168, ymax=182,
+      xtick={1,2,3,4,5,6,7,8,9,10,11},
       grid=both,
       grid style={dashed,gray!25},
       legend pos=north west,
@@ -16,21 +17,20 @@
       tick label style={font=\footnotesize},
       label style={font=\footnotesize},
     ]
-      % Observed data points (9 months)
+      % Real TPSO series from production (n=11)
       \addplot[only marks,mark=*,mark size=2pt,blue!70!black] coordinates {
-        (1,109.8) (2,110.4) (3,110.7) (4,111.1) (5,111.6)
-        (6,111.9) (7,112.4) (8,112.7) (9,113.2)
+        (1,171) (2,171) (3,172) (4,173) (5,173)
+        (6,174) (7,174) (8,175) (9,175) (10,179.45) (11,179.45)
       };
-      \addlegendentry{ค่าจริง (CMI)}
+      \addlegendentry{ค่าจริงจาก TPSO}
 
-      % Linear regression: y = 109.59 + 0.396x
-      \addplot[thick,red!80!black,domain=1:9,samples=2] {109.59 + 0.396*x};
-      \addlegendentry{แนวโน้มเชิงเส้น $y = 109.59 + 0.396x$}
+      % Linear regression on real data: y = 169.35 + 0.819x
+      \addplot[thick,red!80!black,domain=1:11,samples=2] {169.35 + 0.819*x};
+      \addlegendentry{แนวโน้มเชิงเส้น $y = 169.35 + 0.819x$}
 
-      % R^2 annotation
-      \node[draw,fill=white,rounded corners=2pt,inner sep=4pt,font=\scriptsize] at (axis cs:2.2,114) {$R^{2} = 0.989$};
+      \node[draw,fill=white,rounded corners=2pt,inner sep=4pt,font=\scriptsize] at (axis cs:3.0,180.5) {$R^{2} = 0.871$};
     \end{axis}
   \end{tikzpicture}
-  \caption{แนวโน้มดัชนีราคาวัสดุก่อสร้าง (CMI) ของสำนักงานนโยบายและยุทธศาสตร์การค้า ในช่วง 9 เดือน (ส.ค.\ 2568 -- เม.ย.\ 2569). การวิเคราะห์ด้วย least-squares regression พบความชัน $0.396$ จุด/เดือน และ $R^{2} = 0.989$ บ่งชี้แนวโน้มเชิงเส้นที่ชัดเจน — สอดคล้องกับการประเมินงบประมาณโครงการก่อสร้างที่ต้องเผื่อปัจจัยเงินเฟ้อของวัสดุ.}
+  \caption{แนวโน้มราคาปูนซีเมนต์ Type I (50 กก.) จากดัชนี TPSO ของกรุงเทพมหานคร ตั้งแต่ ส.ค.\ 2568 ถึง 24 พ.ค.\ 2569 จำนวน 11 จุดข้อมูล (ดึงจาก endpoint \texttt{/api/history/tpso/CEMENT\_001} ของระบบเมื่อ 2026-05-24). การวิเคราะห์ด้วย least-squares regression ให้ความชัน 0.819 บาท/เดือน และ $R^{2} = 0.871$ บ่งชี้แนวโน้มเชิงเส้นที่ชัดเจนแม้จะมีการกระโดดของราคาเดือนล่าสุดที่สะท้อนการปรับ baseline ของ TPSO.}
   \label{fig:chart-tpso}
 \end{figure}

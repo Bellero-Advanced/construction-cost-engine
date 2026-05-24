@@ -100,129 +100,105 @@ government reference สำหรับงานราชการและ Home
 
 \begin{table}[H]
 \centering
-\caption{เปรียบเทียบราคาปูนซีเมนต์ Type I 50 กก.\ ข้ามแหล่ง}
+\caption{เปรียบเทียบราคาปูนซีเมนต์ Type I 50 กก.\ ข้ามแหล่ง (กรุงเทพมหานคร, 24 พ.ค.\ 2569)}
 \label{tab:cement-compare}
 \begin{tabularx}{\textwidth}{l X r r}
 \toprule
 \textbf{แหล่งข้อมูล} & \textbf{ประเภท} & \textbf{ราคา (฿/ถุง)} & \textbf{$\Delta$\% จาก CGD} \\
 \midrule
-CGD                & Government   & 175 & baseline \\
-DIT                & Government   & 195 & +11.4\% \\
-HomePro            & Modern Trade & 220 & +25.7\% \\
-MegaHome           & Modern Trade & 210 & +20.0\% \\
-Boonthavorn        & Modern Trade & 215 & +22.9\% \\
+CGD  & Government   & 175.00 & baseline \\
+TPSO & Government   & 179.45 & $+$2.5\% \\
+DIT  & Government   & 195.00 & $+$11.4\% \\
 \midrule
-\textbf{ค่าเฉลี่ย (Mean)}   & & \textbf{203} & \\
-\textbf{มัธยฐาน (Median)}    & & \textbf{210} & \\
-\textbf{Spread (max-min)/min}& & \multicolumn{2}{c}{\textbf{25.7\%}} \\
+\multicolumn{4}{l}{\small\itshape ราคาค้าปลีก (Modern Trade) ยังไม่มีข้อมูลในช่วงทดลองระบบ} \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
+\textbf{หมายเหตุ:} ข้อมูลราคาค้าปลีก (HomePro, MegaHome, บุญถาวร ฯลฯ) ยังไม่ถูกรวบรวมสำเร็จในช่วงทดลองระบบ (ณ 24 พ.ค.\ 2569) เนื่องจากแหล่งเหล่านี้ต้องใช้ AI agent research ซึ่งอยู่ระหว่างการพัฒนา. ตารางนี้แสดงเฉพาะราคาที่ระบบดึงได้จริงจาก endpoint \texttt{/api/prices/\{source\}/CEMENT\_001?province=10}.
+
 \input{figures/chart-mt-vs-cgd}
 
-\textbf{การตีความ:}
+\textbf{การตีความ (จากข้อมูลที่มี):}
 \begin{itemize}[leftmargin=2em]
-  \item ราคา Modern Trade เฉลี่ยสูงกว่า CGD baseline 22.9\% สะท้อนว่า
-        ราคาประเมินทางการต่ำกว่าราคาตลาดจริงพอสมควร — ผู้ประมาณราคา
-        ที่ใช้เฉพาะ CGD อาจ underestimate งบประมาณ
-  \item DIT ที่อยู่กึ่งกลาง (+11.4\%) มักเป็นราคาที่ใกล้กับราคา
-        ตลาดส่งจริงมากที่สุด เนื่องจาก DIT สำรวจราคาจริงรายวัน
-  \item ค่า median (210) เหมาะสมสำหรับใช้เป็นราคาประมาณการ
-        \emph{ในงาน private side} ที่ต้องการความแม่นยำกับตลาด
+  \item ราคา DIT สูงกว่า CGD baseline $+$11.4\% (175 $\to$ 195 บาท) สะท้อนว่า
+        ราคาสำรวจตลาดรายวันของ DIT สูงกว่าราคามาตรฐานที่ CGD กำหนด
+  \item ราคา TPSO ($+$2.5\%) ใกล้เคียง CGD เพราะ TPSO ใช้ฐานข้อมูลเดียวกัน
+        แต่ปรับตามดัชนีรายเดือน
+  \item ข้อมูลจาก 10 คู่ราคาที่มีทั้ง CGD และแหล่งอื่น (ดูรูปที่ \ref{fig:chart-mtvscgd})
+        แสดง median premium $+$5.4\% และ mean $+$14.1\% (ค่าเฉลี่ยถูกดึงสูงโดย
+        น้ำยารองพื้นที่มีความแตกต่างของขนาดบรรจุภัณฑ์)
 \end{itemize}
 
 \subsection{กรณีศึกษา: เหล็กข้ออ้อย DB12 SD40}
 
 \begin{table}[H]
 \centering
-\caption{เปรียบเทียบราคาเหล็กข้ออ้อย DB12 SD40 ข้ามแหล่ง}
+\caption{เปรียบเทียบราคาเหล็กข้ออ้อย DB12 SD40 ข้ามแหล่ง (กรุงเทพมหานคร, 24 พ.ค.\ 2569)}
 \label{tab:rebar-compare}
 \begin{tabularx}{\textwidth}{l X r r}
 \toprule
 \textbf{แหล่งข้อมูล} & \textbf{ประเภท} & \textbf{ราคา (฿/ตัน)} & \textbf{$\Delta$\% จาก CGD} \\
 \midrule
-CGD          & Government   & 24,200 & baseline \\
-DIT          & Government   & 24,800 & +2.5\% \\
-HomePro      & Modern Trade & 25,300 & +4.5\% \\
-MegaHome     & Modern Trade & 24,600 & +1.7\% \\
-Boonthavorn  & Modern Trade & 25,800 & +6.6\% \\
+CGD & Government & 24{,}200 & baseline \\
+DIT & Government & 24{,}800 & $+$2.5\% \\
 \midrule
-\textbf{Spread} & & \multicolumn{2}{c}{\textbf{6.6\%}} \\
+\multicolumn{4}{l}{\small\itshape ราคาค้าปลีกยังไม่มีข้อมูลในช่วงทดลองระบบ} \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\textbf{การตีความ:} เหล็กเส้นมี spread ต่ำกว่าปูนซีเมนต์ (6.6\% เทียบ
-25.7\%) เพราะตลาดเหล็กในไทยมีผู้ผลิตหลักเพียงไม่กี่ราย (TATA, SCI, BNS)
-และส่วนใหญ่ขายผ่าน wholesale price ที่ใกล้เคียงกัน. ราคาในแต่ละแหล่ง
-จึงไม่ต่างกันมาก.
+\textbf{การตีความ:} เหล็กเส้นมี spread ต่ำ (CGD vs DIT = $+$2.5\%) เพราะตลาดเหล็กในไทยมีผู้ผลิตหลักเพียงไม่กี่ราย และส่วนใหญ่ขายผ่าน wholesale price ที่ใกล้เคียงกัน.
 
 \section{ผลการวิเคราะห์แนวโน้มเชิงเวลา}
 \label{sec:trend-result}
 
-\subsection{TPSO Construction Materials Index (CMI)}
+\subsection{TPSO ราคาปูนซีเมนต์ Type I กรุงเทพมหานคร}
 
-จากข้อมูล TPSO CMI ย้อนหลัง 9 เดือน ผลการคำนวณ Linear Trend ของ
-ดัชนีในระดับชาติ:
-
-\begin{equation}
-Y = 109.59 + 0.396 \cdot X, \qquad R^2 = 0.989
-\end{equation}
-
-โดย $X$ = เลขลำดับเดือน (0--8) เริ่มจาก ส.ค.\ 2568.
-
-\textbf{การตีความ:}
-\begin{itemize}[leftmargin=2em]
-  \item ค่า slope $b = 0.396$ จุด/เดือน หมายความว่าดัชนีราคาวัสดุ
-        ก่อสร้างเพิ่มขึ้นเฉลี่ย 0.4 จุดต่อเดือน
-  \item ค่า $R^2 = 0.989$ บ่งชี้ว่าแบบจำลองเชิงเส้นอธิบายข้อมูลได้ดี
-        เกือบ 99\% — แสดงว่าราคาวัสดุก่อสร้างในช่วง 9 เดือนนี้มี
-        แนวโน้มเชิงเส้นที่ชัดเจน ไม่มีการเปลี่ยนแปลงแบบไม่เป็นเส้นตรง
-        อย่างมีนัยสำคัญ
-  \item อัตราเพิ่มต่อปี (annualized) $\approx 0.396 \times 12 = 4.75$ จุด
-        หรือเทียบเท่ากับ $\approx 4.3\%$ ของฐาน 110 ในเดือนแรก
-\end{itemize}
-
-\begin{figure}[H]
-\centering
-\fbox{\parbox{0.85\textwidth}{\centering\small\itshape\vspace{2cm}
-[Placeholder: Screenshot จากหน้า /trend\\
-แสดง 9-month line chart + linear regression overlay\\
-y=109.59 + 0.396x, R\textsuperscript{2}=0.989]\\\vspace{2cm}}}
-\caption{แนวโน้มดัชนีราคาวัสดุก่อสร้าง TPSO CMI 9 เดือน
-(ส.ค.\ 2568 -- เม.ย.\ 2569) พร้อม linear regression overlay}
-\label{fig:trend-cmi}
-\end{figure}
-
-\input{figures/chart-tpso-trend}
-
-\subsection{อัตราการเปลี่ยนแปลงรายเดือน}
+จากข้อมูลที่ระบบดึงจาก TPSO ผ่าน endpoint \texttt{/api/history/tpso/CEMENT\_001}
+ได้ series ราคาปูนซีเมนต์ Type I (50 กก.) ในกรุงเทพมหานคร จำนวน 11 จุด
+ตั้งแต่ ส.ค.\ 2568 ถึง 24 พ.ค.\ 2569 ดังตารางที่ \ref{tab:cmi-mom}.
 
 \begin{table}[H]
 \centering
-\caption{อัตราการเปลี่ยนแปลงรายเดือนของ TPSO CMI}
+\caption{ราคาปูนซีเมนต์ Type I (50 กก.) จาก TPSO กรุงเทพมหานคร (ดึงจากระบบ 24 พ.ค.\ 2569)}
 \label{tab:cmi-mom}
 \begin{tabularx}{\textwidth}{l c c}
 \toprule
-\textbf{เดือน} & \textbf{Index} & \textbf{$\Delta$\% MoM} \\
+\textbf{วันที่} & \textbf{ราคา (บาท/ถุง)} & \textbf{$\Delta$\% MoM} \\
 \midrule
-ส.ค.\ 2568    & 110.2 & --- \\
-ก.ย.\ 2568    & 110.5 & +0.27\% \\
-ต.ค.\ 2568    & 111.1 & +0.54\% \\
-พ.ย.\ 2568    & 111.4 & +0.27\% \\
-ธ.ค.\ 2568    & 111.8 & +0.36\% \\
-ม.ค.\ 2569    & 112.1 & +0.27\% \\
-ก.พ.\ 2569    & 112.5 & +0.36\% \\
-มี.ค.\ 2569   & 112.8 & +0.27\% \\
-เม.ย.\ 2569   & 113.0 & +0.18\% \\
+ส.ค.\ 2568    & 171.00 & --- \\
+ก.ย.\ 2568    & 171.00 & 0.00\% \\
+ต.ค.\ 2568    & 172.00 & $+$0.58\% \\
+พ.ย.\ 2568    & 173.00 & $+$0.58\% \\
+ธ.ค.\ 2568    & 173.00 & 0.00\% \\
+ม.ค.\ 2569    & 174.00 & $+$0.58\% \\
+ก.พ.\ 2569    & 174.00 & 0.00\% \\
+มี.ค.\ 2569   & 175.00 & $+$0.57\% \\
+เม.ย.\ 2569   & 175.00 & 0.00\% \\
+21 พ.ค.\ 2569 & 179.45 & $+$2.54\% \\
+24 พ.ค.\ 2569 & 179.45 & 0.00\% \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-อัตราการเปลี่ยนแปลงรายเดือนเฉลี่ยอยู่ที่ +0.32\%/เดือน ทรงตัว
-ค่อนข้างคงที่ ซึ่งสะท้อนภาวะเศรษฐกิจที่มีเงินเฟ้อเล็กน้อยในช่วง
-ที่ศึกษา.
+ผลการวิเคราะห์ linear regression บน series 11 จุด:
+
+\begin{equation}
+Y = 169.35 + 0.819 \cdot X, \qquad R^2 = 0.871
+\end{equation}
+
+โดย $X$ = ลำดับจุดข้อมูล ($X = 1$ คือ ส.ค.\ 2568).
+
+\textbf{การตีความ:}
+\begin{itemize}[leftmargin=2em]
+  \item ค่า slope $b = 0.819$ บาท/จุดข้อมูล บ่งชี้แนวโน้มราคาเพิ่มขึ้น
+        ตลอดช่วงที่ศึกษา
+  \item ค่า $R^{2} = 0.871$ บ่งชี้ว่าแบบจำลองเชิงเส้นอธิบายข้อมูลได้ดี
+        แต่มีความผันผวนบางส่วน โดยเฉพาะการกระโดดของราคาในเดือน พ.ค.\ 2569
+        ($+$2.54\%) ที่สะท้อนการปรับ baseline ของ TPSO
+  \item ราคาเพิ่มขึ้นรวม 8.45 บาท (4.9\%) ตลอด 10 เดือน
+\end{itemize}
 
 \section{ผลการวิเคราะห์เชิงพื้นที่}
 \label{sec:regional-result}
@@ -233,23 +209,25 @@ y=109.59 + 0.396x, R\textsuperscript{2}=0.989]\\\vspace{2cm}}}
 
 \begin{table}[H]
 \centering
-\caption{ราคาปูนซีเมนต์ Type I 50 กก.\ ตามภูมิภาค (CGD baseline)}
+\caption{ราคาปูนซีเมนต์ Type I 50 กก.\ ตามภูมิภาค (CGD, ดึงจาก \texttt{/api/regional/CEMENT\_001?source=cgd} เมื่อ 24 พ.ค.\ 2569)}
 \label{tab:regional}
-\begin{tabularx}{\textwidth}{l l r r r r}
+\begin{tabularx}{\textwidth}{l l r}
 \toprule
-\textbf{ภาค} & \textbf{จังหวัดอ้างอิง} & \textbf{Mean} & \textbf{Min} & \textbf{Max} & \textbf{Median} \\
+\textbf{ภาค} & \textbf{จังหวัดอ้างอิง} & \textbf{ราคา CGD (บาท/ถุง)} \\
 \midrule
-ใต้           & สงขลา      & 215 & 215 & 215 & 215 \\
-เหนือ         & เชียงใหม่   & 195 & 195 & 195 & 195 \\
-อีสาน         & ขอนแก่น    & 188 & 188 & 188 & 188 \\
-ตะวันตก       & ราชบุรี    & 180 & 180 & 180 & 180 \\
-ตะวันออก      & ชลบุรี     & 178 & 178 & 178 & 178 \\
-กลาง          & กรุงเทพฯ   & 175 & 175 & 175 & 175 \\
+ใต้           & สงขลา      & 215 \\
+เหนือ         & เชียงใหม่   & 195 \\
+อีสาน         & ขอนแก่น    & 188 \\
+ตะวันตก       & ราชบุรี    & 180 \\
+ตะวันออก      & ชลบุรี     & 178 \\
+กลาง          & กรุงเทพฯ   & 175 \\
 \midrule
-\textbf{Spread} & & \multicolumn{4}{c}{\textbf{22.9\%}} \\
+\textbf{Spread (ใต้ vs กลาง)} & & \textbf{22.9\%} \\
 \bottomrule
 \end{tabularx}
 \end{table}
+
+\textbf{หมายเหตุ:} ข้อมูลนี้ดึงจาก endpoint \texttt{/api/regional/CEMENT\_001?source=cgd} ของระบบ ซึ่งอ้างอิงราคา CGD ที่ระบบรวบรวมไว้ (1 จังหวัดต่อภูมิภาค ตามขอบเขตข้อมูลที่มีในช่วงทดลอง).
 
 \input{figures/chart-regional-bar}
 
@@ -306,20 +284,22 @@ $\approx 507.58$ บาท/ตร.ม.
 
 \begin{table}[H]
 \centering
-\caption{สรุปต้นทุนต่อหน่วยของ 5 ประเภทงาน (อ้างอิง CGD baseline)}
+\caption{สรุปต้นทุนต่อหน่วยของ 5 ประเภทงาน (คำนวณจากราคา CGD จริง ณ 24 พ.ค.\ 2569)}
 \label{tab:boq-summary}
 \begin{tabularx}{\textwidth}{l X r}
 \toprule
-\textbf{ประเภทงาน} & \textbf{สมมติฐาน} & \textbf{ต้นทุนวัสดุ (฿/หน่วย)} \\
+\textbf{ประเภทงาน} & \textbf{สมมติฐาน (อัตราส่วนวัสดุ)} & \textbf{ต้นทุนวัสดุ (฿/หน่วย)} \\
 \midrule
-\texttt{wall\_tile}  & กระเบื้อง 12x12 + adhesive + grout              & 308 / ตร.ม. \\
-\texttt{column\_beam}& คอนกรีต Type I + ทราย + หิน                     & 1{,}450 / ลบ.ม. \\
-\texttt{rebar}       & DB12 SD40 + ลวด + ไม้แบบ + ตะปู                 & 26{,}500 / ตันเหล็ก \\
-\texttt{paint}       & primer 1 รอบ + paint INT 2 รอบ                  & 98 / ตร.ม. \\
-\texttt{brick}       & อิฐมอญ + cement 0.25 + sand 0.03                & 320 / ตร.ม. \\
+\texttt{wall\_tile}   & กระเบื้อง 12$\times$12 (waste 5\%) $+$ ปูนกาว 0.25 ถุง/ตร.ม.\ $+$ ยาแนว 0.30 ถุง/ตร.ม. & 308 / ตร.ม. \\
+\texttt{column\_beam} & คอนกรีต 240 ksc $+$ ทราย 0.5 ลบ.ม.\ $+$ หิน 0.8 ลบ.ม.\ ต่อ 1 ลบ.ม.\ คอนกรีต & 848 / ลบ.ม. \\
+\texttt{rebar}        & DB12 SD40 (CGD) & 24{,}200 / ตัน \\
+\texttt{paint}        & น้ำยารองพื้น 1 รอบ $+$ สีทาภายใน 2 รอบ (coverage 10 ตร.ม./ลิตร) & 18 / ตร.ม. \\
+\texttt{brick}        & อิฐมอญ 60 ก้อน/ตร.ม.\ $+$ ปูน 0.01 ถุง $+$ ทราย 0.003 ลบ.ม. & 111 / ตร.ม. \\
 \bottomrule
 \end{tabularx}
 \end{table}
+
+\textbf{หมายเหตุ:} ต้นทุนข้างต้นคำนวณจากราคา CGD จริงที่ระบบดึงได้ (snapshot 24 พ.ค.\ 2569) ตามสูตรอัตราส่วนวัสดุของกรมบัญชีกลาง \cite{cgd2569}. ต้นทุนนี้เป็นเฉพาะค่าวัสดุ ไม่รวมค่าแรงงาน ค่าดำเนินการ และกำไรผู้รับเหมา.
 
 \subsection{การบันทึก fact\_calculations}
 
