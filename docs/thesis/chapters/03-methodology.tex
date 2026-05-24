@@ -1,122 +1,398 @@
-% chapters/03-methodology.tex — บทที่ 3 วิธีการดำเนินงาน
+% chapters/03-methodology.tex — บทที่ 3 (expanded)
 \chapter{วิธีการดำเนินงาน}
 \label{ch:method}
 
-\section{ภาพรวมระบบ}
-\label{sec:overview}
+\section{ภาพรวมของระเบียบวิธีวิจัย}
+\label{sec:research-method}
 
-ระบบที่พัฒนาขึ้นใช้ระเบียบวิธีวิจัยและพัฒนา (Research and Development: R\&D)
-ผสมผสานกับการวิจัยเชิงปริมาณ โดยแบ่งกระบวนการออกเป็น 5 ขั้น ได้แก่
-(1) Input -- รับข้อมูลจาก 11 แหล่ง (3 ภาครัฐ + 8 ค้าปลีก)
-(2) Acquire -- ใช้ 4 กลยุทธ์ดึงราคา (PDF, JSON API, Headless Browser, Manual Upload)
-(3) Normalize -- canonicalization (brand/size/grade) และ unit standardization
-(4) Store -- Cloudflare KV (live cache + history snapshot)
-(5) Serve -- REST API + UI สำหรับการเปรียบเทียบและคำนวณ.
+งานวิจัยนี้ใช้ระเบียบวิธีวิจัยและพัฒนา (Research and Development: R\&D)
+ผสมผสานกับการวิจัยเชิงปริมาณ (Quantitative Research) โดยแบ่งกระบวนการ
+ออกเป็น 5 ระยะตามแนวทางวิศวกรรมซอฟต์แวร์ คือ
+(1) ระยะวิเคราะห์ความต้องการ
+(2) ระยะออกแบบสถาปัตยกรรม
+(3) ระยะพัฒนา
+(4) ระยะทดสอบ
+(5) ระยะประเมินผลและปรับปรุง.
 
-\begin{table}[h]
+\subsection{สถาปัตยกรรมระบบ}
+
+ระบบที่พัฒนาขึ้นใช้สถาปัตยกรรมแบบ \emph{edge-first serverless} โดยรัน
+บน Cloudflare Workers ซึ่งเป็นแพลตฟอร์มที่กระจาย server ไปยัง
+data center กว่า 300 แห่งทั่วโลก \cite{cloudflare2025}. การออกแบบนี้
+ส่งผลให้ระบบมี \emph{cold-start latency เป็นศูนย์} และสามารถตอบ
+request ได้ในหลักมิลลิวินาที (ค่าเฉลี่ย < 50 ms) จากทุกที่ในโลก
+ซึ่งเหมาะสมกับงานวิจัยที่ต้องการให้ผู้ประมาณราคาเข้าถึงข้อมูลได้
+ตลอดเวลา.
+
+ระบบประกอบด้วย 5 ชั้นการทำงาน (layers) ดังที่แสดงในตารางที่
+\ref{tab:layers}.
+
+\begin{table}[H]
 \centering
-\caption{สถาปัตยกรรมระบบและเทคโนโลยีที่ใช้}
-\label{tab:tech-stack}
+\caption{5 ชั้นของระบบ}
+\label{tab:layers}
 \begin{tabularx}{\textwidth}{lXX}
 \toprule
-\textbf{ส่วน} & \textbf{เทคโนโลยี} & \textbf{เหตุผล} \\
+\textbf{ชั้น} & \textbf{หน้าที่} & \textbf{เทคโนโลยี} \\
 \midrule
-Frontend & Next.js 16 + TypeScript + Tailwind CSS 4 & SSR ที่ edge, SEO ดี, type-safe \\
-Backend  & Next.js Route Handlers (Cloudflare Workers) & Edge runtime, 0 cold start \\
-Database & Cloudflare KV (key-value) & Lookup เร็ว, scale-to-zero \\
-Scraping & \texttt{@cloudflare/puppeteer}, ScrapingBee, \texttt{unpdf} & รองรับ SPA, anti-bot, PDF \\
-Scheduler & GitHub Actions cron & ทุกจันทร์ 03:17 UTC \\
-Hosting   & Cloudflare Workers & 300+ edge locations \\
+1.\ Input    & รับข้อมูลจาก 11 แหล่ง (3 รัฐ + 8 retail) & เว็บไซต์ + PDF + JSON API \\
+2.\ Acquire  & 4 กลยุทธ์ดึงราคา                          & Puppeteer, ScrapingBee, unpdf, Manual \\
+3.\ Normalize& Canonicalization + Unit Conversion        & TypeScript: brand/size/grade matcher \\
+4.\ Store    & เก็บใน KV cache + history snapshot        & Cloudflare KV \\
+5.\ Serve    & เผยแพร่เป็น REST API + UI                  & Next.js 16 + React 19 \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\section{การออกแบบฐานข้อมูล}
+\subsection{การเลือกเทคโนโลยี}
 
-โครงสร้างข้อมูลใช้รูปแบบ key-value แทน relational schema เนื่องจากการเข้าถึง
-หลักคือ lookup ด้วย $\langle$ source, material, province $\rangle$ ไม่จำเป็น
-ต้องทำ JOIN ซับซ้อน และการเก็บใน Cloudflare KV ทำให้ตอบกลับได้ภายใน 5--20ms ทั่วโลก.
+ตารางที่ \ref{tab:tech-stack} เปรียบเทียบเทคโนโลยีที่เลือกใช้กับทางเลือก
+อื่น ๆ พร้อมเหตุผลในการเลือก.
 
-\begin{table}[h]
+\begin{table}[H]
 \centering
-\caption{โครงสร้าง KV keys}
-\label{tab:kv-schema}
-\begin{tabularx}{\textwidth}{lXX}
+\caption{การเลือกเทคโนโลยีของระบบ}
+\label{tab:tech-stack}
+\small
+\begin{tabularx}{\textwidth}{l X X}
 \toprule
-\textbf{ประเภท} & \textbf{Key pattern} & \textbf{Value} \\
+\textbf{ส่วน} & \textbf{เทคโนโลยีที่เลือก} & \textbf{เหตุผล} \\
 \midrule
-Live cache & \texttt{\{source\}:\{materialId\}:\{province\}} & \{price, fetchedAt\} \\
-History    & \texttt{history:\{src\}:\{mat\}:\{prov\}}        & [\{date, price\}, ...] \\
-Calculations & \texttt{calc:\{uuid\}}                         & CalcResult + savedAt \\
+Frontend Framework & Next.js 16 + TypeScript &
+รองรับ Server-Side Rendering ที่ edge, type-safe, มี ecosystem ใหญ่ \\
+Styling & Tailwind CSS 4 &
+Utility-first, ลดขนาด CSS bundle, รองรับ JIT compilation \\
+Visualization & Recharts &
+React-native, ทำงานร่วมกับ Next.js ได้ดี, รองรับ responsive chart \\
+Internationalization & next-intl &
+รองรับ App Router ของ Next.js, type-safe \\
+Backend & Next.js Route Handlers (Edge) &
+รวม FE+BE ในโปรเจกต์เดียว, รัน edge runtime \\
+Database & Cloudflare KV &
+Lookup เร็ว < 20 ms ทั่วโลก, ราคาประหยัด, scale-to-zero \\
+Web Scraping & \texttt{@cloudflare/puppeteer} + ScrapingBee &
+Headless browser + residential proxy เลี่ยง bot challenge \\
+PDF Parsing & \texttt{unpdf} &
+WASM-based, ทำงานใน Workers runtime ได้ \\
+Scheduler & GitHub Actions cron &
+Native CI/CD integration, ฟรีสำหรับ public repo \\
+Hosting & Cloudflare Workers &
+Edge runtime, 0 cold start, 100k req/day free tier \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+หมายเหตุ: ระบบไม่ได้ใช้ FastAPI/Python เนื่องจาก Cloudflare Workers
+ไม่รองรับ Python runtime ดั้งเดิม และ Next.js Route Handlers ให้
+ประสิทธิภาพและความสะดวกในการ deploy ที่ดีกว่าในกรณีนี้
+\cite{cloudflare2025,nextjs2025}.
+
+\section{การออกแบบฐานข้อมูล}
+\label{sec:db-design}
+
+ระบบใช้ \emph{Cloudflare KV (Key-Value Store)} แทน relational database
+แบบดั้งเดิม เนื่องจากการเข้าถึงข้อมูลหลักของระบบเป็นการ lookup ด้วย
+ชุดของ \texttt{(source, materialId, province)} ไม่จำเป็นต้องทำการ
+JOIN ข้อมูลที่ซับซ้อน. KV ตอบสนองในระดับ 5--20 ms ทั่วโลก ซึ่งเร็วกว่า
+PostgreSQL หรือ MySQL ในงาน lookup ลักษณะนี้.
+
+\subsection{โครงสร้าง Key-Value}
+
+ระบบจัดเก็บข้อมูล 3 ประเภทหลักใน KV ดังตารางที่ \ref{tab:kv-schema}.
+
+\begin{table}[H]
+\centering
+\caption{โครงสร้าง KV Keys ที่ใช้ในระบบ}
+\label{tab:kv-schema}
+\begin{tabularx}{\textwidth}{l X X r}
+\toprule
+\textbf{ประเภท} & \textbf{Key Pattern} & \textbf{Value} & \textbf{TTL} \\
+\midrule
+Live Cache    & \texttt{\{source\}:\{materialId\}:\{province\}}              & \{price, fetchedAt\}            & 14--30 d \\
+History       & \texttt{history:\{source\}:\{materialId\}:\{province\}}      & [\{date, price\}, \ldots]       & 365 d \\
+Calculations  & \texttt{calc:\{uuid\}}                                       & CalcResult + savedAt timestamp  & 365 d \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{Live Cache} เก็บราคาปัจจุบันที่ดึงล่าสุดจากแต่ละแหล่ง โดยมี
+อายุการเก็บ (TTL) ตั้งแต่ 14 ถึง 30 วันตามประเภทแหล่ง — แหล่งภาครัฐ
+ที่อัปเดตช้า (CGD รายไตรมาส) ใช้ TTL ยาวกว่า, แหล่ง retail ที่ราคา
+เปลี่ยนเร็ว (HomePro, MegaHome) ใช้ TTL สั้นกว่า.
+
+\textbf{History} เก็บ time-series ของราคา เพื่อใช้ในการวิเคราะห์
+แนวโน้ม โดยมี cron job เก็บ snapshot รายสัปดาห์ทุกวันจันทร์ 03:17 UTC.
+
+\textbf{Calculations} เก็บผลการคำนวณ BOQ ของผู้ใช้ทุกครั้ง เพื่อใช้
+เป็น dimension table \texttt{fact\_calculations} สำหรับการวิเคราะห์
+เชิงรวม (aggregate analytics) ในอนาคต.
+
+\subsection{Mapping กับ Star Schema}
+
+แม้ระบบใช้ KV เป็น primary storage แต่โครงสร้างเชิงตรรกะของข้อมูล
+ยังคงสอดคล้องกับ Star Schema มาตรฐาน ดังตารางที่ \ref{tab:star-schema}.
+
+\begin{table}[H]
+\centering
+\caption{Mapping ระหว่าง KV Keys กับ Star Schema เชิงตรรกะ}
+\label{tab:star-schema}
+\begin{tabularx}{\textwidth}{l X X}
+\toprule
+\textbf{ตาราง (Schema)} & \textbf{ประเภท} & \textbf{การจัดเก็บใน KV} \\
+\midrule
+\texttt{dim\_materials}    & Dimension & TypeScript const ใน \texttt{src/data/materials.ts} (24 รายการ + MOC code) \\
+\texttt{dim\_provinces}    & Dimension & TypeScript const (77 จังหวัด) \\
+\texttt{dim\_retailers}    & Dimension & TypeScript const (11 แหล่ง) \\
+\texttt{dim\_time}         & Dimension & ISO date strings ใน history keys \\
+\texttt{fact\_prices}      & Fact      & Live cache + history KV keys \\
+\texttt{fact\_calculations}& Fact      & \texttt{calc:\{uuid\}} keys \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
 \section{การดึงและจัดการข้อมูล}
+\label{sec:data-acquire}
 
-\subsection{4 กลยุทธ์การดึงราคา}
+\subsection{สี่กลยุทธ์การดึงข้อมูลราคา}
 
-\begin{enumerate}
-  \item \textbf{PDF parsing} (\texttt{unpdf}) -- ใช้กับ TPSO และ CGD ที่ส่งราคา
-        ในรูปแบบ PDF rate report
-  \item \textbf{JSON API} (\texttt{suggest.jsp}) -- HomePro และ MegaHome เปิด
-        endpoint \texttt{/service/search/suggest.jsp?q=} ที่ส่งข้อมูล structured
-  \item \textbf{ScrapingBee proxy} -- ผ่าน residential IP จากประเทศไทย เพื่อ
-        เลี่ยง bot challenge ของเว็บที่ block CF egress; พร้อม fallback ไป
-        Cloudflare Browser Rendering
-  \item \textbf{Manual upload} -- \texttt{POST /api/admin/upload-prices} สำหรับ
-        แหล่งที่ scrape ไม่ได้ (CGD anti-bot, DIT URL deprecated, retail SPA)
+ระบบใช้ 4 กลยุทธ์ที่แตกต่างกันเพื่อรองรับลักษณะของแต่ละแหล่งข้อมูล
+ดังนี้
+
+\subsubsection{กลยุทธ์ที่ 1: PDF Parsing}
+
+ใช้กับ TPSO และ CGD ที่เผยแพร่ข้อมูลในรูปแบบ PDF rate report.
+ระบบใช้ library \texttt{unpdf} ซึ่งเป็น WASM-based PDF parser
+ที่รัน Cloudflare Workers ได้. ขั้นตอน:
+
+\begin{enumerate}[leftmargin=2em,itemsep=0.2em]
+  \item Download PDF จาก URL ของแหล่ง
+  \item Extract ข้อความจากทุกหน้าด้วย \texttt{unpdf.extractText()}
+  \item ใช้ Regular Expression (RegEx) จับคู่บรรทัดที่ตรงกับ
+        material code และ unit price
+  \item Validate ราคาที่จับได้ (ต้องเป็นตัวเลขบวก, อยู่ในช่วงที่
+        สมเหตุสมผล)
+  \item Cache ลง KV
 \end{enumerate}
+
+\subsubsection{กลยุทธ์ที่ 2: JSON API (\texttt{suggest.jsp})}
+
+HomePro และ MegaHome เปิดเผย endpoint
+\texttt{/service/search/suggest.jsp?q=\{keyword\}} ที่ส่งคืนข้อมูล
+สินค้าในรูปแบบ JSON structured ระบบเรียก endpoint นี้โดยตรงด้วย
+HTTP GET พร้อม headers ที่จำลองเบราว์เซอร์ปกติ.
+
+ตัวอย่างการเรียก:
+\begin{lstlisting}[language=TypeScript,caption={การเรียก JSON API}]
+const url = `https://www.homepro.co.th/service/search/suggest.jsp?q=${q}`;
+const response = await fetch(url, {
+  headers: {
+    accept: "application/json",
+    "user-agent": "Mozilla/5.0 ...",
+    referer: "https://www.homepro.co.th/",
+  },
+  signal: AbortSignal.timeout(10_000),
+});
+const data = await response.json();
+const items = data.items;  // -> [{item_name, price_display, ...}, ...]
+\end{lstlisting}
+
+\subsubsection{กลยุทธ์ที่ 3: ScrapingBee Proxy + Browser Rendering}
+
+สำหรับเว็บไซต์ที่ block direct scraping (เช่น Thai Watsadu, BnB Home)
+ระบบใช้ ScrapingBee เป็น residential proxy ที่ส่ง request ผ่าน IP
+ของบ้านในประเทศไทย เพื่อหลีกเลี่ยง Cloudflare bot challenge.
+หาก ScrapingBee ไม่สำเร็จ ระบบจะ fallback ไปยัง Cloudflare Browser
+Rendering (\texttt{@cloudflare/puppeteer}) ที่เปิด headless Chrome
+ในตัว Workers.
+
+ลำดับ fallback ของ retail provider:
+\begin{enumerate}[leftmargin=2em,itemsep=0.2em]
+  \item ScrapingBee + JSON-LD canonical extraction
+  \item ScrapingBee + RegEx price extraction
+  \item Cloudflare Browser Rendering (Puppeteer) + DOM scraping
+  \item คืน null และรอ manual upload
+\end{enumerate}
+
+\subsubsection{กลยุทธ์ที่ 4: Manual Upload}
+
+สำหรับแหล่งที่ scrape ไม่ได้เลย (CGD anti-bot, DIT URL deprecated,
+SPA ที่โหลดราคาผ่าน XHR) ระบบเปิด admin endpoint
+\texttt{POST /api/admin/upload-prices} ที่รับ payload JSON หรือ CSV
+จาก admin โดยตรง เพื่อบันทึกราคาเข้า KV. การ authenticate ใช้
+\texttt{x-admin-token} header.
 
 \subsection{Canonicalization (Option B)}
 
-ทุก material ในระบบถูก tag ด้วย canonical spec \{brand, size, grade\} และ
-\texttt{searchTerms[]} เพื่อกรองผลลัพธ์จาก JSON API ให้ตรงสินค้าเดียวกัน
-ข้ามแหล่ง โดยใช้ 3-tier filter: \emph{tight} (ขนาด+brand match), \emph{loose}
-(ขนาดอย่างเดียว), \emph{legacy} (median ทั้งหมด).
+ปัญหาสำคัญในการเปรียบเทียบราคาข้ามแหล่งคือ \emph{ชื่อสินค้าและหน่วย
+ที่ต่างกัน}. ระบบแก้ปัญหานี้ด้วยการ tag ทุก material ด้วย canonical
+specification ประกอบด้วย 3 ส่วน:
+
+\begin{itemize}[leftmargin=2em,itemsep=0.2em]
+  \item \textbf{brand} — ยี่ห้อมาตรฐาน (เช่น ``ตราเสือ'', ``Q-CON'')
+  \item \textbf{size} — ขนาดที่ระบุ (เช่น ``50kg'', ``DB12'',
+        ``12x12 นิ้ว'')
+  \item \textbf{grade} — มาตรฐาน/เกรด (เช่น ``Type I'', ``SD40'')
+\end{itemize}
+
+นอกจากนี้ ทุก material มี \texttt{searchTerms[]} ซึ่งเป็นคำค้นหาที่
+หลากหลายในภาษาไทย ใช้ในการค้นจากเว็บไซต์ retail ที่ใช้คำต่างกัน.
+
+\subsubsection{สามชั้นการกรอง (Three-tier filter)}
+
+เมื่อระบบดึงผลลัพธ์การค้นหามาได้ จะกรองด้วยลำดับ 3 ชั้น:
+
+\begin{enumerate}[leftmargin=2em,itemsep=0.2em]
+  \item \textbf{Tight match:} ผลลัพธ์ต้องมีทั้ง \texttt{size} และ
+        \texttt{brand} ตรงกับ canonical spec
+  \item \textbf{Loose match:} ผลลัพธ์ต้องมี \texttt{size} ตรงเท่านั้น
+  \item \textbf{Legacy match:} หากไม่มีผลลัพธ์ที่ตรง ใช้ค่ามัธยฐาน
+        (median) ของผลลัพธ์ทั้งหมด — เป็น fallback ที่ใช้ในกรณีที่
+        แหล่งข้อมูลไม่มีรายละเอียดเพียงพอ
+\end{enumerate}
 
 \subsection{Unit Standardization}
 
-ระบบมี \texttt{src/lib/units/converter.ts} แปลงหน่วยข้ามโดเมน:
-\begin{itemize}
-  \item \textbf{มวล:} ตัน $\leftrightarrow$ กก. $\leftrightarrow$ ถุง50กก. $\leftrightarrow$ ถุง20กก.
-  \item \textbf{ปริมาตร:} ลบ.ม. $\leftrightarrow$ ลิตร $\leftrightarrow$ แกลลอน
-  \item \textbf{เหล็กเส้น:} \texttt{rebarPerTon}(price/bar, length, wpm) คำนวณ
-        ราคา/ตัน จากราคา/เส้น โดยใช้ weight-per-meter
+ระบบมี \texttt{src/lib/units/converter.ts} ที่รองรับการแปลงหน่วย
+ข้ามโดเมน 12 หน่วยหลัก:
+
+\begin{itemize}[leftmargin=2em,itemsep=0.1em]
+  \item \textbf{มวล:} ตัน, กก., กรัม, ถุง 50 กก., ถุง 20 กก.,
+        ถุง 1 กก.
+  \item \textbf{ปริมาตร:} ลบ.ม., ลิตร, แกลลอน, ลิตรสี
+  \item \textbf{ความยาว:} เมตร, ซม.
+  \item \textbf{พิเศษ:} เส้น 12 ม.\ (rebar), เส้น 10 ม., ถุง 1 กก.
 \end{itemize}
 
-ตัวอย่าง: เหล็กราคา 25,000 บาท/ตัน $\Rightarrow$ 25 บาท/กก.
+ตัวอย่างการแปลงราคา rebar จากเส้นเป็นตัน:
+\begin{equation}
+\text{ราคา/ตัน} = \frac{\text{ราคา/เส้น}}{L \times w_{pm}} \times 1000
+\end{equation}
+โดย $L$ = ความยาว/เส้น (ม.), $w_{pm}$ = น้ำหนักต่อเมตร (กก./ม.).
 
-\subsection{Outlier Detection}
+\subsection{การตรวจจับค่าผิดปกติ (Outlier Detection)}
 
-ใช้ z-score test ตามวิธีของ \textcite{lee2024}:
-\[
-z = \frac{|x - \bar{x}|}{\sigma}, \qquad \text{outlier ถ้า } z > 2.0
-\]
-ค่าที่ผ่านการกรองจะถูกใช้ในการคำนวณ summary และ chart; ค่าที่เป็น outlier
-จะถูก flag เป็น badge สีแดงในหน้า \texttt{/compare-sources}.
+ระบบใช้ z-score test ตามแนวทางของ \textcite{lee2024}:
+\begin{equation}
+z_i = \frac{|x_i - \bar{x}|}{\sigma}
+\end{equation}
+โดย $\bar{x}$ = ค่าเฉลี่ย, $\sigma$ = ส่วนเบี่ยงเบนมาตรฐาน.
+ราคาที่มี $|z| > 2.0$ ถือเป็น outlier และจะถูก flag เป็น badge สีแดง
+ในหน้า \texttt{/compare-sources} เพื่อให้ผู้ใช้พิจารณาว่าเป็นราคา
+โปรโมชัน ราคาขั้นต่ำ หรือข้อผิดพลาดในการดึงข้อมูล.
+
+ค่า threshold $z = 2.0$ เลือกเพราะให้ความสมดุลระหว่าง false positive
+และ false negative สำหรับข้อมูลราคาวัสดุที่มีกระจายตัวค่อนข้างสูง
+\cite{lee2024}.
 
 \section{การคำนวณต้นทุนต่อหน่วย}
+\label{sec:boq}
 
-ระบบรองรับ 5 ประเภทงานตามหลักเกณฑ์การคำนวณราคากลาง ตุลาคม 2560:
-\texttt{wall\_tile}, \texttt{column\_beam}, \texttt{rebar}, \texttt{paint},
-\texttt{brick}. ทุกการคำนวณจะถูกบันทึกเป็น \texttt{calc:\{uuid\}} ใน KV
-(TTL 365 วัน) เพื่อใช้เป็น \texttt{fact\_calculations} dimension.
+ระบบรองรับการคำนวณ Bill of Quantities (BOQ) สำหรับ 5 ประเภทงานหลัก
+ตามหลักเกณฑ์การคำนวณราคากลางงานก่อสร้าง ตุลาคม 2560 \cite{cgd2569}:
 
-\subsection{การวิเคราะห์เชิงสถิติ}
+\begin{enumerate}[leftmargin=2em,itemsep=0.2em]
+  \item \texttt{wall\_tile} — งานบุกระเบื้องผนัง/พื้น
+  \item \texttt{column\_beam} — งานเสาเอ็น/คานทับหลัง คอนกรีต
+  \item \texttt{rebar} — งานเหล็กเสริม
+  \item \texttt{paint} — งานทาสี (primer + 2 ชั้น)
+  \item \texttt{brick} — งานก่ออิฐ (อิฐมอญ/อิฐมวลเบา)
+\end{enumerate}
 
-\textbf{Linear Trend Analysis (\textcite{ashworth2015}):}
-\[
-Y = a + bX, \qquad b = \frac{\sum(x_i - \bar{x})(y_i - \bar{y})}{\sum(x_i - \bar{x})^2}, \quad a = \bar{y} - b\bar{x}
-\]
-\[
-R^2 = \frac{\left(\sum(x_i-\bar{x})(y_i-\bar{y})\right)^2}{\sum(x_i-\bar{x})^2 \sum(y_i-\bar{y})^2}
-\]
+\subsection{สูตรการคำนวณตัวอย่าง: งานทาสี}
 
-\textbf{Percentage Change:}
-\[
-\Delta\% = \frac{Y_t - Y_{t-1}}{Y_{t-1}} \times 100
-\]
+\begin{equation}
+\text{ต้นทุน/ตร.ม.} = (P_{primer} \times c_{primer}) + (P_{paint} \times c_{paint} \times n)
+\end{equation}
+โดย:
+\begin{itemize}[leftmargin=2em,itemsep=0.1em]
+  \item $P_{primer}$ = ราคา primer (บาท/แกลลอน)
+  \item $c_{primer}$ = consumption ของ primer (0.025 แกลลอน/ตร.ม.)
+  \item $P_{paint}$ = ราคาสี (บาท/แกลลอน)
+  \item $c_{paint}$ = consumption ของสี (0.031 แกลลอน/ตร.ม./ชั้น)
+  \item $n$ = จำนวนชั้นที่ทา (default = 2)
+\end{itemize}
 
-\textbf{Regional Aggregator:} median ราคาต่อภาค (เหนือ, อีสาน, กลาง,
-ตะวันออก, ใต้, ตะวันตก) เผยให้เห็นการกระจายของราคาเชิงพื้นที่.
+\subsection{การบันทึก fact\_calculations}
+
+ทุกครั้งที่ผู้ใช้คำนวณ BOQ สำเร็จ ระบบจะส่ง POST request ไปยัง
+\texttt{/api/admin/log-calculation} เพื่อบันทึก CalcResult ลง KV
+เป็น \texttt{calc:\{uuid\}} พร้อม timestamp \texttt{savedAt}.
+ข้อมูลนี้สามารถใช้สำหรับการวิเคราะห์เชิงรวม เช่น สถิติการใช้งาน
+ระบบ ความถี่ของวัสดุที่ถูกคำนวณ และค่าเฉลี่ยของขนาดโครงการ.
+
+\section{การวิเคราะห์เชิงสถิติ}
+\label{sec:stats}
+
+ระบบรองรับการวิเคราะห์เชิงสถิติ 4 ประเภท เพื่อสนับสนุนการตัดสินใจ
+ของผู้ประมาณราคา.
+
+\subsection{การวิเคราะห์แนวโน้มเชิงเส้น (Linear Trend)}
+
+ใช้สมการเชิงเส้น $Y = a + bX$ เพื่อหาแนวโน้มการเปลี่ยนแปลงของราคา
+ตามเวลา \cite{ashworth2015}. ค่าสัมประสิทธิ์คำนวณด้วย Ordinary Least
+Squares (OLS):
+
+\begin{equation}
+b = \frac{\sum_{i=1}^{n}(x_i - \bar{x})(y_i - \bar{y})}{\sum_{i=1}^{n}(x_i - \bar{x})^2},
+\qquad a = \bar{y} - b\bar{x}
+\end{equation}
+
+ค่าสัมประสิทธิ์การกำหนด $R^2$ บ่งชี้ความสามารถของแบบจำลองในการ
+อธิบายการกระจายของข้อมูล:
+
+\begin{equation}
+R^2 = \frac{\left(\sum (x_i - \bar{x})(y_i - \bar{y})\right)^2}
+            {\sum (x_i - \bar{x})^2 \cdot \sum (y_i - \bar{y})^2}
+\end{equation}
+
+ค่า $R^2$ ที่เข้าใกล้ 1 หมายความว่าราคามีแนวโน้มเชิงเส้นที่ชัดเจน
+ส่วนค่าที่ต่ำหมายความว่าราคามีความผันผวนเชิงไม่เป็นเส้นตรง.
+
+\subsection{อัตราการเปลี่ยนแปลงร้อยละ (Percentage Change)}
+
+\begin{equation}
+\Delta\%_t = \frac{Y_t - Y_{t-1}}{Y_{t-1}} \times 100
+\end{equation}
+
+ใช้บ่งชี้การเปลี่ยนแปลงระหว่างช่วงเวลา (Month-over-Month, MoM) ค่าบวก
+หมายถึงราคาเพิ่มขึ้น ค่าลบหมายถึงราคาลดลง.
+
+\subsection{การวิเคราะห์ค่าเฉลี่ยและการกระจายตัว}
+
+\begin{equation}
+\text{Mean: } \bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i,
+\qquad \text{Median: } \tilde{x}
+\end{equation}
+\begin{equation}
+\text{Spread\%: } \frac{x_{max} - x_{min}}{x_{min}} \times 100
+\end{equation}
+
+ค่า Spread บ่งชี้ความแตกต่างระหว่างราคาสูงสุดและต่ำสุด หากเกิน 30\%
+ระบบจะแสดงคำเตือน ``Indicative Range'' เพื่อให้ผู้ใช้ทราบว่ามีความ
+ผันผวนสูงและควรพิจารณาเลือกใช้ราคาที่เหมาะสมกับบริบท.
+
+\subsection{Regional Aggregator}
+
+ระบบรวบรวมราคาทุกจังหวัดเป็น 6 ภูมิภาค (เหนือ/อีสาน/กลาง/ตะวันออก/
+ใต้/ตะวันตก) แล้วคำนวณ \texttt{mean}, \texttt{median}, \texttt{min},
+\texttt{max} ต่อภูมิภาค ผลลัพธ์ใช้สำหรับการวิเคราะห์เชิงพื้นที่และ
+ใช้เป็น input ของการวางแผนต้นทุนโครงการที่ตั้งอยู่ในภูมิภาคต่าง ๆ.
+
+\section{การ Deploy และการบำรุงรักษา}
+\label{sec:deploy}
+
+ระบบใช้ CI/CD pipeline ผ่าน GitHub Actions ที่ทำการ
+\texttt{tsc --noEmit} (type-check) + build + deploy ไปยัง Cloudflare
+Workers อัตโนมัติทุกครั้งที่มีการ push ไปยัง branch \texttt{main}.
+
+นอกจากนี้ ยังมี cron schedule (\texttt{17 3 * * 1}) ที่รันทุกวันจันทร์
+03:17 UTC เพื่อ:
+\begin{enumerate}[leftmargin=2em,itemsep=0.1em]
+  \item เรียก \texttt{POST /api/admin/refresh-prices} สำหรับทุกแหล่ง
+  \item เรียก \texttt{POST /api/admin/snapshot-history} เพื่อบันทึก
+        ราคาปัจจุบันเข้า history time-series
+\end{enumerate}
+
+ระบบจึงสามารถดูแลตัวเองได้โดยอัตโนมัติ ผู้ดูแลเพียงแค่ตรวจสอบ
+\texttt{/health} dashboard เพื่อดู freshness ของข้อมูล และทำ manual
+upload สำหรับแหล่งที่ scrape ไม่ได้เป็นรอบ ๆ.

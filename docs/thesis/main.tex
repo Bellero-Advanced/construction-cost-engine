@@ -1,51 +1,79 @@
-% main.tex — Chulalongkorn Civil Engineering Thesis
+% main.tex — Chulalongkorn Civil Engineering Thesis (XeLaTeX)
 % =====================================================
-% สำหรับใช้ใน Overleaf — paste class file `chulaengthesis.cls` ก่อน compile
-% Class file ดาวน์โหลดได้จาก: https://github.com/CUEEThesis/CUEEThesis-Template
-% หรือใช้ class ของคณะวิศวฯ ที่ภาควิชาให้
-%
-% ถ้ายังไม่มี chulaengthesis.cls สามารถ compile ด้วย report class ตาม fallback
-% ที่ตั้งไว้ใน \documentclass บรรทัดถัดไป
+% Compile: XeLaTeX + Biber + XeLaTeX + XeLaTeX
+% In Overleaf: Menu → Compiler → XeLaTeX
+% =====================================================
 \documentclass[12pt,a4paper,oneside]{report}
 
-% ── Packages ────────────────────────────────────────────
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage[english,thai]{babel}
+% ── Fonts (Thai + English) ─────────────────────────────
+% XeLaTeX is required. polyglossia handles Thai; fontspec selects fonts.
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{thai}
+\setotherlanguage{english}
+
+% Use TH Sarabun New if available; fall back to Norasi (ships with TeX Live).
+% Overleaf has both. Garuda also works.
+\IfFontExistsTF{TH Sarabun New}
+  {\setmainfont[Scale=1.0]{TH Sarabun New}}
+  {\IfFontExistsTF{Norasi}
+    {\setmainfont[Scale=1.0]{Norasi}}
+    {\setmainfont{Garuda}}}
+
+\newfontfamily\thaifont{TH Sarabun New}[Scale=1.0]
+\newfontfamily\englishfont{Latin Modern Roman}
+
+% ── Page geometry ─────────────────────────────────────
+\usepackage[a4paper,top=3cm,bottom=2.5cm,left=3.5cm,right=2.5cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+
+% ── Math / tables / graphics ─────────────────────────
+\usepackage{amsmath,amssymb,amsthm}
 \usepackage{tabularx}
 \usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
 \usepackage{graphicx}
 \usepackage{xcolor}
-\usepackage{hyperref}
-\usepackage{listings}
-\usepackage{amsmath,amssymb}
-\usepackage{geometry}
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{enumitem}
-\usepackage{longtable}
-\usepackage[backend=biber,style=apa]{biblatex}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{url}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=black, citecolor=blue, urlcolor=blue}
 
-\geometry{a4paper, top=3cm, bottom=2.5cm, left=3.5cm, right=2.5cm}
-\hypersetup{
-  colorlinks=true,
-  linkcolor=black,
-  citecolor=blue,
-  urlcolor=blue
-}
+% ── Bibliography (numeric style, robust) ─────────────
+\usepackage[backend=biber,style=numeric,sorting=nyt]{biblatex}
 \addbibresource{references.bib}
 
-% ── Code listing style ─────────────────────────────────
+% ── Code listing style ────────────────────────────────
 \definecolor{codebg}{rgb}{0.96,0.96,0.96}
 \definecolor{codekey}{rgb}{0.0,0.4,0.7}
-\definecolor{codecom}{rgb}{0.4,0.5,0.4}
+\definecolor{codecom}{rgb}{0.4,0.55,0.4}
 \lstset{
   backgroundcolor=\color{codebg},
   basicstyle=\ttfamily\footnotesize,
   keywordstyle=\color{codekey}\bfseries,
   commentstyle=\color{codecom}\itshape,
   numbers=left, numberstyle=\tiny, frame=single,
-  breaklines=true, captionpos=b, tabsize=2
+  breaklines=true, captionpos=b, tabsize=2,
+  showstringspaces=false
+}
+
+% ── Captions in Thai ──────────────────────────────────
+\addto\captionsthai{%
+  \renewcommand{\contentsname}{สารบัญ}%
+  \renewcommand{\listfigurename}{สารบัญรูป}%
+  \renewcommand{\listtablename}{สารบัญตาราง}%
+  \renewcommand{\bibname}{บรรณานุกรม}%
+  \renewcommand{\appendixname}{ภาคผนวก}%
+  \renewcommand{\chaptername}{บทที่}%
+  \renewcommand{\figurename}{รูปที่}%
+  \renewcommand{\tablename}{ตารางที่}%
 }
 
 % ── Thesis metadata ────────────────────────────────────
@@ -54,7 +82,7 @@
 \newcommand{\authorname}{นาย พัชรพงษ์ จิวสืบพงษ์}
 \newcommand{\authornameEN}{Mr.\ Patcharapong Jewsubpong}
 \newcommand{\studentid}{6330357521}
-\newcommand{\advisor}{รศ.ดร.\ วัชระ เพียรสุภาพ}
+\newcommand{\advisor}{รศ.ดร.\ วัชระ\ \ เพียรสุภาพ}
 \newcommand{\advisorEN}{Assoc.\ Prof.\ Dr.\ Vachara Peansupap}
 \newcommand{\academicyear}{2568}
 \newcommand{\faculty}{ภาควิชาวิศวกรรมโยธา คณะวิศวกรรมศาสตร์}
@@ -62,7 +90,6 @@
 
 \begin{document}
 
-% ── Front matter ───────────────────────────────────────
 \input{frontmatter/cover}
 \input{frontmatter/abstract-th}
 \input{frontmatter/abstract-en}
@@ -72,17 +99,14 @@
 \listoffigures
 \listoftables
 
-% ── Main chapters ──────────────────────────────────────
 \input{chapters/01-introduction}
 \input{chapters/02-literature-review}
 \input{chapters/03-methodology}
 \input{chapters/04-results}
 \input{chapters/05-conclusion}
 
-% ── References ─────────────────────────────────────────
-\printbibliography[title=บรรณานุกรม]
+\printbibliography[title=บรรณานุกรม,heading=bibintoc]
 
-% ── Appendices ─────────────────────────────────────────
 \appendix
 \input{appendix/A-system-screenshots}
 \input{appendix/B-code-listings}

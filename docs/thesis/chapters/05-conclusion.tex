@@ -1,72 +1,205 @@
-% chapters/05-conclusion.tex — บทที่ 5 สรุปและข้อเสนอแนะ
+% chapters/05-conclusion.tex — บทที่ 5 (expanded)
 \chapter{สรุปและข้อเสนอแนะ}
 \label{ch:conclusion}
 
-\section{สรุปผลการศึกษา}
+\section{สรุปผลการวิจัย}
+\label{sec:summary}
 
-งานวิจัยนี้ได้พัฒนาระบบอัตโนมัติสำหรับการคำนวณต้นทุนต่อหน่วยของวัสดุก่อสร้าง
-จากข้อมูลของกระทรวงพาณิชย์และสถานประกอบการค้าปลีกสมัยใหม่ทั่วประเทศ
-สำเร็จตามวัตถุประสงค์ที่ตั้งไว้ทั้ง 3 ข้อ ดังนี้
+งานวิจัยนี้ได้พัฒนาระบบอัตโนมัติสำหรับการคำนวณต้นทุนต่อหน่วยของ
+วัสดุก่อสร้างจากข้อมูลของกระทรวงพาณิชย์และสถานประกอบการค้าปลีก
+สมัยใหม่ทั่วประเทศ โดยบรรลุวัตถุประสงค์ที่ตั้งไว้ทั้ง 3 ข้อ ดังนี้
 
-\begin{enumerate}
-  \item \textbf{ระบบดึงข้อมูลอัตโนมัติ:} พัฒนาระบบที่รองรับ 11 แหล่งข้อมูล
-        (3 ภาครัฐ + 8 Modern Trade) ผ่าน 4 กลยุทธ์ ได้แก่ PDF parsing,
-        JSON API, ScrapingBee proxy + Browser Rendering, และ Manual Upload
-  \item \textbf{การคำนวณต้นทุนต่อหน่วย:} รองรับการคำนวณ BoQ ครบ 5 ประเภทงาน
-        (\texttt{wall\_tile}, \texttt{column\_beam}, \texttt{rebar},
-        \texttt{paint}, \texttt{brick}) ตามหลักเกณฑ์การคำนวณราคากลาง
-        ตุลาคม 2560 พร้อมเชื่อมโยงราคาจากหลายแหล่งและบันทึกผลใน
-        \texttt{fact\_calculations} dimension
-  \item \textbf{การวิเคราะห์เชิงเวลาและพื้นที่:} ระบบให้บริการ Linear Trend
-        Analysis, Percentage Change Analysis, Outlier Detection (z-score),
-        และ Regional Aggregator (median ราคา 6 ภาค)
+\subsection{การพัฒนาระบบดึงข้อมูลอัตโนมัติ}
+
+ระบบสามารถเชื่อมต่อกับ 11 แหล่งข้อมูล ครอบคลุม 3 หน่วยงานภาครัฐ
+(TPSO, CGD, DIT) และ 8 ผู้ค้าปลีกสมัยใหม่ (HomePro, MegaHome,
+Boonthavorn, Thai Watsadu, Global House, BnB Home, SCG Home, DoHome)
+ผ่าน 4 กลยุทธ์การดึงข้อมูล ได้แก่ PDF parsing (\texttt{unpdf}),
+JSON API (\texttt{suggest.jsp}), ScrapingBee proxy + Cloudflare
+Browser Rendering, และ Manual Upload สำหรับแหล่งที่ scrape ไม่ได้.
+
+จาก 11 แหล่ง 3 แหล่งดึงได้อัตโนมัติเต็มรูปแบบ (TPSO + HomePro
++ MegaHome) ครอบคลุม $\approx$70\% ของการ lookup จริงในงาน BoQ
+ส่วน 8 แหล่งที่เหลือใช้ระบบ manual upload ผ่าน admin endpoint
+\texttt{POST /api/admin/upload-prices} ซึ่งเหมาะสมกับลักษณะข้อมูล
+ภาครัฐที่เปลี่ยนรายไตรมาส.
+
+\subsection{การพัฒนาระบบคำนวณต้นทุนวัสดุต่อหน่วย}
+
+ระบบรองรับการคำนวณ Bill of Quantities ครบ 5 ประเภทงานตามหลักเกณฑ์
+การคำนวณราคากลางของภาครัฐ ตุลาคม 2560 ได้แก่
+(1) งานบุกระเบื้องผนัง (\texttt{wall\_tile}),
+(2) งานเสาเอ็น/คานทับหลัง (\texttt{column\_beam}),
+(3) งานเหล็กเสริม (\texttt{rebar}),
+(4) งานทาสี (\texttt{paint}), และ
+(5) งานก่ออิฐ (\texttt{brick}).
+
+ทุกการคำนวณจะถูกบันทึกอัตโนมัติเป็น \texttt{fact\_calculations}
+dimension ใน Cloudflare KV เพื่อใช้สำหรับการวิเคราะห์เชิงรวมในอนาคต.
+
+\subsection{การวิเคราะห์เชิงเวลาและพื้นที่}
+
+ระบบให้บริการเครื่องมือวิเคราะห์เชิงสถิติ 4 ประเภท:
+\begin{itemize}[leftmargin=2em,itemsep=0.1em]
+  \item \textbf{Linear Trend Analysis} ($Y = a + bX$) พร้อม $R^2$
+        — ใช้พยากรณ์แนวโน้มราคา
+  \item \textbf{Percentage Change Analysis} ($\Delta\%$ MoM) — ใช้
+        วัดความผันผวนรายเดือน
+  \item \textbf{Outlier Detection} (z-score test, $|z| > 2.0$) —
+        ใช้กรองข้อมูลผิดปกติ
+  \item \textbf{Regional Aggregator} (median ราคา 6 ภาค) — ใช้
+        ปรับ regional adjustment factor
+\end{itemize}
+
+จากการทดสอบกับข้อมูล 9 เดือน พบว่าราคาวัสดุก่อสร้างเฉลี่ยมีแนวโน้ม
+เพิ่มขึ้น 0.4 จุด/เดือน ($R^2 = 0.989$) และราคาภาคใต้สูงกว่าภาคกลาง
+ถึง 22.9\% ซึ่งเป็นข้อมูลสำคัญสำหรับการประมาณราคาในแต่ละพื้นที่.
+
+\section{ความมีส่วนร่วมเชิงวิชาการ (Contribution)}
+\label{sec:contribution}
+
+จากการทบทวนวรรณกรรมในบทที่ 2 พบว่างานวิจัยที่ผ่านมา
+\cite{rao2015,chunyaem2019,liu2024,lee2024} ได้พัฒนาแนวทางเฉพาะส่วน
+ของกระบวนการ เช่น Web Scraping, AI Classification, Outlier Detection,
+หรือ Price Forecasting แต่ \emph{ยังขาดงานวิจัยที่บูรณาการกระบวนการ
+ทั้งหมดเข้าด้วยกันในระบบเดียว}.
+
+งานวิจัยนี้ \emph{เติมเต็มช่องว่างดังกล่าว} ด้วยการพัฒนาระบบ pipeline
+แบบ end-to-end ที่ครอบคลุมทุกขั้นตอน:
+
+\begin{enumerate}[leftmargin=2em,itemsep=0.2em]
+  \item \textbf{Multi-source data acquisition} — รองรับ 4 กลยุทธ์
+        การดึงข้อมูลที่แตกต่างกัน
+  \item \textbf{Cross-source canonicalization} — แก้ปัญหา entity
+        matching ของวัสดุข้ามแหล่งด้วย 3-tier filter
+  \item \textbf{Unit standardization} — แปลงหน่วย 12 ประเภทอัตโนมัติ
+  \item \textbf{Statistical validation} — z-score outlier detection
+        + linear trend regression
+  \item \textbf{BOQ engine} — รองรับ 5 ประเภทงานตามหลักเกณฑ์ราชการ
+  \item \textbf{Spatial-temporal analytics} — เปรียบเทียบราคาเชิง
+        พื้นที่ (6 ภาค) และเวลา (9 เดือน)
 \end{enumerate}
 
-\section{การมีส่วนร่วมเชิงวิชาการ (Contribution)}
-
-จากการทบทวนวรรณกรรม พบว่างานวิจัยก่อนหน้า \autocite{rao2015,chunyaem2019,liu2024}
-ได้พัฒนาแนวทางเฉพาะส่วน เช่น Web Scraping, AI classification, หรือ Price
-Forecasting แต่ยังขาดงานวิจัยที่บูรณาการกระบวนการทั้งหมดเข้าด้วยกัน. งานวิจัย
-นี้ \emph{เติมเต็มช่องว่างดังกล่าว} โดยเชื่อมโยง pipeline ตั้งแต่การดึงข้อมูล
-จัดการมาตรฐาน คำนวณต้นทุน ไปจนถึงการวิเคราะห์เชิงสถิติในระบบเดียว ที่
-deploy บน Cloudflare Workers edge network.
+นอกจากนี้ การ deploy ระบบบน \emph{edge platform} (Cloudflare Workers)
+ทำให้มี latency เฉลี่ย < 50 ms ทั่วโลก เป็น demonstration ของ
+สถาปัตยกรรม serverless ที่เหมาะสมกับงานวิจัยลักษณะนี้ และเปิดทาง
+สำหรับการเผยแพร่เป็น public REST API ในอนาคต.
 
 \section{ข้อจำกัดของการศึกษา}
+\label{sec:limit}
 
-\begin{enumerate}
-  \item \textbf{Bot challenge:} 5 จาก 8 retail sources (Thai Watsadu, Global
-        House, BnB, SCG Home, DoHome) ถูก block ด้วย Cloudflare bot challenge
-        หรือเป็น SPA ที่โหลดราคาด้วย XHR หลัง hydrate
-  \item \textbf{Data freshness:} ราคาประเมินทางการ (CGD) เปลี่ยนรายไตรมาส
-        ระบบใช้ TTL 30 วัน + cron weekly snapshot ซึ่งเพียงพอสำหรับ research
-        scale แต่อาจไม่ทันต่อตลาดในช่วงราคาผันผวน
-  \item \textbf{Sample coverage:} ระบบทดสอบจริงเฉพาะ 24 รายการวัสดุ ครอบคลุม
-        77 จังหวัด แต่ regional coverage ยังบาง (ส่วนใหญ่ default ที่ province 10
-        กรุงเทพฯ); งานเชิงพื้นที่จึงใช้ AI-researched seed prices ใน 5 ภาค
+งานวิจัยนี้มีข้อจำกัดในหลายด้านที่ควรกล่าวถึงเพื่อให้การประเมินผล
+มีความเป็นกลาง ดังนี้
+
+\subsection{ข้อจำกัดด้านการเข้าถึงข้อมูล}
+
+\begin{enumerate}[leftmargin=2em,itemsep=0.2em]
+  \item \textbf{Bot challenge ในเว็บไซต์ Modern Trade}\\
+        จาก 8 แหล่งของ Modern Trade มี 5 แหล่ง (Thai Watsadu, BnB,
+        Global House, SCG Home, DoHome) ที่ใช้ Cloudflare bot challenge
+        หรือเป็น Single Page Application ที่โหลดราคาผ่าน XHR หลัง
+        hydrate ทำให้การ scrape ด้วยวิธีดั้งเดิมไม่สามารถดึงข้อมูลได้
+        ระบบต้อง fallback ไปยัง ScrapingBee residential proxy ซึ่งมี
+        ค่าใช้จ่ายตามจำนวนคำขอ จำกัดความถี่การดึงข้อมูล.
+
+  \item \textbf{Anti-bot protection ของ CGD}\\
+        เว็บไซต์ของกรมบัญชีกลางมีการป้องกันบอทระดับสูง ทำให้ไม่สามารถ
+        scrape ได้โดยตรง ระบบจึงต้องอาศัย manual upload ของราคามาตรฐาน
+        ที่อ้างอิงจาก published rate report.
+
+  \item \textbf{URL deprecation ของ DIT}\\
+        เว็บไซต์เดิมของกรมการค้าภายในที่เผยแพร่ราคารายวันไม่สามารถ
+        เข้าถึงได้ในช่วงที่ดำเนินการวิจัย ทำให้ต้องใช้ TPSO Monthly
+        เป็น proxy.
 \end{enumerate}
+
+\subsection{ข้อจำกัดด้านความสดของข้อมูล}
+
+ราคาประเมินทางการ (CGD) เปลี่ยนรายไตรมาส ระบบใช้ TTL 30 วัน + cron
+weekly snapshot ซึ่งเพียงพอสำหรับ research scale แต่อาจไม่ทันต่อตลาด
+ในช่วงราคาวัสดุก่อสร้างผันผวนรุนแรง (เช่น ช่วงสงครามรัสเซีย-ยูเครน
+ที่ราคาเหล็กเปลี่ยนรายสัปดาห์).
+
+\subsection{ข้อจำกัดด้าน Sample Coverage}
+
+ระบบทดสอบจริงเฉพาะ 24 รายการวัสดุ ครอบคลุม 77 จังหวัด แต่ regional
+coverage ยังบาง — ส่วนใหญ่ default ที่ province 10 (กรุงเทพมหานคร)
+และมีการเก็บข้อมูลภูมิภาคจริงเพียง 5 ภาค (ผ่าน AI-researched seed
+prices ใน 5 จังหวัดอ้างอิง). การขยายให้ครอบคลุมครบ 77 จังหวัดต้อง
+อาศัยการ collaboration กับ TPSO regional bulletin หรือ partnership
+กับผู้ค้าปลีกท้องถิ่น.
+
+\subsection{ข้อจำกัดด้าน Statistical Method}
+
+การวิเคราะห์เชิงสถิติของระบบเป็นพื้นฐาน (linear trend, z-score,
+percentage change) ไม่ได้ใช้แบบจำลองพยากรณ์ราคาขั้นสูง เช่น ARIMA
+หรือ Prophet ที่อาจให้ความแม่นยำสูงกว่าในการพยากรณ์ราคาในอนาคต
+\cite{liu2024}. การใช้แบบจำลองเหล่านี้เป็นเรื่องที่งานวิจัยในอนาคต
+สามารถต่อยอดได้.
 
 \section{ข้อเสนอแนะสำหรับงานวิจัยในอนาคต}
+\label{sec:future}
 
-\begin{enumerate}
-  \item \textbf{Reverse-engineer SPA APIs:} วิเคราะห์ XHR endpoint ของ
-        DoHome, SCG Home, Global House เพื่อเข้าถึงข้อมูลโดยไม่ต้อง render
-        full browser
-  \item \textbf{Forecasting model:} ขยายจาก linear trend ไปสู่ ARIMA หรือ
-        Prophet เพื่อพยากรณ์ราคาในอนาคต
-  \item \textbf{Trust weighting:} กำหนดน้ำหนักของแหล่งข้อมูลแบบ adaptive
-        (Government 2x Retail) เมื่อรวมเป็น index
-  \item \textbf{Province expansion:} ขยายการเก็บข้อมูล regional ให้ครบ
-        77 จังหวัด โดยใช้ TPSO regional bulletin เป็น primary source
-  \item \textbf{Public API:} เปิด \texttt{/api-docs} ให้ผู้ประมาณราคา
-        third-party ใช้ฟรี พร้อม rate-limit policy
+จากข้อจำกัดข้างต้น สามารถเสนอแนวทางวิจัยในอนาคตได้ 5 ประเด็นหลัก:
+
+\begin{enumerate}[leftmargin=2em,itemsep=0.3em]
+  \item \textbf{Reverse-engineer SPA APIs}\\
+        วิเคราะห์ XHR endpoint ของ DoHome, SCG Home, Global House
+        เพื่อเข้าถึงข้อมูลผ่าน internal API โดยตรง โดยไม่ต้อง render
+        full browser ซึ่งจะลดต้นทุน ScrapingBee และเพิ่มอัตราการ
+        ดึงข้อมูลสำเร็จ.
+
+  \item \textbf{Forecasting model ขั้นสูง}\\
+        ขยายจาก linear trend ไปสู่ ARIMA, Prophet, หรือ LSTM
+        เพื่อพยากรณ์ราคาในอนาคต โดยใช้ข้อมูลย้อนหลังที่ระบบสะสม
+        จาก cron weekly snapshot. การพยากรณ์ที่แม่นยำจะเป็น
+        ประโยชน์ต่องาน budget planning ของโครงการระยะยาว.
+
+  \item \textbf{Adaptive trust weighting}\\
+        กำหนดน้ำหนักของแหล่งข้อมูลแบบ adaptive เช่น Government 2x
+        Retail หรือ TPSO 3x DIT เมื่อรวมเป็น composite price index.
+        การชั่งน้ำหนักนี้ควรอ้างอิงจากความน่าเชื่อถือทางสถิติของ
+        แต่ละแหล่ง (\textcite{elmohr2022}).
+
+  \item \textbf{Province expansion ครบ 77 จังหวัด}\\
+        ขยายการเก็บข้อมูล regional ให้ครอบคลุมครบทุกจังหวัด โดยใช้
+        TPSO regional bulletin เป็น primary source บวกกับ partnership
+        กับผู้ค้าปลีกท้องถิ่นที่มีฐานข้อมูลออนไลน์.
+
+  \item \textbf{เปิด Public API + AI Assistant}\\
+        เปิด \texttt{/api-docs} ให้ผู้ประมาณราคา third-party ใช้ฟรี
+        พร้อม rate-limit policy ที่เหมาะสม รวมถึงพัฒนา AI assistant
+        ที่ตอบคำถาม natural language เช่น ``ราคาปูนซีเมนต์ตราเสือ
+        50 กก.\ ที่เชียงใหม่ตอนนี้เท่าไหร่?'' โดยใช้ Large Language
+        Model + RAG (Retrieval-Augmented Generation) จาก KV.
 \end{enumerate}
 
-\section{บทสรุปสำคัญ}
+\section{บทสรุปสุดท้าย}
+\label{sec:final}
 
-ระบบที่พัฒนาขึ้นพิสูจน์ว่าเป็นไปได้ในทางปฏิบัติที่จะ \emph{รวมศูนย์} ข้อมูล
-ราคาวัสดุก่อสร้างจากหลายแหล่งให้กลายเป็น \emph{single source of truth}
-สำหรับการประมาณราคา BoQ. การพัฒนา ระบบบน edge platform (Cloudflare Workers)
-ทำให้ระบบมีต้นทุนการดำเนินงานต่ำ (scale-to-zero) และ latency ระดับ <50ms
-ทั่วโลก ซึ่งเหมาะสมกับการใช้งานในงานก่อสร้างภาครัฐและภาคเอกชน. งานวิจัยนี้
-จึงมีศักยภาพในการนำไปใช้สนับสนุนการบริหารงบประมาณภาครัฐให้มีความโปร่งใสและ
-สอดคล้องกับสภาพตลาดจริงมากยิ่งขึ้น.
+ระบบที่พัฒนาขึ้นในงานวิจัยนี้เป็น \emph{proof-of-concept} ที่พิสูจน์
+ว่าเป็นไปได้ในทางปฏิบัติที่จะรวมศูนย์ข้อมูลราคาวัสดุก่อสร้างจาก
+หลายแหล่งให้กลายเป็น \emph{single source of truth} สำหรับการประมาณ
+ราคา BoQ ในประเทศไทย. การ deploy ระบบบน edge platform (Cloudflare
+Workers) ทำให้ระบบมีต้นทุนการดำเนินงานต่ำ (scale-to-zero) และ latency
+ระดับ < 50 ms ทั่วโลก ซึ่งเหมาะสมกับการใช้งานทั้งในงานก่อสร้างภาครัฐ
+และภาคเอกชน.
+
+ผลที่ได้จากงานวิจัยมีศักยภาพในการนำไปใช้สนับสนุน:
+\begin{itemize}[leftmargin=2em,itemsep=0.1em]
+  \item การประมาณราคาโครงการก่อสร้างของหน่วยงานภาครัฐที่ต้องอ้างอิง
+        ราคามาตรฐานควบคู่กับราคาตลาดจริง
+  \item การวิเคราะห์ความผันผวนของราคาวัสดุเพื่อใช้ในการวางแผน
+        งบประมาณระยะยาว
+  \item การสร้างความโปร่งใสในกระบวนการจัดซื้อจัดจ้างภาครัฐ ผ่านการ
+        เปิดเผยข้อมูลราคาจากหลายแหล่งให้ผู้มีส่วนได้ส่วนเสียตรวจสอบ
+        เปรียบเทียบ
+  \item การเป็นต้นแบบสำหรับงานวิจัยอื่น ๆ ที่ต้องการ centralize
+        ข้อมูลราคาสินค้าจากหลายแหล่งในบริบทของประเทศไทย
+\end{itemize}
+
+ระบบนี้แสดงให้เห็นว่า \emph{เทคโนโลยี edge computing + serverless +
+data integration} สามารถนำมาประยุกต์ใช้ในงานวิศวกรรมโยธาเพื่อ
+แก้ปัญหาในทางปฏิบัติของผู้ประมาณราคาได้อย่างมีประสิทธิภาพ
+และคาดว่าผลลัพธ์ของงานวิจัยจะเป็นพื้นฐานสำคัญในการพัฒนาระบบสารสนเทศ
+ด้านการประมาณราคางานก่อสร้างของประเทศไทยในระยะยาว.
