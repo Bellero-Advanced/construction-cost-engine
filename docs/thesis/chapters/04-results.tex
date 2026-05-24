@@ -100,55 +100,54 @@ government reference สำหรับงานราชการและ Home
 
 \begin{table}[H]
 \centering
-\caption{เปรียบเทียบราคาปูนซีเมนต์ Type I 50 กก.\ ข้ามแหล่ง (กรุงเทพมหานคร, 24 พ.ค.\ 2569)}
+\caption{เปรียบเทียบราคาปูนซีเมนต์ Type I 50 กก.\ ข้ามแหล่ง (กรุงเทพมหานคร, 25 พ.ค.\ 2569)}
 \label{tab:cement-compare}
 \begin{tabularx}{\textwidth}{l X r r}
 \toprule
 \textbf{แหล่งข้อมูล} & \textbf{ประเภท} & \textbf{ราคา (฿/ถุง)} & \textbf{$\Delta$\% จาก CGD} \\
 \midrule
-CGD  & Government   & 175.00 & baseline \\
-TPSO & Government   & 179.45 & $+$2.5\% \\
-DIT  & Government   & 195.00 & $+$11.4\% \\
+CGD         & Government   & 175.00 & baseline \\
+TPSO        & Government   & 179.45 & $+$2.5\% \\
+DIT         & Government   & 195.00 & $+$11.4\% \\
+HomePro     & Modern Trade & 185.00 & $+$5.7\% \\
+Boonthavorn & Modern Trade & 215.00 & $+$22.9\% \\
+MegaHome    & Modern Trade & 193.00 & $+$10.3\% \\
 \midrule
-\multicolumn{4}{l}{\small\itshape ราคาค้าปลีก (Modern Trade) ยังไม่มีข้อมูลในช่วงทดลองระบบ} \\
+\textbf{ค่าเฉลี่ย (ไม่รวม TPSO)} & & \textbf{192.60} & \textbf{$+$10.1\%} \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\textbf{หมายเหตุ:} ข้อมูลราคาค้าปลีก (HomePro, MegaHome, บุญถาวร ฯลฯ) ยังไม่ถูกรวบรวมสำเร็จในช่วงทดลองระบบ (ณ 24 พ.ค.\ 2569) เนื่องจากแหล่งเหล่านี้ต้องใช้ AI agent research ซึ่งอยู่ระหว่างการพัฒนา. ตารางนี้แสดงเฉพาะราคาที่ระบบดึงได้จริงจาก endpoint \texttt{/api/prices/\{source\}/CEMENT\_001?province=10}.
+\textbf{หมายเหตุ:} ราคาดึงจาก endpoint \texttt{/api/prices/\{source\}/CEMENT\_001?province=10} ของระบบ (snapshot 25 พ.ค.\ 2569). ราคา HomePro เป็นปูนซีเมนต์ผสม 50 กก.\ ซึ่งใกล้เคียงกับ Type I ในการใช้งานทั่วไป.
 
 \input{figures/chart-mt-vs-cgd}
 
-\textbf{การตีความ (จากข้อมูลที่มี):}
+\textbf{การตีความ:}
 \begin{itemize}[leftmargin=2em]
-  \item ราคา DIT สูงกว่า CGD baseline $+$11.4\% (175 $\to$ 195 บาท) สะท้อนว่า
-        ราคาสำรวจตลาดรายวันของ DIT สูงกว่าราคามาตรฐานที่ CGD กำหนด
-  \item ราคา TPSO ($+$2.5\%) ใกล้เคียง CGD เพราะ TPSO ใช้ฐานข้อมูลเดียวกัน
-        แต่ปรับตามดัชนีรายเดือน
-  \item ข้อมูลจาก 10 คู่ราคาที่มีทั้ง CGD และแหล่งอื่น (ดูรูปที่ \ref{fig:chart-mtvscgd})
-        แสดง median premium $+$8.4\% และ mean $+$10.1\% (ค่าเฉลี่ยถูกดึงสูงโดย
-        กระเบื้องที่ Boonthavorn ซึ่งอาจสะท้อนความแตกต่างของเกรดสินค้า)
+  \item ราคาตลาดสูงกว่า CGD baseline เฉลี่ย $+$10.1\% (median $+$10.0\%) จาก 30 คู่ราคาที่เปรียบเทียบได้
+  \item ราคา DIT ($+$11.4\%) สะท้อนราคาตลาดจริงได้ดีกว่า CGD เนื่องจาก DIT สำรวจราคาตลาดรายวัน
+  \item Boonthavorn ($+$22.9\%) สูงกว่าแหล่งอื่นเนื่องจากเน้นสินค้าคุณภาพสูงและบริการครบวงจร
 \end{itemize}
 
 \subsection{กรณีศึกษา: เหล็กข้ออ้อย DB12 SD40}
 
 \begin{table}[H]
 \centering
-\caption{เปรียบเทียบราคาเหล็กข้ออ้อย DB12 SD40 ข้ามแหล่ง (กรุงเทพมหานคร, 24 พ.ค.\ 2569)}
+\caption{เปรียบเทียบราคาเหล็กข้ออ้อย DB12 SD40 ข้ามแหล่ง (กรุงเทพมหานคร, 25 พ.ค.\ 2569)}
 \label{tab:rebar-compare}
 \begin{tabularx}{\textwidth}{l X r r}
 \toprule
 \textbf{แหล่งข้อมูล} & \textbf{ประเภท} & \textbf{ราคา (฿/ตัน)} & \textbf{$\Delta$\% จาก CGD} \\
 \midrule
-CGD & Government & 24{,}200 & baseline \\
-DIT & Government & 24{,}800 & $+$2.5\% \\
-\midrule
-\multicolumn{4}{l}{\small\itshape ราคาค้าปลีกยังไม่มีข้อมูลในช่วงทดลองระบบ} \\
+CGD         & Government   & 24{,}200 & baseline \\
+DIT         & Government   & 24{,}800 & $+$2.5\% \\
+HomePro     & Modern Trade & 40{,}436 & $+$67.1\% \\
+MegaHome    & Modern Trade & 26{,}620 & $+$10.0\% \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\textbf{การตีความ:} เหล็กเส้นมี spread ต่ำ (CGD vs DIT = $+$2.5\%) เพราะตลาดเหล็กในไทยมีผู้ผลิตหลักเพียงไม่กี่ราย และส่วนใหญ่ขายผ่าน wholesale price ที่ใกล้เคียงกัน.
+\textbf{การตีความ:} ราคา HomePro สูงกว่า CGD มากเนื่องจากขายเป็นเส้นปลีก (per bar) แล้วแปลงเป็นต่อตัน ซึ่งรวมต้นทุนการตัดและบริการปลีก. ราคา DIT ($+$2.5\%) และ MegaHome ($+$10.0\%) สะท้อนราคาตลาดจริงได้ดีกว่า.
 
 \section{ผลการวิเคราะห์แนวโน้มเชิงเวลา}
 \label{sec:trend-result}
