@@ -1,5 +1,5 @@
-% figures/chart-mt-vs-cgd.tex — Other-source vs CGD scatter (real data)
-% Source: GET /api/prices/{src}/{material}?province=10 (snapshot: 2026-05-24)
+% figures/chart-mt-vs-cgd.tex — Cross-source vs CGD scatter (real data, 16 pairs)
+% Source: GET /api/prices/{src}/{mat}?province=10 (snapshot: 2026-05-24/25)
 \begin{figure}[H]
   \centering
   \begin{tikzpicture}
@@ -8,9 +8,9 @@
       xmode=log, ymode=log,
       log basis x=10, log basis y=10,
       xlabel={CGD baseline (บาท/หน่วย, log scale)},
-      ylabel={ราคาแหล่งอื่น (DIT/HomePro, log scale)},
-      xmin=100, xmax=30000,
-      ymin=100, ymax=30000,
+      ylabel={ราคาแหล่งอื่น (DIT/HomePro/Boonthavorn, log scale)},
+      xmin=50, xmax=30000,
+      ymin=50, ymax=30000,
       grid=both, grid style={dashed,gray!25},
       legend pos=north west,
       legend style={font=\scriptsize,draw=gray!40},
@@ -18,21 +18,24 @@
       label style={font=\footnotesize},
     ]
       % y = x reference line
-      \addplot[dashed,gray,thick,domain=100:30000,samples=2] {x};
+      \addplot[dashed,gray,thick,domain=50:30000,samples=2] {x};
       \addlegendentry{$y = x$ (ราคาตรงกัน)}
 
-      % y = 1.054 x (median ratio of 10 real pairs)
-      \addplot[red!70!black,thick,domain=100:30000,samples=2] {1.054*x};
-      \addlegendentry{$y = 1.054x$ (median premium $+5.4\%$)}
+      % y = 1.084 x (mean ratio of 16 valid pairs)
+      \addplot[red!70!black,thick,domain=50:30000,samples=2] {1.084*x};
+      \addlegendentry{$y = 1.084x$ (mean premium $+8.4\%$ median)}
 
-      % Real cross-source pairs (n=10) — see Table~\ref{tab:cross-source-pairs}
+      % Real cross-source pairs (n=16, same unit, comparable)
+      % (cgd, other) pairs
       \addplot[only marks,mark=*,mark size=2pt,blue!70!black] coordinates {
-        (175,195) (180,200) (1250,1290) (1590,1650) (820,1500)
-        (24200,24800) (650,680) (480,510) (2800,2900) (220,245)
+        (175,195) (220,245) (220,289) (180,195) (65,79)
+        (24200,24800) (650,680) (1250,1290) (1250,1350)
+        (1590,1650) (1590,1750) (820,890)
+        (180,190) (180,200) (180,210) (2800,2900)
       };
-      \addlegendentry{วัสดุ 10 รายการที่มีคู่ราคา}
+      \addlegendentry{16 คู่ราคาที่มีหน่วยเดียวกัน}
     \end{axis}
   \end{tikzpicture}
-  \caption{การเปรียบเทียบราคาจากแหล่งอื่น (DIT หรือ HomePro) เทียบกับ CGD baseline สำหรับวัสดุ 10 รายการที่ระบบมีคู่ราคาในวันที่ดึงข้อมูล (24 พ.ค.\ 2569). คู่ส่วนใหญ่อยู่ใกล้เส้น $y = x$ โดยมีค่า median premium $+5.4\%$ ส่วนเฉลี่ย $+14.1\%$ ที่ดึงสูงขึ้นจากกรณีน้ำยารองพื้นที่ HomePro ($+82.9\%$) ซึ่งสะท้อนความแตกต่างของขนาดบรรจุภัณฑ์ระหว่างราคา CGD ต่อแกลลอน 18 ลิตรกับราคาขายปลีกที่บรรจุภัณฑ์เล็กกว่า. ในงานประมาณราคาจริง วิศวกรประมาณราคาจึงควรเปรียบเทียบทั้ง spec และหน่วยก่อนนำราคาไปใช้แทนกัน.}
+  \caption{การเปรียบเทียบราคาจากแหล่งอื่น (DIT, HomePro, Boonthavorn) เทียบกับ CGD baseline สำหรับ 16 คู่ราคาที่มีหน่วยเดียวกันและสามารถเปรียบเทียบได้โดยตรง (snapshot 24--25 พ.ค.\ 2569, กรุงเทพมหานคร). ค่า median premium $+8.4\%$ และ mean $+10.1\%$ บ่งชี้ว่าราคาตลาดสูงกว่าราคามาตรฐาน CGD อย่างสม่ำเสมอ. คู่ที่มีความแตกต่างสูงสุด (กระเบื้องที่ Boonthavorn $+31.4\%$) อาจสะท้อนความแตกต่างของเกรดสินค้ามากกว่าความคลาดเคลื่อนของระบบ.}
   \label{fig:chart-mtvscgd}
 \end{figure}
