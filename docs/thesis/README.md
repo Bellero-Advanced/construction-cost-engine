@@ -10,15 +10,63 @@
 
 ---
 
-## ⚠ สำคัญที่สุด — Compiler Settings
+## ⚠ ตั้งค่า Compiler ก่อน
 
-ใน Overleaf ต้องตั้งค่า:
+ใน Overleaf:
 1. **Menu → Compiler → XeLaTeX** (ไม่ใช่ pdfLaTeX!)
 2. **Menu → Main document → main.tex**
-3. ปล่อย Bibliography compiler เป็น Biber (default)
 
-**ทำไม:** ภาษาไทยใน LaTeX ต้องใช้ **XeLaTeX** + **polyglossia** + **fontspec**
-ถ้าใช้ pdfLaTeX (default) → ภาษาไทยหายหมด, citations แสดง `labelyearlabel...`
+ถ้าใช้ pdfLaTeX → ภาษาไทยหายหมด
+
+---
+
+## ฟอนต์ — เลือกได้ 2 แบบ
+
+### Option A: TH Sarabun New (สวยกว่า แต่ต้อง upload)
+
+TH Sarabun New เป็นฟอนต์ทางการของไทย (SIPA / ราชการ ปล่อยฟรี) — Overleaf ไม่ติดตั้งให้แต่
+upload เข้า project ได้
+
+**ขั้นตอน:**
+
+1. **ดาวน์โหลด TH Sarabun New** จาก:
+   - <https://www.f0nt.com/release/th-sarabun-new/> (4 ไฟล์ .ttf)
+   - หรือ <https://github.com/SIPA-CTH/THFonts>
+   - หรือถ้าเครื่องมีอยู่แล้ว ดูที่ `/System/Library/Fonts/Supplemental/` (macOS)
+
+2. **ใน Overleaf project**: คลิก "New Folder" สร้าง `fonts/`
+   แล้ว Upload 4 ไฟล์เข้าไป:
+   ```
+   fonts/THSarabunNew.ttf
+   fonts/THSarabunNew Bold.ttf
+   fonts/THSarabunNew Italic.ttf
+   fonts/THSarabunNew BoldItalic.ttf
+   ```
+
+3. **แก้ `main.tex`** บรรทัด 19-29:
+   - **Comment** บรรทัด `\setmainfont[Ligatures=TeX,Scale=1.0]{Norasi}` (Option B)
+   - **Uncomment** block ของ Option A (7 บรรทัดที่ขึ้นด้วย `\setmainfont[Path=...`)
+
+4. **Recompile** — TH Sarabun New จะ render สวยงาม
+   - `Scale=1.4` คือ scale factor (Sarabun เล็กกว่าฟอนต์อังกฤษ ต้องคูณ 1.3-1.5 ให้สมดุล)
+
+### Option B: Norasi (default — ใช้ได้ทันทีไม่ต้อง upload)
+
+Norasi มากับ TeX Live ทุก distribution รวม Overleaf — เป็น default ของ skeleton นี้
+ลักษณะใกล้ Browallia/Cordia มาก แต่อาจดูตัวอักษรเล็กกว่า Sarabun
+
+ถ้าจะใช้ Norasi เลย → ไม่ต้องทำอะไร compile ได้เลย
+
+### Comparison
+
+| Font | สวยงาม | ต้อง upload | จำนวน TTF | Scale แนะนำ |
+|---|---|---|---|---|
+| **TH Sarabun New** | ⭐⭐⭐⭐⭐ ราชการมาตรฐาน | ✅ 4 ไฟล์ | 4 | 1.4 |
+| **Norasi** | ⭐⭐⭐ ใช้ได้ | ❌ มาให้แล้ว | 0 | 1.0 |
+| **Garuda** | ⭐⭐⭐ ใช้ได้ | ❌ มาให้แล้ว | 0 | 1.0 |
+| **TH Sarabun Chula** | ⭐⭐⭐⭐ จุฬาฯ ทางการ | ✅ ขอจากภาควิชา | 4 | 1.4 |
+
+> **คำแนะนำ:** ใช้ TH Sarabun New ถ้ามีเวลา upload — ฟอนต์ราชการที่ดูเป็นทางการที่สุด.
 
 ---
 
@@ -44,87 +92,59 @@ docs/thesis/
 │   ├── B-code-listings.tex
 │   └── C-raw-data.tex
 ├── figures/                        ← ใส่ .png/.pdf ทีหลัง
+├── fonts/                          ← (ถ้าใช้ Option A) ใส่ THSarabunNew*.ttf
 └── README.md
 ```
 
-**คาดจำนวนหน้ารวม:** 60-80 หน้า (เหมาะสมกับ thesis ป.ตรี)
+**คาดจำนวนหน้ารวม:** 60-80 หน้า
 
 ---
 
-## ขั้นตอนใช้งาน Overleaf
+## Bug Fixes ที่แก้ไปแล้ว
 
-### 1. Upload Project
-1. New Project → Upload Project
-2. Zip โฟลเดอร์ `docs/thesis/` ทั้งโฟลเดอร์
-3. Set main document: `main.tex`
-4. **Set Compiler: XeLaTeX** (สำคัญมาก)
-
-### 2. Verify Thai font (Overleaf)
-Overleaf มี Norasi ติดตั้งไว้แล้ว (ทุก TeX Live distribution มี). ถ้า compile แล้วฟอนต์
-ไม่สวยให้ลองเปลี่ยนใน `main.tex`:
-```latex
-\setmainfont[Ligatures=TeX]{Norasi}        % default — ทำงานทุก distribution
-\setmainfont[Ligatures=TeX]{Garuda}         % alternative — มีในหลาย distribution
-% \setmainfont{TH Sarabun New}              % ⚠ ห้ามใช้ — Overleaf TeX Live 2025 ไม่มี
-```
-
-### 3. Compile
-- กด "Recompile"
-- รอ XeLaTeX → Biber → XeLaTeX → XeLaTeX (3-pass)
-- ดู PDF ที่ panel ขวา
-
----
-
-## Bug Fixes จาก PDF เดิม
-
-ปัญหาที่พบใน `thesis_overleaf.pdf` (เวอร์ชั่นก่อนหน้า):
+จาก compile log (`output (1).log`) ที่พบเมื่อ Overleaf compile รอบแรก:
 
 | Bug | สาเหตุ | แก้แล้วโดย |
 |---|---|---|
-| ภาษาไทยหายเกือบหมด | compile ด้วย pdfLaTeX | ใช้ `\usepackage{polyglossia}` + XeLaTeX |
-| `labelyearlabelmonthlabelday` ในทุก citation | biblatex APA ต้องการ `date` field | เปลี่ยน `.bib` ให้ใช้ `date={2024}` แทน `year=` |
-| TOC entries เป็น `.....` ว่าง | chapter title ไทย render ไม่ได้ | XeLaTeX + Thai font fix |
-| เนื้อหาน้อย (~22 หน้า) | chapter scaffolds สั้น | expand ทุกบท 3-5 เท่า |
-| header chapter เป็น `บทที่ 1` ตามด้วยบรรทัดว่าง | LaTeX bug — chapter title หาย | ฟิกซ์ใน XeLaTeX setup |
+| `TH Sarabun New ... TFM not found` (18 ครั้ง) | Overleaf ไม่ติดตั้ง font | เปลี่ยนเป็น Norasi default + เปิด Option A ให้ upload เองได้ |
+| `polyglossia: monospace font undefined` (24 ครั้ง) | ไม่ได้ set `\setmonofont` | เพิ่ม `\setmonofont{Latin Modern Mono}` |
+| `LaTeX Error: There's no line here to end` | `\\[2.5cm]` ใน `\center` | เปลี่ยนเป็น `\vspace{Xcm}` paragraph separators |
+| `biblatex Warning: Language 'thai' not supported` | biblatex ไม่รู้จัก thai | เพิ่ม `language=english` ใน biblatex options |
+| `labelyearlabelmonthlabelday` ในทุก citation | biblatex APA ต้องการ `date` ไม่ใช่ `year` | rewrite `references.bib` ใช้ `date={2024}` |
+| ภาษาไทยหาย 95% | compile ด้วย pdfLaTeX | XeLaTeX + polyglossia + fontspec |
 
 ---
 
 ## Citation Style
 
-ใช้ **numeric** (\[1\], \[2\], \[3\]) แทน APA — กันปัญหา biblatex render fail
-เปลี่ยนเป็น `style=apa` ภายหลังได้ถ้าต้องการ
+ใช้ **numeric** (\[1\], \[2\]) — robust กับ biblatex มากที่สุด
 
 ```latex
-\usepackage[backend=biber,style=numeric,sorting=nyt]{biblatex}
+\usepackage[backend=biber,style=numeric,sorting=nyt,language=english]{biblatex}
 ```
 
 **ตัวอย่างการอ้าง:**
 - `\cite{ashworth2015}` → \[1\]
 - `\textcite{lee2024}` → Lee and Yun \[2\]
 
-15 entries ใน `references.bib` ครอบคลุม:
-- Sirieawphikul (2024), Crone & Voith (1992), Ashworth et al. (2013)
-- Ashworth & Perera (2015), Leung et al. (2005), Benchanakatkun (2014)
-- Lee & Yun (2024), Rao et al. (2015), Chunyaem et al. (2019)
-- Liu et al. (2024), Elmohr et al. (2022)
-- TPSO (2569), CGD (2017), Vercel Next.js (2025), Cloudflare (2025)
-
 ---
 
 ## Workflow แนะนำ
 
-### สัปดาห์ 1: ตรวจสอบ + ปรับเนื้อหา
-- ✓ Compile ครั้งแรกใน Overleaf — ตรวจสอบไม่มี LaTeX error
-- ✓ ตรวจ Thai render ทุกหน้า + แก้คำผิด
-- ✓ เพิ่มเนื้อหาที่ที่ปรึกษา comment
+### สัปดาห์ 1: Setup + ตรวจสอบ
+- ✓ Upload zip เข้า Overleaf
+- ✓ ตั้ง Compiler = XeLaTeX
+- ✓ ดาวน์โหลด TH Sarabun New + upload เข้า `fonts/` (optional แต่แนะนำ)
+- ✓ Compile ครั้งแรก → ตรวจไม่มี LaTeX error
+- ✓ ตรวจ Thai render + แก้คำผิด
 
 ### สัปดาห์ 2: Figures + Tables
-- ถ่าย screenshot 7 รูปจาก production website (ดูตารางด้านล่าง)
+- ถ่าย screenshot 7 รูปจาก production website
 - export pipeline diagrams เป็น PDF จาก `docs/pipeline-deck/`
-- แทนที่ทุก `\fbox{Placeholder...}` ด้วย `\includegraphics`
+- แทน `\fbox{Placeholder...}` ด้วย `\includegraphics`
 
 ### สัปดาห์ 3: Proofread + ส่งอาจารย์
-- run spell check (Thai + English)
+- spell check (Thai + English)
 - ตรวจ \cite ที่ break/missing
 - ส่งให้ที่ปรึกษา review
 
@@ -145,12 +165,6 @@ Overleaf มี Norasi ติดตั้งไว้แล้ว (ทุก TeX
 | `screen-health.png` | `/health` | App.A §A.5 |
 | `arch-overview.pdf` | `docs/pipeline-deck/index.html` slide 02 | Ch3 §3.1 |
 | `flow-pipeline.pdf` | `docs/pipeline-deck/index.html` slide 04 | Ch3 §3.3 |
-
-**วิธีถ่าย:**
-1. F12 → device toolbar → 1280×720
-2. Cmd-Shift-S → save as `.png`
-3. upload ใส่ folder `figures/` ของ Overleaf
-4. uncomment `\includegraphics{...}` ในไฟล์ที่เกี่ยวข้อง
 
 ---
 

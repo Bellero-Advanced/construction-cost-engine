@@ -11,8 +11,31 @@
 \setdefaultlanguage{thai}
 \setotherlanguage{english}
 
-% Norasi ships with every TeX Live distribution incl. Overleaf — no IfFontExistsTF needed.
+% Option A — TH Sarabun New (ต้อง upload .ttf เข้า fonts/ ก่อน)
+% ─────────────────────────────────────────────────────────
+% ดาวน์โหลด 4 ไฟล์จาก https://www.f0nt.com/release/th-sarabun-new/
+% หรือ https://github.com/SIPA-CTH/THFonts (THSarabunNew)
+% แล้วใส่ใน fonts/ ของ Overleaf project:
+%   fonts/THSarabunNew.ttf
+%   fonts/THSarabunNew Bold.ttf
+%   fonts/THSarabunNew Italic.ttf
+%   fonts/THSarabunNew BoldItalic.ttf
+%
+% Uncomment 7 บรรทัดนี้ + comment Option B ด้านล่าง:
+% \setmainfont[
+%   Path=./fonts/,
+%   Extension=.ttf,
+%   UprightFont=THSarabunNew,
+%   BoldFont=THSarabunNew Bold,
+%   ItalicFont=THSarabunNew Italic,
+%   BoldItalicFont=THSarabunNew BoldItalic,
+%   Scale=1.4
+% ]{THSarabunNew}
+
+% Option B — Norasi (default, ทำงานทุก distribution ไม่ต้อง upload)
+% ─────────────────────────────────────────────────────────
 \setmainfont[Ligatures=TeX,Scale=1.0]{Norasi}
+
 \setmonofont[Scale=0.9]{Latin Modern Mono}
 
 % ── Page geometry ─────────────────────────────────────
@@ -38,7 +61,7 @@
 \usepackage{hyperref}
 \hypersetup{colorlinks=true, linkcolor=black, citecolor=blue, urlcolor=blue}
 
-% ── Bibliography (numeric, Thai not supported by biblatex → use english-apa) ──
+% ── Bibliography ──────────────────────────────────────
 \usepackage[backend=biber,style=numeric,sorting=nyt,language=english]{biblatex}
 \addbibresource{references.bib}
 
