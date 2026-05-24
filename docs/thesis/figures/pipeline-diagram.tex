@@ -1,0 +1,37 @@
+% figures/pipeline-diagram.tex — flow การประมวลผลข้อมูลราคา (TikZ)
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+    font=\footnotesize,
+    node distance=0.6cm,
+    start/.style={draw,rounded rectangle,minimum height=0.7cm,minimum width=2.0cm,align=center,fill=blue!15},
+    proc/.style={draw,rectangle,rounded corners=2pt,minimum height=0.85cm,minimum width=2.5cm,align=center,fill=gray!8},
+    dec/.style={diamond,draw,aspect=2.2,minimum width=2.6cm,align=center,fill=yellow!15},
+    store/.style={draw,cylinder,shape border rotate=90,aspect=0.3,minimum height=1.0cm,minimum width=1.6cm,align=center,fill=red!10},
+    arr/.style={-{Stealth[length=2mm]},thick},
+  ]
+    \node[start] (raw) {Raw HTML / PDF / JSON};
+    \node[proc,below=of raw] (parse) {Parse \& Extract};
+    \node[proc,below=of parse] (clean) {Data Cleaning\\(remove HTML/whitespace)};
+    \node[proc,below=of clean] (unit) {Unit Standardization\\(บาท/ถุง 50kg, บาท/ตัน, บาท/เส้น)};
+    \node[dec,below=0.8cm of unit] (canon) {Canonical match?\\(brand+size+grade)};
+    \node[proc,right=2.2cm of canon,fill=orange!15] (legacy) {Legacy match\\(materialId only)};
+    \node[proc,below=0.9cm of canon] (zscore) {Outlier check\\(z-score $> 2.5\sigma$)};
+    \node[dec,below=0.7cm of zscore] (out) {Outlier?};
+    \node[proc,right=2.2cm of out,fill=red!15] (drop) {Drop \& log};
+    \node[store,below=0.8cm of out] (kv) {Cloudflare KV\\\scriptsize\{source:material:province\}};
+
+    \draw[arr] (raw) -- (parse);
+    \draw[arr] (parse) -- (clean);
+    \draw[arr] (clean) -- (unit);
+    \draw[arr] (unit) -- (canon);
+    \draw[arr] (canon) -- node[right,xshift=2pt]{yes} (zscore);
+    \draw[arr] (canon) -- node[above,font=\scriptsize]{no} (legacy);
+    \draw[arr] (legacy) |- (zscore);
+    \draw[arr] (zscore) -- (out);
+    \draw[arr] (out) -- node[right,xshift=2pt]{no} (kv);
+    \draw[arr] (out) -- node[above,font=\scriptsize]{yes} (drop);
+  \end{tikzpicture}
+  \caption{Pipeline การประมวลผลข้อมูลราคาวัสดุ (data pipeline). กระบวนการครอบคลุมตั้งแต่การดึงข้อมูลดิบจนถึงการบันทึกลงในระบบจัดเก็บ พร้อมจุดควบคุมคุณภาพข้อมูล 2 จุด คือ canonical matching และ outlier detection.}
+  \label{fig:pipeline}
+\end{figure}

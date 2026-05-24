@@ -1,0 +1,55 @@
+% figures/architecture-diagram.tex — สถาปัตยกรรมระบบ (TikZ)
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+    font=\footnotesize,
+    node distance=0.6cm and 0.5cm,
+    box/.style={draw,rounded corners=2pt,minimum height=0.9cm,minimum width=2.4cm,align=center,fill=blue!8},
+    src/.style={draw,rounded corners=2pt,minimum height=0.7cm,minimum width=2.0cm,align=center,fill=orange!12,font=\scriptsize},
+    layer/.style={draw,dashed,rounded corners=4pt,inner sep=8pt,fill=gray!4},
+    arr/.style={-{Stealth[length=2mm]},thick,gray!70},
+  ]
+    % ── Layer 1: แหล่งข้อมูล ──
+    \node[src] (s1) {TPSO\\(\scriptsize CMI)};
+    \node[src,right=of s1] (s2) {CGD\\(\scriptsize PDF)};
+    \node[src,right=of s2] (s3) {DIT\\(\scriptsize JSP)};
+    \node[src,right=of s3] (s4) {HomePro};
+    \node[src,right=of s4] (s5) {MegaHome};
+    \node[src,right=of s5] (s6) {... +5};
+    \node[layer,fit=(s1)(s2)(s3)(s4)(s5)(s6),label={[font=\bfseries\small,xshift=-3.5cm]ชั้นแหล่งข้อมูล (11 sources)}] (L1) {};
+
+    % ── Layer 2: scrapers ──
+    \node[box,below=1.6cm of s2] (sc1) {PDF Parser\\(unpdf)};
+    \node[box,right=of sc1] (sc2) {JSON API\\(suggest.jsp)};
+    \node[box,right=of sc2] (sc3) {ScrapingBee\\Proxy};
+    \node[box,right=of sc3] (sc4) {Headless\\Browser};
+    \node[layer,fit=(sc1)(sc2)(sc3)(sc4),label={[font=\bfseries\small,xshift=-3.5cm]ชั้นการดึงข้อมูล (4 strategies)}] (L2) {};
+
+    % ── Layer 3: processing ──
+    \node[box,below=1.5cm of sc2,fill=green!10] (p1) {Cleaning};
+    \node[box,right=of p1,fill=green!10] (p2) {Unit\\Standard.};
+    \node[box,right=of p2,fill=green!10] (p3) {Canonical.\\(3-tier)};
+    \node[box,right=of p3,fill=green!10] (p4) {Outlier\\(z-score)};
+    \node[layer,fit=(p1)(p2)(p3)(p4),label={[font=\bfseries\small,xshift=-3.5cm]ชั้นประมวลผลข้อมูล}] (L3) {};
+
+    % ── Layer 4: storage ──
+    \node[box,below=1.5cm of p2,fill=red!10,minimum width=3.0cm] (kv) {Cloudflare KV\\(price snapshots)};
+    \node[box,right=of kv,fill=red!10,minimum width=3.0cm] (calc) {fact\_calculations\\(BOQ log)};
+    \node[layer,fit=(kv)(calc),label={[font=\bfseries\small,xshift=-3.5cm]ชั้นจัดเก็บข้อมูล}] (L4) {};
+
+    % ── Layer 5: application ──
+    \node[box,below=1.5cm of kv,fill=violet!10] (api) {REST API\\(Next.js)};
+    \node[box,right=of api,fill=violet!10] (calc2) {BOQ Calc\\(5 work types)};
+    \node[box,right=of calc2,fill=violet!10] (stat) {Statistics\\(trend, region)};
+    \node[box,right=of stat,fill=violet!10] (ui) {Web UI\\(QS user)};
+    \node[layer,fit=(api)(calc2)(stat)(ui),label={[font=\bfseries\small,xshift=-3.5cm]ชั้นบริการแก่ผู้ใช้}] (L5) {};
+
+    % arrows between layers
+    \draw[arr] (L1.south) -- ($(L2.north)+(0,0.05)$);
+    \draw[arr] (L2.south) -- ($(L3.north)+(0,0.05)$);
+    \draw[arr] (L3.south) -- ($(L4.north)+(0,0.05)$);
+    \draw[arr] (L4.south) -- ($(L5.north)+(0,0.05)$);
+  \end{tikzpicture}
+  \caption{สถาปัตยกรรมระบบรวบรวมและคำนวณราคาวัสดุก่อสร้างแบบ 5 ชั้น (5-layer architecture). ชั้นล่างสุดให้บริการต่อวิศวกรประมาณราคา (Quantity Surveyor) ผู้เป็นกลุ่มผู้ใช้หลัก.}
+  \label{fig:arch}
+\end{figure}

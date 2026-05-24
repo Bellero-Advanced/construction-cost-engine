@@ -1,0 +1,33 @@
+% figures/canonicalization-diagram.tex — 3-tier canonical matching (TikZ)
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+    font=\footnotesize,
+    node distance=0.5cm,
+    item/.style={draw,rounded corners=2pt,minimum height=0.65cm,minimum width=4.6cm,align=left,fill=blue!8,inner sep=4pt},
+    tier/.style={draw,thick,rounded corners=4pt,minimum height=1.2cm,minimum width=5.0cm,align=center,inner sep=8pt},
+    arr/.style={-{Stealth[length=2.2mm]},thick},
+    score/.style={fill=white,inner sep=2pt,font=\scriptsize\bfseries},
+  ]
+    % Input
+    \node[item,fill=orange!15] (q) {\textbf{Query (CGD baseline):}\\``ปูนซีเมนต์ปอร์ตแลนด์ Type I 50kg''};
+
+    % Tier 1: Tight
+    \node[tier,below=1.2cm of q,fill=green!15] (t1) {\textbf{Tier 1 — Tight Match}\\brand $=$ ``Tiger'' \& size $=$ ``50kg'' \& grade $=$ ``Type I''};
+    \node[item,below=0.4cm of t1] (t1a) {HomePro: ``ปูนตราเสือ Type I 50 กก.''  \quad\textbf{MATCH}};
+
+    % Tier 2: Loose
+    \node[tier,below=0.9cm of t1a,fill=yellow!20] (t2) {\textbf{Tier 2 — Loose Match}\\size $\pm$10\% \& grade compatible (e.g. Type I, II)};
+    \node[item,below=0.4cm of t2] (t2a) {MegaHome: ``Tiger Cement 50kg (Portland)''  \quad\textbf{MATCH}};
+
+    % Tier 3: Legacy
+    \node[tier,below=0.9cm of t2a,fill=orange!25] (t3) {\textbf{Tier 3 — Legacy Match}\\materialId only (no spec metadata)};
+    \node[item,below=0.4cm of t3] (t3a) {ไทวัสดุ: ``CEMENT\_001''  \quad\textbf{MATCH (low confidence)}};
+
+    \draw[arr] (q) -- (t1);
+    \draw[arr] (t1a.south) -- node[score,right]{ใช้ราคาทันที} (t2.north);
+    \draw[arr] (t2a.south) -- node[score,right]{ใช้ราคาพร้อม flag} (t3.north);
+  \end{tikzpicture}
+  \caption{กระบวนการจับคู่รายการวัสดุข้ามแหล่ง (Canonicalization) แบบ 3 ลำดับชั้น (3-tier filter). Tier ที่สูงกว่าให้ความน่าเชื่อถือสูงกว่า แต่ครอบคลุมรายการน้อยกว่า การลด tier เปิดพื้นที่ matching ที่กว้างขึ้นโดยลดความแม่นยำลงตามลำดับ.}
+  \label{fig:canon}
+\end{figure}

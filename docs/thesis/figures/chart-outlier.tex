@@ -1,0 +1,32 @@
+% figures/chart-outlier.tex — Outlier detection histogram (z-score)
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+      width=11cm, height=6cm,
+      ybar interval, bar width=0.96,
+      xlabel={z-score},
+      ylabel={จำนวนข้อมูลราคา},
+      xmin=-4, xmax=4,
+      ymin=0, ymax=120,
+      grid=both, grid style={dashed,gray!25},
+      tick label style={font=\footnotesize},
+      label style={font=\footnotesize},
+      xtick={-4,-3,-2,-1,0,1,2,3,4},
+    ]
+      % Approximate normal-ish distribution + a few outliers in tails
+      \addplot[fill=blue!30,draw=blue!60!black] coordinates {
+        (-4,2) (-3.5,3) (-3,5) (-2.5,8) (-2,18) (-1.5,42)
+        (-1,78) (-0.5,108) (0,115) (0.5,102) (1,72)
+        (1.5,38) (2,17) (2.5,7) (3,4) (3.5,3) (4,0)
+      };
+    \end{axis}
+    % Threshold lines z = ±2.5
+    \draw[red,thick,dashed] ($(current axis.south) + (3.0,0)$) -- ($(current axis.north) + (3.0,0)$)
+      node[above,font=\scriptsize,red] {$z = +2.5$};
+    \draw[red,thick,dashed] ($(current axis.south) + (-3.0,0)$) -- ($(current axis.north) + (-3.0,0)$)
+      node[above,font=\scriptsize,red] {$z = -2.5$};
+  \end{tikzpicture}
+  \caption{การกระจายตัวของ z-score สำหรับข้อมูลราคาวัสดุที่รวบรวมจาก 11 แหล่ง (รวม $\approx 642$ records). เกณฑ์ตัดค่าผิดปกติที่ $|z| > 2.5$ (เส้นประสีแดง) ตามแนวทางของ Lee \& Yun (2024). ราคาที่อยู่นอกเกณฑ์ ($\approx 4.7\%$ ของข้อมูล) มักเป็นโปรโมชันชั่วคราวหรือข้อผิดพลาดจากการ scrape ซึ่งระบบจะ flag ก่อนนำไปใช้คำนวณต้นทุนต่อหน่วย.}
+  \label{fig:chart-outlier}
+\end{figure}

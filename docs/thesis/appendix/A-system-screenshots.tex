@@ -3,41 +3,22 @@
 \label{app:screenshots}
 
 ภาคผนวกนี้รวบรวมภาพหน้าจอจากระบบที่พัฒนาขึ้น เพื่อใช้ประกอบการอธิบาย
-การทำงานในบทที่ 4. รูปทั้งหมดถ่ายจาก production deployment ที่
+การทำงานในบทที่ 4. ภาพในภาคผนวกนี้เป็น \emph{ภาพจำลอง UI (UI mockup)}
+ที่สร้างจาก TikZ ตามองค์ประกอบจริงของระบบ. ภาพถ่ายจาก production จะถูก
+นำมาแทนที่ในการเข้าเล่มฉบับสมบูรณ์ จาก URL
 \url{https://construction-cost-engine.steep-tooth-c420.workers.dev}.
 
 \section{หน้าหลัก (Home)}
-\begin{figure}[h]\centering
-% \includegraphics[width=\textwidth]{figures/screen-home.png}
-\fbox{\parbox{0.9\textwidth}{\centering\small\itshape Placeholder: หน้าหลัก /}}
-\caption{หน้าหลักของระบบ}
-\end{figure}
+\input{figures/screenshot-home}
 
 \section{เปรียบเทียบราคาข้ามแหล่ง (\texttt{/compare-sources})}
-\begin{figure}[h]\centering
-% \includegraphics[width=\textwidth]{figures/screen-compare.png}
-\fbox{\parbox{0.9\textwidth}{\centering\small\itshape Placeholder:
-bar chart + spread + outlier badge}}
-\caption{หน้า compare-sources แสดงราคาปูนซีเมนต์จาก 5 แหล่ง พร้อม OUTLIER column}
-\end{figure}
+\input{figures/screenshot-compare}
 
 \section{แนวโน้มราคา (\texttt{/trend})}
-\begin{figure}[h]\centering
-\fbox{\parbox{0.9\textwidth}{\centering\small\itshape Placeholder:
-9-month line chart + linear regression overlay}}
-\caption{หน้า trend แสดง TPSO CMI 9 เดือน + linear trend line}
-\end{figure}
+\input{figures/screenshot-trend}
 
 \section{เครื่องคิดเลข BoQ (\texttt{/wall-tile}, \texttt{/paint}, \ldots)}
-\begin{figure}[h]\centering
-\fbox{\parbox{0.9\textwidth}{\centering\small\itshape Placeholder:
-calculator form + BOM result + breakdown chart}}
-\caption{ตัวอย่างเครื่องคิดเลขงานบุกระเบื้อง}
-\end{figure}
+\input{figures/screenshot-walltile}
 
 \section{สุขภาพแหล่งข้อมูล (\texttt{/health})}
-\begin{figure}[h]\centering
-\fbox{\parbox{0.9\textwidth}{\centering\small\itshape Placeholder:
-coverage tiles + per-source freshness}}
-\caption{หน้า health แสดงสถิติ fresh/ok/stale/missing}
-\end{figure}
+\input{figures/screenshot-health}

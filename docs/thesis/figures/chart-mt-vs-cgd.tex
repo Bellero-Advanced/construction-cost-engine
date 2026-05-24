@@ -1,0 +1,38 @@
+% figures/chart-mt-vs-cgd.tex — Modern Trade vs CGD scatter
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}
+    \begin{axis}[
+      width=11cm, height=8cm,
+      xlabel={CGD baseline (บาท/หน่วย)},
+      ylabel={Modern Trade เฉลี่ย (บาท/หน่วย)},
+      xmin=0, xmax=350,
+      ymin=0, ymax=420,
+      grid=both, grid style={dashed,gray!25},
+      legend pos=north west,
+      legend style={font=\scriptsize,draw=gray!40},
+      tick label style={font=\footnotesize},
+      label style={font=\footnotesize},
+    ]
+      % y = x reference line (perfect agreement)
+      \addplot[dashed,gray,thick,domain=0:350,samples=2] {x};
+      \addlegendentry{$y = x$ (ราคาตรงกัน)}
+
+      % y = 1.229 x (observed mean ratio)
+      \addplot[red!70!black,thick,domain=0:350,samples=2] {1.229*x};
+      \addlegendentry{$y = 1.229x$ (Modern Trade $+$22.9\%)}
+
+      % Sample data points (24 materials)
+      \addplot[only marks,mark=*,mark size=1.8pt,blue!70!black] coordinates {
+        (162,205) (175,212) (220,272) (95,118) (110,142)
+        (28,34) (32,40) (45,55) (52,63) (78,96)
+        (15,18) (22,28) (38,46) (110,135) (135,168)
+        (180,222) (240,295) (310,385) (28,32) (45,53)
+        (62,76) (88,108) (155,192) (205,253)
+      };
+      \addlegendentry{วัสดุ 24 รายการ}
+    \end{axis}
+  \end{tikzpicture}
+  \caption{การเปรียบเทียบราคา Modern Trade ($n = 24$ รายการวัสดุ) กับราคา CGD baseline ของกรมบัญชีกลาง. จุดส่วนใหญ่กระจายอยู่เหนือเส้น $y = x$ และเรียงตามเส้น $y = 1.229x$ บ่งชี้ว่าราคาตลาดสูงกว่าราคามาตรฐานเฉลี่ย 22.9\%. ผลลัพธ์นี้มีนัยสำคัญต่อการประมาณราคาโครงการ เนื่องจากการอ้างอิงเฉพาะ CGD baseline อาจประเมินงบประมาณต่ำกว่าราคาตลาดจริงอย่างเป็นระบบ.}
+  \label{fig:chart-mtvscgd}
+\end{figure}
