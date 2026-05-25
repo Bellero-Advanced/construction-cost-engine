@@ -72,3 +72,66 @@ export async function GET(req, { params }) {
   return NextResponse.json({ material, province, sources, summary });
 }
 \end{lstlisting}
+
+\section{AI Agent Research Endpoint (\texttt{/api/admin/ai-agent})}
+\begin{lstlisting}[language=TypeScript,caption={src/app/api/admin/ai-agent/route.ts (excerpt)}]
+// Endpoint รับราคาจาก AI Agent (LLM-based) และเขียนลงทั้ง live + history KV
+export async function POST(req: Request) {
+  const { kv, token } = await getEnv();
+  const reqToken = req.headers.get("x-admin-token");
+  if (token && reqToken !== token) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+
+  const body: { source: string; province: number; prices: Record<string, number>; date?: string }
+    = await req.json();
+
+  const today = body.date ?? new Date().toISOString().slice(0, 10);
+  const written: string[] = [];
+
+  for (const [materialId, raw] of Object.entries(body.prices)) {
+    if (!MATERIALS[materialId]) continue;
+    const price = Number(raw);
+    if (!Number.isFinite(price) || price <= 0) continue;
+
+    // Write live price (same key as auto-scrapers)
+    const priceKey = `${body.source}:${materialId}:${body.province}`;
+    await kv.put(priceKey, JSON.stringify({ price, fetchedAt: Date.now() }), {
+      expirationTtl: DEFAULT_TTL[body.source] ?? 86400,
+    });
+
+    // Append to history time-series
+    const histKey = `history:${body.source}:${materialId}:${body.province}`;
+    const existing = (await kv.get<HistoryEntry[]>(histKey, "json")) ?? [];
+    if (!existing.some(e => e.date === today)) {
+      existing.push({ date: today, price });
+      await kv.put(histKey, JSON.stringify(existing));
+    }
+    written.push(materialId);
+  }
+  return NextResponse.json({ ok: true, source: body.source, written: written.length, writtenIds: written });
+}
+\end{lstlisting}
+
+\section{Boonthavorn GraphQL Scraper}
+\begin{lstlisting}[language=TypeScript,caption={src/lib/scrapers/boonthavorn.ts}]
+// Boonthavorn ใช้ Magento GraphQL API — ไม่ต้องใช้ ScrapingBee
+export const boonthavornProvider: PriceProvider = {
+  key: "boonthavorn",
+  ttlSec: 60 * 60 * 24 * 30,
+  async fetch(materialId: string): Promise<number | null> {
+    const q = searchTermFor(materialId);
+    const r = await fetch("https://www.boonthavorn.com/graphql", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        query: `{ products(search: "${q}" pageSize: 10) {
+          items { name price_range { minimum_price { regular_price { value } } } }
+        } }`,
+      }),
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!r.ok) return null;
+    const data = await r.json();
+    return pickBestPrice(data.data.products.items, materialId);
+  },
+};
+\end{lstlisting}

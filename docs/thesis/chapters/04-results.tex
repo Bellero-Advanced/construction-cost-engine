@@ -69,21 +69,21 @@ DIT          & Government   & URL deprecated $\to$ AI agent research        & AI
 HomePro      & Modern Trade & JSON API (\texttt{suggest.jsp})              & Live (auto) \\
 MegaHome     & Modern Trade & JSON API (\texttt{suggest.jsp})              & Live (auto) \\
 Boonthavorn  & Modern Trade & ไม่มี API $\to$ AI agent research              & AI-assisted \\
-Thai Watsadu & Modern Trade & CF bot challenge $\to$ ScrapingBee fallback   & Limited \\
-Global House & Modern Trade & SPA $+$ XHR $\to$ AI agent research           & AI-assisted \\
-BnB Home     & Modern Trade & CF bot challenge $\to$ ScrapingBee fallback   & Limited \\
-SCG Home     & Modern Trade & SPA $\to$ AI agent research                  & AI-assisted \\
-DoHome       & Modern Trade & SPA $+$ XHR $\to$ AI agent research           & AI-assisted \\
+Thai Watsadu & Modern Trade & CF bot challenge $\to$ AI agent (CGD ratio)   & Estimated \\
+Global House & Modern Trade & SPA $+$ XHR $\to$ AI agent (CGD ratio)        & Estimated \\
+BnB Home     & Modern Trade & CF bot challenge $\to$ AI agent (CGD ratio)   & Estimated \\
+SCG Home     & Modern Trade & SPA $\to$ AI agent (CGD ratio)               & Estimated \\
+DoHome       & Modern Trade & SPA $+$ XHR $\to$ AI agent (CGD ratio)        & Estimated \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
 \textbf{สรุป:} จาก 11 แหล่ง มี 3 แหล่งที่ดึงได้อัตโนมัติเต็มรูปแบบ
-(TPSO, HomePro, MegaHome), 2 แหล่งที่มีระบบ ScrapingBee fallback
-แต่ยังต้องตรวจสอบเป็นกรณี ๆ (Thai Watsadu, BnB Home), และ 6 แหล่ง
-ที่ใช้ \emph{AI agent research} --- ระบบให้ AI agent (LLM-based)
-สืบค้นเว็บไซต์ต้นทาง อ่านราคาจากหน้าสินค้า แล้วบันทึกผ่าน admin
-endpoint อัตโนมัติแทนการป้อนข้อมูลด้วยมือ.
+(TPSO, HomePro, MegaHome), 3 แหล่งที่ใช้ AI agent research จากข้อมูลจริง
+(CGD, DIT, Boonthavorn), และ 5 แหล่งที่ใช้ \emph{estimated price}
+(CGD $\times$ 1.08) ผ่าน AI agent (Global House, Thai Watsadu, BnB Home,
+SCG Home, DoHome). ราคา estimated ถือเป็น market proxy ที่สมเหตุสมผล
+เนื่องจากแหล่งเหล่านี้ไม่มี public API และมีระบบป้องกันบอทระดับสูง.
 
 \textbf{Reality check:} แม้ว่า 3/11 แหล่งจะ auto, แต่ครอบคลุม
 ประมาณ 70\% ของการ lookup ในงาน BoQ จริง เนื่องจาก TPSO เป็น primary
