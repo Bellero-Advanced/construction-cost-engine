@@ -127,3 +127,14 @@ Every major section is wrapped in a `<Doc tag="...">` card:
 - Session continuity: `.claude/rules/session-continuity.md`
 - Memory: `MEMORY.md`
 - Adapted from: `../factory-landing/`
+
+## .claude/ Architecture
+
+- **Rules:** `.claude/rules/{engineering,session-continuity,reproducibility,scraper-discipline}.md`
+- **Memory:** `.claude/memory/{active,architecture,decisions,changelog,experiments}.md`
+- **Agents:** `.claude/agents/{plan-orchestrator,frontend-builder,scraper-engineer,api-designer,deploy-operator,memory-keeper}.md`
+- **Skills:** `.claude/skills/{memory-system,scraper-patterns,cloudflare-workers,i18n-discipline,kv-cache-strategy,nextjs-16-discipline}/SKILL.md`
+- **Commands:** `.claude/commands/cce.md`
+- **Settings:** `.claude/settings.json` (allow/deny + timeouts)
+
+Read order at session start: `MEMORY.md` → `CLAUDE.md` → `.claude/memory/active.md` → `.claude/memory/decisions.md`.
