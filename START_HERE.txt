@@ -1,0 +1,164 @@
+╔══════════════════════════════════════════════════════════════════════╗
+║              🏗️  CONSTRUCTION COST ENGINE - SHOWCASE                 ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+ระบบคำนวณต้นทุนวัสดุก่อสร้างต่อหน่วย - Demo/Prototype Package
+Ready to run on any machine! ✨
+
+────────────────────────────────────────────────────────────────────────
+📦 PACKAGE FILES
+────────────────────────────────────────────────────────────────────────
+
+✓ showcase_complete.ipynb   🎯 Main Jupyter Notebook (รันไฟล์นี้)
+✓ showcase_data.py          📊 Data module + Calculators
+✓ demo.py                   ⚡ Quick terminal demo
+✓ SHOWCASE.md               📖 Project documentation
+✓ SHOWCASE_README.md        📋 Quick start guide
+✓ SHOWCASE_INDEX.md         📑 Complete index
+✓ START_HERE.txt            📍 This file
+
+────────────────────────────────────────────────────────────────────────
+🚀 QUICK START (Choose One)
+────────────────────────────────────────────────────────────────────────
+
+Option 1: Jupyter Notebook (Recommended) 🎯
+
+  $ pip install jupyter pandas matplotlib seaborn tabulate
+  $ jupyter notebook showcase_complete.ipynb
+
+  → Opens interactive notebook with:
+    • Data tables
+    • Calculator demos
+    • Charts & visualizations
+    • Complete walkthrough
+
+────────────────────────────────────────────────────────────────────────
+
+Option 2: Quick Terminal Demo ⚡
+
+  $ python3 demo.py
+
+  → Runs instant demo showing:
+    • 9 materials, 6 sources, 8 provinces
+    • Wall tile calculator (25.5 sqm)
+    • Concrete calculator (2.5 cu.m.)
+    • Price trends (+4.9% cement, -1.4% rebar)
+
+────────────────────────────────────────────────────────────────────────
+
+Option 3: Full Web Application 🌐
+
+  $ npm install
+  $ npm run dev
+  → http://localhost:3000
+
+  Full Next.js app with:
+    • 3 calculators (Tile, Concrete, Rebar)
+    • 11 data sources comparison
+    • 10 provinces comparison
+    • Interactive charts
+
+────────────────────────────────────────────────────────────────────────
+📊 WHAT'S INCLUDED
+────────────────────────────────────────────────────────────────────────
+
+Data:
+  • 27 construction materials (9 in demo)
+  • 11 price sources (6 in demo)
+  • 10 provinces coverage (8 in demo)
+  • 11-month price trends (Aug 2568 - May 2569)
+
+Calculators:
+  • Wall Tile: area (sqm) → cost breakdown
+  • Concrete: volume (cu.m.) → materials + labor
+  • (Full app has Rebar calculator too)
+
+Visualizations:
+  • Line charts: Price trends over time
+  • Bar charts: Source comparison
+  • Tables: Material specs, BOMs
+
+────────────────────────────────────────────────────────────────────────
+🧮 EXAMPLE RESULTS
+────────────────────────────────────────────────────────────────────────
+
+Wall Tile (25.5 sqm):
+  Total: 7,099.20 THB
+  Unit:  278.40 THB/sqm
+
+Concrete (2.5 cu.m.):
+  Total: 5,040.38 THB
+  Unit:  2,016.15 THB/cu.m.
+
+────────────────────────────────────────────────────────────────────────
+📚 DOCUMENTATION
+────────────────────────────────────────────────────────────────────────
+
+• START_HERE.txt       → You are here
+• SHOWCASE_README.md   → Quick start guide
+• SHOWCASE_INDEX.md    → Complete documentation
+• SHOWCASE.md          → Project overview
+
+────────────────────────────────────────────────────────────────────────
+✅ REQUIREMENTS
+────────────────────────────────────────────────────────────────────────
+
+Minimum: Python 3.8+
+
+For Jupyter Notebook:
+  pip install jupyter pandas matplotlib seaborn tabulate
+
+For Web App:
+  Node.js 18+ and npm
+
+────────────────────────────────────────────────────────────────────────
+🎯 RECOMMENDED WORKFLOW
+────────────────────────────────────────────────────────────────────────
+
+1. Run quick demo first:
+   $ python3 demo.py
+
+2. If it works, open notebook:
+   $ jupyter notebook showcase_complete.ipynb
+
+3. For full experience, run web app:
+   $ npm install && npm run dev
+
+────────────────────────────────────────────────────────────────────────
+🐛 TROUBLESHOOTING
+────────────────────────────────────────────────────────────────────────
+
+Error: "ModuleNotFoundError: No module named 'showcase_data'"
+→ Make sure showcase_data.py is in the same folder
+
+Error: "No module named 'pandas'"
+→ Run: pip install pandas matplotlib seaborn
+
+Notebook won't open:
+→ Try: jupyter lab showcase_complete.ipynb
+→ Or open in VS Code with Python extension
+
+────────────────────────────────────────────────────────────────────────
+💡 TIPS
+────────────────────────────────────────────────────────────────────────
+
+• All files are standalone - copy to any folder
+• No database or backend required
+• Mock data for demo purposes
+• Real web app connects to 11 live sources
+
+────────────────────────────────────────────────────────────────────────
+📧 PROJECT INFO
+────────────────────────────────────────────────────────────────────────
+
+Name:    Construction Cost Engine
+Purpose: Senior Project / Thesis Demo
+Stack:   Next.js 16, TypeScript, React 19, Tailwind CSS 4
+Design:  Ink & Paper blueprint aesthetic
+Status:  Production-ready demo/prototype
+
+────────────────────────────────────────────────────────────────────────
+
+🏗️  Ready to showcase! Pick your preferred method above and start.
+
+────────────────────────────────────────────────────────────────────────
