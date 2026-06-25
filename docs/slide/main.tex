@@ -1,0 +1,1457 @@
+% main.tex — Beamer presentation for thesis defense (Thai)
+% =====================================================
+% Compile: tectonic -X compile main.tex
+%       or xelatex main.tex (twice for TOC)
+% =====================================================
+\documentclass[aspectratio=169,11pt]{beamer}
+
+% ── Theme ─────────────────────────────────────────────
+\usetheme{default}
+\usecolortheme{seahorse}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{caption}[numbered]
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+\setbeamerfont{title}{size=\LARGE,series=\bfseries}
+\setbeamertemplate{footline}{%
+  \hfill {\tiny \insertframenumber\,/\,\inserttotalframenumber}\kern1em\vskip2pt%
+}
+\setbeamertemplate{headline}{}
+
+% ── Fonts (Thai + English via XeLaTeX) ────────────────
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setmainlanguage[numerals=arabic]{thai}
+\setotherlanguage{english}
+
+\IfFontExistsTF{[../thesis/fonts/THSarabunNew.ttf]}{
+  \setmainfont[
+    Path=../thesis/fonts/,
+    UprightFont=THSarabunNew.ttf,
+    BoldFont=THSarabunNew-Bold.ttf,
+    ItalicFont=THSarabunNew-Italic.ttf,
+    BoldItalicFont=THSarabunNew-BoldItalic.ttf,
+    Scale=1.25,
+    Ligatures=TeX
+  ]{THSarabunNew}
+  \setsansfont[
+    Path=../thesis/fonts/,
+    UprightFont=THSarabunNew.ttf,
+    BoldFont=THSarabunNew-Bold.ttf,
+    ItalicFont=THSarabunNew-Italic.ttf,
+    BoldItalicFont=THSarabunNew-BoldItalic.ttf,
+    Scale=1.25,
+    Ligatures=TeX
+  ]{THSarabunNew}
+  \newfontfamily\thaifonttt[
+    Path=../thesis/fonts/,
+    UprightFont=THSarabunNew.ttf,
+    BoldFont=THSarabunNew-Bold.ttf,
+    Scale=1.15,
+    Ligatures=TeX
+  ]{THSarabunNew}
+}{
+  \setmainfont[Ligatures=TeX,Scale=1.0]{Norasi}
+  \setsansfont[Ligatures=TeX,Scale=1.0]{Norasi}
+  \newfontfamily\thaifonttt[Scale=1.0,Ligatures=TeX]{Norasi}
+}
+\setmonofont[Scale=0.85]{Menlo}
+
+\XeTeXlinebreaklocale "th"
+\XeTeXlinebreakskip = 0pt plus 1pt minus 0.1pt
+
+% ── Packages ──────────────────────────────────────────
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{enumitem}
+% Manual labels to avoid polyglossia thai \labelenumi recursion
+\setlist[itemize,1]{label=\textbullet,leftmargin=1.5em,itemsep=0.25em}
+\setlist[itemize,2]{label=\textendash,leftmargin=1.5em,itemsep=0.15em}
+\setlist[enumerate,1]{label=\arabic*.,leftmargin=1.8em,itemsep=0.25em}
+\setlist[enumerate,2]{label=\alph*),leftmargin=1.5em,itemsep=0.15em}
+
+% ── Custom colors ─────────────────────────────────────
+\definecolor{ink}{RGB}{10,22,40}
+\definecolor{amber}{RGB}{217,119,6}
+\definecolor{paper}{RGB}{245,241,232}
+\definecolor{green2}{RGB}{77,124,15}
+\definecolor{red2}{RGB}{153,27,27}
+\definecolor{teal2}{RGB}{14,124,123}
+\definecolor{blue2}{RGB}{26,53,86}
+
+% ── Title info ────────────────────────────────────────
+\title[ระบบประมาณการต้นทุนวัสดุก่อสร้าง]{ระบบสารสนเทศต้นแบบ\\
+สำหรับประมาณการต้นทุนวัสดุก่อสร้างต่อหน่วย\\
+จากแหล่งข้อมูลภาครัฐและภาคเอกชน}
+\subtitle{A Prototype Information System for Construction Material\\
+Unit Cost Estimation from Government and Private Data Sources}
+\author[ชื่อนิสิต]{ชื่อนิสิต~นามสกุล}
+\institute[ภาควิชาวิศวกรรมโยธา จุฬาฯ]{ภาควิชาวิศวกรรมโยธา\\คณะวิศวกรรมศาสตร์ จุฬาลงกรณ์มหาวิทยาลัย}
+\date{พฤษภาคม พ.ศ.~2569}
+
+% ──────────────────────────────────────────────────────
+\begin{document}
+
+% ============ Title slide ============
+{\setbeamertemplate{footline}{}
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+}
+
+% ============ Outline ============
+\begin{frame}[shrink=10]{หัวข้อการนำเสนอ}
+  \tableofcontents
+\end{frame}
+
+% =========================================================
+\section{บทที่ 1 บทนำ}
+% =========================================================
+
+\begin{frame}{1.1 ที่มาและความสำคัญของงานวิจัย}
+  \begin{itemize}
+    \item อุตสาหกรรมก่อสร้างเป็นหนึ่งในภาคเศรษฐกิจที่สำคัญที่สุดต่อการพัฒนาประเทศ
+          โครงการก่อสร้างภาครัฐในประเทศไทยมีมูลค่ารวม \textbf{หลายแสนล้านบาทต่อปี}
+    \item ครอบคลุมงานถนน สะพาน อาคารสำนักงาน โรงพยาบาล โรงเรียน และระบบสาธารณูปโภค
+    \item หัวใจสำคัญของการประมาณราคาคือ \textbf{ต้นทุนวัสดุต่อหน่วย (Unit Cost)}
+          ซึ่งคิดเป็น \textbf{ร้อยละ 50--60} ของต้นทุนรวมงานก่อสร้าง
+    \item ความถูกต้องของการประมาณราคาขึ้นอยู่กับ 3 ปัจจัยหลัก
+          \begin{enumerate}
+            \item ความครบถ้วนของข้อมูลราคา
+            \item ความทันสมัยของข้อมูล
+            \item ความสอดคล้องระหว่างราคามาตรฐานกับราคาตลาดจริง
+          \end{enumerate}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{1.1 แหล่งข้อมูลราคาวัสดุก่อสร้างของประเทศไทย}
+  \textbf{แหล่งข้อมูลทางการ (ภาครัฐ)}
+  \begin{itemize}
+    \item \textbf{TPSO} (สำนักงานนโยบายและยุทธศาสตร์การค้า) --- เผยแพร่
+          ดัชนีราคาวัสดุก่อสร้าง (CMI) เป็นรายเดือน
+    \item \textbf{CGD} (กรมบัญชีกลาง) --- กำหนดราคามาตรฐานสำหรับงานก่อสร้าง
+          ของส่วนราชการ
+    \item \textbf{DIT} (กรมการค้าภายใน) --- เผยแพร่ราคาตลาดสินค้าประจำวัน
+  \end{itemize}
+  \vspace{0.3em}
+  \textbf{แหล่งข้อมูลภาคเอกชน (Modern Trade)}
+  \begin{itemize}
+    \item ผู้ค้าปลีกวัสดุก่อสร้างสมัยใหม่ที่เผยแพร่ราคาผ่านเว็บไซต์
+    \item ปรับปรุงราคาในรอบที่สั้นกว่าราคาทางการ
+    \item สะท้อนราคาตลาดจริงได้ดีกว่าในช่วงที่ราคาผันผวน
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{1.1 ช่องว่างของงานวิจัย}
+  \begin{block}{\textbf{ข้อจำกัดของแหล่งข้อมูลราคาในปัจจุบัน}}
+  \begin{enumerate}
+    \item ข้อมูลราคาทางการมีรอบการปรับปรุงค่อนข้างยาว (รายเดือน/ไตรมาส)
+    \item ราคาทางการเป็นค่าเฉลี่ยระดับประเทศ ไม่ครอบคลุมความหลากหลายเชิงพื้นที่
+    \item รายการวัสดุของภาครัฐไม่ครอบคลุมยี่ห้อและขนาดเฉพาะที่ใช้ในโครงการจริง
+    \item ข้อมูลจากแหล่งต่าง ๆ มีรูปแบบไม่เป็นมาตรฐาน (PDF, HTML, JSON)
+    \item เว็บไซต์ภาคเอกชนใช้ Single Page Application และระบบป้องกันบอท
+  \end{enumerate}
+  \end{block}
+  \vspace{0.3em}
+  \begin{alertblock}{\textbf{ความท้าทายที่งานวิจัยนี้มุ่งจะตอบสนอง}}
+  ยังขาดระบบที่บูรณาการข้อมูลราคาจาก \textbf{หลายแหล่งทั้งภาครัฐและเอกชน}
+  มาคำนวณต้นทุนต่อหน่วยและวิเคราะห์เชิงสถิติได้ในระบบเดียว
+  \end{alertblock}
+\end{frame}
+
+\begin{frame}{1.2 ปัญหางานวิจัย (1/2)}
+  จากการศึกษาเบื้องต้นพบปัญหา \textbf{8 ประเด็น} ในการสืบค้นและคำนวณต้นทุนวัสดุก่อสร้าง
+  \begin{enumerate}
+    \item \textbf{ความกระจัดกระจายของแหล่งข้อมูลราคา} --- เผยแพร่ในหลายแหล่งที่ไม่
+          เชื่อมโยงกัน ผู้ประมาณราคาต้องสืบค้นแต่ละแหล่งและรวมด้วยตนเอง
+    \item \textbf{ความไม่เป็นมาตรฐานของรูปแบบข้อมูล} --- หน่วยจำหน่าย ชื่อสินค้า
+          ขนาด เกรด และรูปแบบเอกสาร (PDF/HTML/JSON) ที่หลากหลาย
+    \item \textbf{ความไม่ทันสมัยของข้อมูลราคา} --- ราคามาตรฐานภาครัฐ
+          เผยแพร่รายเดือน/ไตรมาส แต่ตลาดเปลี่ยนแปลงรายวัน
+    \item \textbf{ความแตกต่างของราคาตามพื้นที่} --- แตกต่างตามภูมิภาค ระยะทางขนส่ง
+          และโครงสร้างตลาดท้องถิ่น
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{1.2 ปัญหางานวิจัย (2/2)}
+  \begin{enumerate}
+    \setcounter{enumi}{4}
+    \item \textbf{ข้อจำกัดในการเข้าถึงข้อมูลดิจิทัล} --- เอกสาร PDF/รูปภาพ ไม่สามารถ
+          ดึงเชิงโครงสร้างได้โดยตรง เว็บไซต์ Single Page Application โหลดราคาผ่าน XHR
+          ระบบป้องกันบอทอย่าง Cloudflare bot challenge หรือ CAPTCHA
+    \item \textbf{ความไม่สอดคล้องของชื่อและคุณลักษณะวัสดุข้ามแหล่ง} --- เช่น
+          ปูนตราเสือ 50 กก.\ ใน HomePro vs ``Tiger Cement Type I 50kg'' ในเว็บอื่น
+    \item \textbf{การคำนวณต้นทุนต่อหน่วยที่ยังไม่บูรณาการ} --- ผู้ประมาณราคา
+          ต้องคำนวณปริมาณการใช้วัสดุต่อหน่วยงานคูณกับราคาด้วยตนเอง
+    \item \textbf{การขาดเครื่องมือเปรียบเทียบและวิเคราะห์เชิงสถิติ} --- การหา outlier
+          และการวิเคราะห์แนวโน้มราคายังขาดเครื่องมือที่บูรณาการกับฐานข้อมูล
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{1.3 วัตถุประสงค์หลักของงานวิจัย}
+  \begin{block}{\textbf{วัตถุประสงค์หลัก}}
+    เพื่อพัฒนา \textbf{ระบบสารสนเทศต้นแบบ} สำหรับการประมาณการต้นทุนวัสดุก่อสร้าง
+    ต่อหน่วย ที่ \textbf{บูรณาการข้อมูลราคาจากแหล่งภาครัฐและภาคเอกชน}
+    เข้าด้วยกันอย่างเป็นระบบ เพื่อสนับสนุนการจัดทำบัญชีแสดงปริมาณงาน
+    (Bill of Quantities: BOQ) ของโครงการก่อสร้างในประเทศไทย
+  \end{block}
+  \vspace{0.5em}
+  \textbf{ผลลัพธ์ที่คาดหวัง}
+  \begin{itemize}
+    \item ระบบที่ลดเวลาการสืบค้นราคาวัสดุจากหลายแหล่ง
+    \item ฐานข้อมูลราคาที่สามารถเปรียบเทียบเชิงพื้นที่และเชิงเวลา
+    \item เครื่องมือวิเคราะห์เชิงสถิติเพื่อสนับสนุนการตัดสินใจ
+    \item แพลตฟอร์มที่เปิดให้นักวิจัยและผู้พัฒนาภายนอกต่อยอดได้
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{1.3 วัตถุประสงค์รอง}
+  \begin{enumerate}
+    \item พัฒนา \textbf{ระบบรวบรวมข้อมูลราคาแบบอัตโนมัติ} จากแหล่งภาครัฐและภาคเอกชน
+          ผ่านเทคนิคการประมวลผลเอกสาร PDF, การเรียก API, และ Headless Browser
+    \item ออกแบบกระบวนการ \textbf{จับคู่รายการวัสดุข้ามแหล่ง (Canonicalization)}
+          และการแปลงหน่วยมาตรฐาน
+    \item พัฒนา \textbf{แบบจำลองการคำนวณต้นทุนวัสดุต่อหน่วย} ตามหลักเกณฑ์การคำนวณ
+          ราคากลางของกรมบัญชีกลาง
+    \item วิเคราะห์ \textbf{แนวโน้มและความผันผวน} ของต้นทุนเชิงเวลาและเชิงพื้นที่
+          ด้วยวิธี Mean, Percentage Change, Linear Trend, z-score Outlier
+    \item ทดสอบและประเมินผลระบบกับ \textbf{ข้อมูลจริง} พร้อมเปรียบเทียบราคา
+          ระหว่างภาครัฐและภาคเอกชน
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{1.4 ขอบเขต: แหล่งข้อมูล (11 แหล่ง)}
+  \textbf{แหล่งข้อมูลภาครัฐ (3 แหล่ง)}
+  \begin{itemize}
+    \item \textbf{TPSO} --- ดัชนีราคาวัสดุก่อสร้าง (Construction Materials Index: CMI)
+          รายเดือน
+    \item \textbf{CGD} --- ราคามาตรฐานสำหรับงานก่อสร้างของส่วนราชการ
+    \item \textbf{DIT} --- ราคาตลาดสินค้ารายวัน (เท่าที่เข้าถึงได้)
+  \end{itemize}
+  \vspace{0.3em}
+  \textbf{แหล่งข้อมูลภาคเอกชน (8 แหล่ง Modern Trade)}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item โฮมโปร (HomePro)
+        \item เมกาโฮม (MegaHome)
+        \item บุญถาวร (Boonthavorn)
+        \item ไทวัสดุ (Thai Watsadu)
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{itemize}
+        \item โกลบอลเฮ้าส์ (Global House)
+        \item ดูโฮม (DoHome)
+        \item เอสซีจีโฮม (SCG Home)
+        \item บีเอ็นบีโฮม (BnB Home)
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \vspace{0.3em}
+  \footnotesize\emph{เกณฑ์การคัดเลือกผู้ค้าปลีกทั้ง 8 ราย: ดูบทที่ 3}
+\end{frame}
+
+\begin{frame}{1.4 ขอบเขต: วัสดุก่อสร้าง 27 รายการ}
+  ครอบคลุมวัสดุหลัก \textbf{27 รายการ} จัดเป็น \textbf{6 หมวด}
+  \begin{enumerate}
+    \item \textbf{กระเบื้องและวัสดุปูพื้น/ผนัง (6 รายการ)} --- รวมคิ้ว PVC
+          และน้ำยาผสมปูน
+    \item \textbf{ปูนซีเมนต์ ทราย หิน (4 รายการ)}
+    \item \textbf{เหล็กเสริมคอนกรีต (8 รายการ)} --- RB6, RB9, DB10, DB12, DB16,
+          DB20, DB25, ลวดผูกเหล็ก, ไม้แบบ, ตะปู
+    \item \textbf{สี (3 รายการ)} --- สีทาภายใน, สีทาภายนอก, สีรองพื้น
+    \item \textbf{อิฐ (2 รายการ)} --- อิฐมอญ, อิฐมวลเบา
+    \item \textbf{คอนกรีตผสมเสร็จ (2 รายการ)} --- กำลังอัดประลัย 240 และ 280
+          กิโลกรัม/ตารางเซนติเมตร (ksc)
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{1.4 ขอบเขต: ประเภทงานก่อสร้าง 5 ประเภท}
+  ระบบสนับสนุนการคำนวณต้นทุนต่อหน่วยสำหรับงานก่อสร้างหลักของอาคาร
+  \textbf{5 ประเภท}
+  \begin{enumerate}
+    \item \textbf{งานก่ออิฐ (Brick Masonry Work)} --- รองรับทั้งอิฐมอญและอิฐมวลเบา
+    \item \textbf{งานบุกระเบื้องผนังและพื้น (Wall and Floor Tiling Work)}
+    \item \textbf{งานเสาเอ็นและคานทับหลัง คสล.} (Reinforced Concrete Stiffener
+          Column and Lintel Beam Work)
+    \item \textbf{งานเหล็กเสริมคอนกรีต (Reinforcing Steel Work)}
+    \item \textbf{งานทาสี (Painting Work)} --- รองรับการทาสีรองพื้น 1 ชั้น
+          และสีทับหน้า 2 ชั้น
+  \end{enumerate}
+  \vspace{0.5em}
+  \footnotesize\emph{เกณฑ์การคัดเลือกประเภทงานทั้ง 5 ประเภท: ดูบทที่ 3}
+\end{frame}
+
+\begin{frame}{1.4 ขอบเขต: พื้นที่ เวลา และวิธีการ}
+  \textbf{ขอบเขตด้านพื้นที่}
+  \begin{itemize}
+    \item ระบบรองรับการแยกข้อมูลรายจังหวัด \textbf{77 จังหวัด} ของประเทศไทย
+    \item เก็บราคาเปรียบเทียบ \textbf{6 ภูมิภาค}: กลาง, เหนือ, อีสาน, ตะวันออก, ใต้,
+          ตะวันตก
+    \item จังหวัดอ้างอิงเริ่มต้น: กรุงเทพมหานคร (province ID = 10)
+  \end{itemize}
+  \vspace{0.3em}
+  \textbf{ขอบเขตด้านช่วงเวลา}
+  \begin{itemize}
+    \item ข้อมูลย้อนหลัง \textbf{10 เดือน}: สิงหาคม พ.ศ.~2568 -- พฤษภาคม พ.ศ.~2569
+  \end{itemize}
+  \vspace{0.3em}
+  \textbf{ขอบเขตด้านวิธีการ}
+  \begin{itemize}
+    \item \textbf{วิศวกรรมโยธา}: หลักเกณฑ์ราคากลางของ CGD + ดัชนี CMI ของ TPSO
+    \item \textbf{สถิติพื้นฐาน}: ค่าเฉลี่ย, มัธยฐาน, ส่วนเบี่ยงเบนมาตรฐาน, z-score,
+          Linear Regression
+    \item \textbf{เทคโนโลยีสนับสนุน}: Web Scraping, PDF Parsing, Edge Runtime
+          (Cloudflare Workers)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{1.5 ประโยชน์ที่คาดว่าจะได้รับ}
+  \begin{enumerate}
+    \item \textbf{ด้านวิชาชีพวิศวกรรมโยธา} --- เครื่องมือสนับสนุนการประมาณราคา
+          ที่บูรณาการราคามาตรฐานภาครัฐกับราคาตลาดจริง วิศวกรประมาณราคา
+          สถาปนิก และเจ้าหน้าที่โครงการสามารถใช้ในการจัดทำ BOQ ได้รวดเร็วขึ้น
+    \item \textbf{ด้านการบริหารโครงการก่อสร้างภาครัฐ} --- ใช้ตรวจสอบราคากลาง
+          เปรียบเทียบกับราคาตลาดจริงก่อนการประกาศประกวดราคา ลดความเสี่ยง
+          ที่งบประมาณจะคลาดเคลื่อน เพิ่มความโปร่งใสในการจัดซื้อจัดจ้าง
+    \item \textbf{ด้านวิชาการ} --- ระบบต้นแบบที่บูรณาการการรวบรวมข้อมูลราคา
+          การจับคู่รายการวัสดุ การคำนวณต้นทุนต่อหน่วย และการวิเคราะห์เชิงสถิติ
+          เติมเต็มช่องว่างของงานวิจัยก่อนหน้า
+    \item \textbf{ด้านการแบ่งปันข้อมูล} --- เปิดให้ผู้พัฒนาและนักวิจัยภายนอก
+          เรียกใช้ฐานข้อมูลราคาผ่านส่วนต่อประสานมาตรฐานเพื่อนำไปใช้ในเครื่องมืออื่น
+  \end{enumerate}
+\end{frame}
+
+% =========================================================
+\section{บทที่ 2 การทบทวนวรรณกรรม}
+% =========================================================
+
+\begin{frame}{2.1 องค์ประกอบของต้นทุนงานก่อสร้าง}
+  ต้นทุนงานก่อสร้างประกอบด้วย \textbf{4 ส่วนหลัก}
+  \begin{enumerate}
+    \item \textbf{ต้นทุนวัสดุ (Material Cost)} --- ค่าใช้จ่ายในการจัดหาวัสดุก่อสร้าง
+          รวมค่าขนส่ง ค่าจัดเก็บ และค่าเสียหายระหว่างการก่อสร้าง
+    \item \textbf{ต้นทุนค่าแรง (Labor Cost)} --- ค่าจ้างแรงงาน ขึ้นอยู่กับ
+          ระดับทักษะ ประสบการณ์ และระยะเวลาทำงาน
+    \item \textbf{ต้นทุนเครื่องจักร (Equipment Cost)} --- ค่าเช่า ค่าเสื่อมราคา
+          และค่าน้ำมันเชื้อเพลิง
+    \item \textbf{ต้นทุนทางอ้อม (Overhead Cost)} --- ค่าบริหารโครงการ ประกันภัย
+          ภาษี และค่าใช้จ่ายอื่น ๆ
+  \end{enumerate}
+  \vspace{0.3em}
+  \begin{block}{\textbf{ความสำคัญของต้นทุนวัสดุ}}
+    ต้นทุนวัสดุมีสัดส่วนสูงสุด \textbf{ร้อยละ 50--60} ของต้นทุนรวม ความถูกต้อง
+    ในการประมาณราคาวัสดุจึงส่งผลโดยตรงต่อความแม่นยำของงบประมาณโครงการ
+  \end{block}
+\end{frame}
+
+\begin{frame}{2.1 ประเภทของวัสดุก่อสร้าง}
+  วัสดุก่อสร้างจำแนกได้ \textbf{2 กลุ่มหลัก}
+  \vspace{0.3em}
+  \begin{block}{\textbf{(ก) วัสดุโครงสร้าง}}
+    ปูนซีเมนต์, เหล็กเสริม, ทราย, หิน, คอนกรีตผสมเสร็จ และวัสดุก่ออิฐฉาบปูน
+    เป็นองค์ประกอบหลักของโครงสร้างอาคาร ส่งผลต่อ \textbf{ความแข็งแรง
+    ความคงทน และความปลอดภัย}
+  \end{block}
+  \begin{block}{\textbf{(ข) วัสดุตกแต่ง}}
+    กระเบื้อง, สี, อุปกรณ์ประปาสุขภัณฑ์, อุปกรณ์ไฟฟ้า, และวัสดุประกอบอาคาร
+    มีบทบาทต่อ \textbf{คุณภาพ ความสวยงาม และมูลค่า} ของสิ่งปลูกสร้าง
+  \end{block}
+  \vspace{0.3em}
+  \footnotesize\emph{ต้นทุนวัสดุครอบคลุมถึงค่าขนส่ง ค่าขนถ่าย/จัดเก็บ
+  และค่าเสียหายระหว่างการก่อสร้าง}
+\end{frame}
+
+\begin{frame}{2.2 ต้นทุนวัสดุต่อหน่วย: 5 ขั้นตอนตาม Ashworth (2015)}
+  \begin{enumerate}
+    \item \textbf{การกำหนดรายละเอียดวัสดุ (Material Specification)} ---
+          ระบุชนิด ขนาด มาตรฐาน คุณสมบัติ และหน่วยวัด เช่น ``เหล็กเส้น SD40
+          ขนาด 12 มม.''
+    \item \textbf{การสำรวจและรวบรวมข้อมูลราคา (Price Survey)} --- จากผู้ผลิต
+          ฐานข้อมูลออนไลน์ Modern Trade ราคากลางจากกระทรวงพาณิชย์
+          และร้านค้าวัสดุท้องถิ่น
+    \item \textbf{การตรวจสอบและคัดกรองข้อมูล (Data Validation)} --- เปรียบเทียบ
+          ค่าเฉลี่ยตลาด, วิเคราะห์ค่าเบี่ยงเบน, กำจัด outlier
+    \item \textbf{การปรับหน่วยให้เป็นมาตรฐานเดียวกัน (Unit Standardization)} ---
+          แปลงหน่วยให้สอดคล้องก่อนวิเคราะห์ เช่น เส้น $\to$ ตัน, ถุง $\to$ กก.
+    \item \textbf{การคำนวณต้นทุนวัสดุต่อหน่วย} --- คูณราคาต่อหน่วยกับปริมาณ
+          การใช้ตามมาตรฐาน
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{2.2 ตัวอย่างการคำนวณ: งานบุกระเบื้องผนัง 1 ตร.ม.}
+  ตัวอย่างจากหลักเกณฑ์การคำนวณราคากลางงานก่อสร้างของ CGD
+  \begin{table}
+    \centering
+    \footnotesize
+    \begin{tabularx}{\textwidth}{X r r r}
+      \toprule
+      \textbf{รายการวัสดุ} & \textbf{ปริมาณ} & \textbf{ราคา/หน่วย} & \textbf{รวม (฿)} \\
+      \midrule
+      กระเบื้องเคลือบเซรามิค 4''$\times$4''     & 1.10 ตร.ม. & 419 ฿/ตร.ม. & 460.90 \\
+      ปูนกาวซีเมนต์ หนา 5 มม.                  & 5.25 กก.   & 3.14 ฿/กก.  &  16.49 \\
+      ปูนยาแนว                                & 0.38 กก.   & 3.14 ฿/กก.  &   1.19 \\
+      น้ำผสมปูน                               & 2.00 ลิตร  & 0.0164 ฿/ล. &   0.03 \\
+      คิ้ว PVC (เล็ก)                          & 0.33 ม.    & 30 ฿/ม.     &   9.90 \\
+      \midrule
+      \multicolumn{3}{r}{\textbf{รวมค่าวัสดุ/ตร.ม.:}} & \textbf{488.51} \\
+      \multicolumn{3}{r}{\textbf{รวมค่าวัสดุ + ค่าแรง (201 ฿):}} & \textbf{689.51} \\
+      \bottomrule
+    \end{tabularx}
+  \end{table}
+  \footnotesize\emph{ที่มา: หลักเกณฑ์การคำนวณราคากลางงานก่อสร้าง ตุลาคม พ.ศ.~2560}
+\end{frame}
+
+\begin{frame}{2.3 ข้อจำกัดในการสืบค้นราคา 8 ประเด็น}
+  \footnotesize
+  \begin{enumerate}
+    \item \textbf{ความกระจัดกระจายของแหล่ง} --- เว็บไซต์ผู้จำหน่าย, Modern Trade,
+          เอกสารภาครัฐ, ฐานข้อมูลเฉพาะองค์กร
+    \item \textbf{รูปแบบไม่เป็นมาตรฐาน} --- หน่วยจำหน่าย, ชื่อ, ขนาด, รูปแบบ
+          เอกสาร (PDF/HTML/JSON)
+    \item \textbf{ความแตกต่างระหว่างหน่วยจำหน่ายกับหน่วยใช้งาน} --- บาท/ถุง vs
+          บาท/ลบ.ม., บาท/เส้น vs บาท/ตัน
+    \item \textbf{ความไม่ทันสมัย} --- ราคาทางการรายเดือน/ไตรมาส ตลาดเปลี่ยนรายวัน
+    \item \textbf{ความแตกต่างตามพื้นที่} --- ตามภูมิภาค ระยะทางขนส่ง โครงสร้าง
+          ตลาดท้องถิ่น
+    \item \textbf{ข้อจำกัดในการเข้าถึงดิจิทัล} --- PDF/รูปภาพ ดึงเชิงโครงสร้าง
+          ไม่ได้
+    \item \textbf{ความไม่สอดคล้องของชื่อ/คุณลักษณะ} --- วัสดุชนิดเดียวกันมีชื่อ
+          ต่างกัน
+    \item \textbf{กระบวนการกึ่งอัตโนมัติ} --- ผู้ประมาณราคายังต้องสืบค้น/แปลงหน่วย
+          /ปรับราคาเอง
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{2.4 เทคโนโลยีการดึงข้อมูล 4 ประเภท}
+  \footnotesize
+  \begin{table}
+    \centering
+    \begin{tabularx}{\textwidth}{l X X}
+      \toprule
+      \textbf{เทคโนโลยี} & \textbf{ข้อดี} & \textbf{ข้อจำกัด} \\
+      \midrule
+      \textbf{API} (JSON/XML)
+        & โครงสร้างชัดเจน, ความถูกต้องสูง, อัตโนมัติได้ง่าย, เสถียร
+        & ต้องลงทะเบียน API Key, มีค่าใช้จ่าย, จำกัดจำนวนคำขอ \\
+      \midrule
+      \textbf{AI Extraction} (NLP/ML)
+        & จัดการข้อมูลซับซ้อนได้, เรียนรู้รูปแบบใหม่, ลดความผิดพลาด
+        & ต้องการตัวอย่างมาก, ใช้ทรัพยากรสูง, Black Box \\
+      \midrule
+      \textbf{Web Scraping}
+        & ดึงข้อมูลจากเว็บที่ไม่มี API ได้, ครอบคลุมหลากหลาย
+        & ขึ้นกับโครงสร้าง HTML, ข้อกำหนดทางกฎหมาย, CAPTCHA, Rate Limit \\
+      \midrule
+      \textbf{DB Integration}
+        & ลดความซ้ำซ้อน, สนับสนุน Analytics เชิงลึก
+        & พัฒนาซับซ้อน, ต้องความรู้เฉพาะ, ปัญหาความปลอดภัย \\
+      \bottomrule
+    \end{tabularx}
+  \end{table}
+  \begin{center}
+  \footnotesize งานวิจัยนี้ใช้ทั้ง 4 ประเภทผสมผสานกัน พร้อมเพิ่มกลยุทธ์ AI Agent Research
+  \end{center}
+\end{frame}
+
+\begin{frame}{2.5 งานวิจัยที่เกี่ยวข้อง}
+  \footnotesize
+  \begin{itemize}
+    \item \textbf{Rao (2015)} --- Web Scraping สำหรับราคาสินค้าโภคภัณฑ์
+          ออนไลน์ ปรับปรุงฐานข้อมูลให้ทันสมัย
+    \item \textbf{Chunyaem (2019)} --- AI สำหรับจำแนก/จัดโครงสร้างข้อมูลวัสดุ
+          ก่อสร้างอัตโนมัติ
+    \item \textbf{Liu (2024)} --- ภาพรวมการพยากรณ์ราคาวัสดุก่อสร้าง
+          (data-driven price forecasting)
+    \item \textbf{Lee \& Yun (2024)} --- Multivariate Z-Score Outlier Detection
+          ($|z| > 2\sigma$)
+    \item \textbf{El-Mohr (2022)} --- ความน่าเชื่อถือของแหล่งข้อมูลราคา
+          (cross-validation)
+    \item \textbf{Yao (2023)} --- ReAct framework: LLM เป็น reasoning engine
+          สลับระหว่าง Reason $\to$ Act
+    \item \textbf{Nakano (2022)} --- LLM browse เว็บและสกัดข้อมูลจาก HTML
+          โดยอัตโนมัติ
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{2.5 เปรียบเทียบงานวิจัย + ช่องว่าง}
+  \footnotesize
+  \begin{table}
+    \centering
+    \begin{tabular}{lcccccc}
+      \toprule
+      \textbf{งานวิจัย} & \textbf{Multi-src} & \textbf{BOQ} & \textbf{Outlier}
+                       & \textbf{Spatial}  & \textbf{AI Agent} & \textbf{TH context} \\
+      \midrule
+      Rao (2015)         & \checkmark & --         & --         & --         & --         & -- \\
+      Chunyaem (2019)    & --         & --         & --         & --         & --         & \checkmark \\
+      Liu (2024)         & --         & --         & --         & --         & --         & -- \\
+      Lee \& Yun (2024)  & --         & --         & \checkmark & --         & --         & -- \\
+      Yao (2023)         & --         & --         & --         & --         & \checkmark & -- \\
+      \midrule
+      \textbf{งานวิจัยนี้} & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+  \vspace{0.3em}
+  \begin{alertblock}{\textbf{ช่องว่าง 4 ประเด็นที่งานวิจัยนี้ตอบสนอง}}
+  \footnotesize
+  (1) ขาดระบบ End-to-End ที่บูรณาการครบทุกขั้นตอน \\
+  (2) ขาดการเปรียบเทียบราคาภาครัฐ-เอกชนของ Modern Trade ในบริบทไทย \\
+  (3) ขาดการเชื่อม BOQ ตามหลักเกณฑ์ราชการกับข้อมูลที่ดึงได้อัตโนมัติ \\
+  (4) ขาดการวิเคราะห์เชิงพื้นที่ครบ 77 จังหวัด
+  \end{alertblock}
+\end{frame}
+
+% =========================================================
+\section{บทที่ 3 วิธีดำเนินการวิจัย}
+% =========================================================
+
+\begin{frame}{3.1 ภาพรวมระเบียบวิธีวิจัย: 5 ระยะ}
+  ใช้ \textbf{Research and Development (R\&D)} ผสมกับ \textbf{Quantitative Research}
+  แบ่งเป็น 5 ระยะ
+  \begin{enumerate}
+    \item \textbf{ระยะศึกษาและกำหนดความต้องการของระบบ} --- ทบทวนวรรณกรรม,
+          สัมภาษณ์ผู้ประมาณราคา, ศึกษาเอกสารหลักเกณฑ์ของ CGD
+    \item \textbf{ระยะออกแบบสถาปัตยกรรมระบบ} --- Edge-first Serverless,
+          Data Flow Diagram, KV Schema
+    \item \textbf{ระยะพัฒนาระบบ} --- ส่วนหน้า (Front-end), ส่วนหลัง (Back-end),
+          ส่วนรวบรวมข้อมูล (Data Collector)
+    \item \textbf{ระยะทดสอบและตรวจสอบความถูกต้อง} --- Unit Test, Integration Test,
+          การตรวจสอบกับข้อมูลอ้างอิง
+    \item \textbf{ระยะประเมินผลและปรับปรุง} --- วิเคราะห์ผลและปรับปรุงระบบ
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{3.2 เกณฑ์การคัดเลือกแหล่งข้อมูลภาคเอกชน 8 ราย}
+  \textbf{เกณฑ์การคัดเลือก 5 ข้อ}
+  \begin{enumerate}
+    \item เป็นผู้ค้าปลีกวัสดุก่อสร้างสมัยใหม่ (Modern Trade) \textbf{ระดับประเทศ}
+          ไม่ใช่ผู้ค้าระดับท้องถิ่น
+    \item เผยแพร่ราคาสินค้าผ่านเว็บไซต์อย่างเปิดเผย เข้าถึงได้
+          \textbf{โดยไม่ต้องล็อกอิน}
+    \item มีรายการวัสดุครอบคลุม \textbf{6 หมวดหลัก} (ปูน/ทราย/หิน, เหล็ก,
+          กระเบื้อง, สี, อิฐ, คอนกรีต)
+    \item มีส่วนแบ่งทางการตลาดในระดับมีนัยสำคัญ ($\geq 10$ สาขา)
+          หรือเป็นบริษัทจดทะเบียน
+    \item มีนโยบายการเปิดเผยราคาที่สม่ำเสมอ ไม่ใช่ราคาส่งเสริมการขาย
+          เพียงชั่วคราว
+  \end{enumerate}
+  \vspace{0.3em}
+  \footnotesize\emph{ผู้ที่ไม่ผ่านเกณฑ์: ร้านวัสดุท้องถิ่น, ผู้ค้าส่ง B2B
+  ที่ไม่เปิดราคา, ผู้ค้าเฉพาะหมวด เช่น เฉพาะกระเบื้อง}
+\end{frame}
+
+\begin{frame}{3.2 ผู้ค้าปลีก 8 รายที่ผ่านเกณฑ์}
+  \footnotesize
+  \begin{table}
+    \centering
+    \begin{tabularx}{\textwidth}{l l X}
+      \toprule
+      \textbf{\#} & \textbf{ผู้ค้าปลีก} & \textbf{เหตุผลการคัดเลือก} \\
+      \midrule
+      1 & โฮมโปร (HomePro)        & ผู้นำตลาดวัสดุตกแต่งบ้าน $>$90 สาขา, มี JSON API \\
+      2 & เมกาโฮม (MegaHome)      & ในเครือโฮมโปร เน้นวัสดุก่อสร้างหนัก, มี JSON API \\
+      3 & บุญถาวร (Boonthavorn)   & ผู้นำตลาดกระเบื้องและสุขภัณฑ์ \\
+      4 & ไทวัสดุ (Thai Watsadu)  & ในเครือเซ็นทรัล สาขาทั่วประเทศ \\
+      5 & โกลบอลเฮ้าส์ (Global House) & ผู้นำตลาดต่างจังหวัด ครอบคลุมภูมิภาค \\
+      6 & ดูโฮม (DoHome)          & บริษัทจดทะเบียน $>$30 สาขา \\
+      7 & เอสซีจีโฮม (SCG Home)   & ในเครือ SCG ครอบคลุมวัสดุโครงสร้างหลัก \\
+      8 & บีเอ็นบีโฮม (BnB Home)  & ในเครือบุญถาวร เน้นภาคเหนือและอีสาน \\
+      \bottomrule
+    \end{tabularx}
+  \end{table}
+\end{frame}
+
+\begin{frame}{3.3 เกณฑ์การคัดเลือกประเภทงานก่อสร้าง 5 ประเภท}
+  \begin{enumerate}
+    \item \textbf{เป็นงานหลักของอาคารทั่วไป} --- ครอบคลุมทั้งงานโครงสร้าง
+          และงานสถาปัตยกรรม
+    \item \textbf{มีหลักเกณฑ์การคำนวณในมาตรฐานของกรมบัญชีกลาง} ---
+          เปรียบเทียบกับราคากลางทางราชการได้โดยตรง
+    \item \textbf{ใช้วัสดุที่อยู่ในขอบเขต 27 รายการ} --- ไม่ต้องอาศัยวัสดุพิเศษเพิ่มเติม
+    \item \textbf{มีปริมาณการใช้งานสูง} ในตลาดก่อสร้างไทย โดยเฉพาะอาคารพักอาศัย
+          และพาณิชย์ทั่วไป
+    \item \textbf{มีสูตรการคำนวณที่เป็นมาตรฐาน} ตรวจสอบกับการคำนวณด้วยมือได้
+  \end{enumerate}
+  \vspace{0.3em}
+  \footnotesize\emph{ประเภทงานที่ตัดออก: งานหลังคา, ไฟฟ้า/ประปา, กระจก, ฉาบฝ้าเพดาน
+  เพราะใช้วัสดุนอกขอบเขต หรือมีรายละเอียดเฉพาะผลิตภัณฑ์}
+\end{frame}
+
+\begin{frame}{3.4 สถาปัตยกรรมระบบ: Edge-first Serverless 5 ชั้น}
+  \footnotesize
+  \begin{table}
+    \centering
+    \begin{tabularx}{\textwidth}{l X X}
+      \toprule
+      \textbf{ชั้น} & \textbf{หน้าที่} & \textbf{เทคโนโลยี} \\
+      \midrule
+      1.\ Input     & รับข้อมูลจาก 11 แหล่ง          & เว็บไซต์ + PDF + JSON API \\
+      2.\ Acquire   & 4 กลยุทธ์การดึงราคา            & Puppeteer, ScrapingBee, unpdf, AI Agent \\
+      3.\ Normalize & จับคู่รายการ + แปลงหน่วย      & TypeScript matcher \\
+      4.\ Store     & เก็บใน KV cache + history     & Cloudflare KV \\
+      5.\ Serve     & เผยแพร่ REST API + UI         & Next.js 16 + React 19 \\
+      \bottomrule
+    \end{tabularx}
+  \end{table}
+  \begin{itemize}
+    \item รันบน Cloudflare Workers ที่กระจายไปยัง Data Center $>$300 แห่งทั่วโลก
+    \item Cold-start latency = 0 ms, ตอบสนองเฉลี่ย $<$50 ms
+    \item เหมาะสมกับการเข้าถึงข้อมูลที่ต้องตอบสนองรวดเร็วตลอดเวลา
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{3.4 การเลือกเทคโนโลยี}
+  \footnotesize
+  \begin{table}
+    \centering
+    \begin{tabularx}{\textwidth}{l l X}
+      \toprule
+      \textbf{ส่วน} & \textbf{เลือกใช้} & \textbf{เหตุผล} \\
+      \midrule
+      Frontend         & Next.js 16 + TypeScript & SSR ที่ Edge, type-safe, ecosystem ใหญ่ \\
+      Styling          & Tailwind CSS 4          & Utility-first, JIT, CSS bundle เล็ก \\
+      Visualization    & Recharts                & React-native, รองรับ responsive \\
+      Internationalization & next-intl           & รองรับ App Router, type-safe \\
+      Backend          & Next.js Route Handlers  & รวม FE+BE, edge runtime \\
+      Database         & Cloudflare KV           & Lookup $<$20 ms, scale-to-zero \\
+      Web Scraping     & Puppeteer + ScrapingBee & Headless + Residential Proxy \\
+      PDF Parsing      & \texttt{unpdf}          & WASM-based, ทำงานใน Workers ได้ \\
+      Scheduler        & GitHub Actions cron     & ฟรีสำหรับ public repo \\
+      Hosting          & Cloudflare Workers      & Edge, 0 cold start, 100k req/วัน free \\
+      \bottomrule
+    \end{tabularx}
+  \end{table}
+\end{frame}
+
+\begin{frame}{3.5 การออกแบบฐานข้อมูล Key-Value}
+  ระบบจัดเก็บข้อมูล \textbf{3 ประเภทหลัก} ใน Cloudflare KV
+  \begin{table}
+    \centering
+    \footnotesize
+    \begin{tabularx}{\textwidth}{l l X r}
+      \toprule
+      \textbf{ประเภท} & \textbf{Key Pattern} & \textbf{Value} & \textbf{TTL} \\
+      \midrule
+      Live Cache    & \texttt{\{src\}:\{mat\}:\{prov\}}     & \{price, fetchedAt\}      & 14--30 วัน \\
+      History       & \texttt{history:\{src\}:\{mat\}:\{prov\}} & [\{date, price\}, ...]  & 365 วัน \\
+      Calculations  & \texttt{calc:\{uuid\}}                 & ผลการคำนวณ BOQ           & 365 วัน \\
+      \bottomrule
+    \end{tabularx}
+  \end{table}
+  \vspace{0.3em}
+  \begin{itemize}
+    \item \textbf{Live Cache} --- ราคาปัจจุบันที่ดึงล่าสุด TTL ต่างกันตามแหล่ง
+          (CGD รายไตรมาสใช้ TTL ยาว, HomePro/MegaHome ราคาเปลี่ยนเร็วใช้ TTL สั้น)
+    \item \textbf{History} --- time-series รายสัปดาห์ (cron จันทร์ 03:17 UTC)
+    \item \textbf{Calculations} --- บันทึกผลการคำนวณ BOQ ทุกครั้ง สำหรับ
+          aggregate analytics ในอนาคต
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{3.5 Star Schema เชิงตรรกะ}
+  \footnotesize
+  แม้ใช้ KV เป็น primary storage แต่โครงสร้างเชิงตรรกะยังสอดคล้องกับ
+  \textbf{Star Schema}
+  \begin{table}
+    \centering
+    \begin{tabularx}{\textwidth}{l l X}
+      \toprule
+      \textbf{ตาราง} & \textbf{ประเภท} & \textbf{การจัดเก็บใน KV} \\
+      \midrule
+      \texttt{dim\_materials}     & Dimension & TypeScript const (27 รายการ + MOC code) \\
+      \texttt{dim\_provinces}     & Dimension & TypeScript const (77 จังหวัด) \\
+      \texttt{dim\_retailers}     & Dimension & TypeScript const (11 แหล่ง) \\
+      \texttt{dim\_time}          & Dimension & ISO date strings ใน history keys \\
+      \texttt{fact\_prices}       & Fact      & Live cache + history KV keys \\
+      \texttt{fact\_calculations} & Fact      & \texttt{calc:\{uuid\}} keys \\
+      \bottomrule
+    \end{tabularx}
+  \end{table}
+  \vspace{0.3em}
+  \textbf{เหตุผลที่เลือก KV แทน RDBMS}
+  \begin{itemize}
+    \item การเข้าถึงหลักเป็น lookup ด้วย \texttt{(source, materialId, province)}
+          ไม่ต้อง JOIN ซับซ้อน
+    \item KV ตอบสนอง 5--20 ms ทั่วโลก เร็วกว่า PostgreSQL/MySQL ในงาน lookup
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{3.6 กลยุทธ์การดึงข้อมูล: 4 กลยุทธ์}
+  \begin{enumerate}
+    \item \textbf{PDF Parsing} (\texttt{unpdf}) --- TPSO, CGD ที่เผยแพร่
+          เป็น PDF rate report
+    \item \textbf{JSON API} (\texttt{suggest.jsp}) --- HomePro, MegaHome
+          ที่เปิด endpoint ภายในให้เรียกตรง ๆ
+    \item \textbf{ScrapingBee Proxy + Browser Rendering} --- เว็บไซต์ที่
+          block direct scraping (Thai Watsadu, BnB Home)
+    \item \textbf{AI Agent Research} --- แหล่งที่ไม่สามารถดึงด้วยวิธีอัตโนมัติ
+          (CGD anti-bot PDF, DIT URL deprecated, SPA + ป้องกันบอท)
+  \end{enumerate}
+  \vspace{0.5em}
+  \begin{block}{\textbf{ลำดับความสำคัญ (Tier Order)}}
+    Provider JSON API $\to$ ScrapingBee free tier $\to$ Cloudflare Browser Rendering
+    $\to$ AI estimate จาก CGD $\times$ multiplier
+  \end{block}
+\end{frame}
+
+\begin{frame}{3.6.1 กลยุทธ์ที่ 1: PDF Parsing}
+  ใช้กับ TPSO และ CGD ที่เผยแพร่ข้อมูลเป็น PDF rate report
+  \vspace{0.3em}
+  \textbf{ขั้นตอน}
+  \begin{enumerate}
+    \item Download PDF จาก URL ของแหล่ง
+    \item Extract ข้อความจากทุกหน้าด้วย \texttt{unpdf.extractText()}
+    \item ใช้ Regular Expression จับคู่บรรทัดที่ตรงกับ material code + unit price
+    \item Validate ราคาที่ได้ (ตัวเลขบวก, อยู่ในช่วงสมเหตุสมผล)
+    \item Cache ลง KV
+  \end{enumerate}
+  \vspace{0.3em}
+  \begin{block}{\textbf{ทำไม unpdf}}
+    เป็น WASM-based PDF parser ที่ทำงานใน Cloudflare Workers Runtime ได้
+    ไม่ต้องอาศัย Node.js native module
+  \end{block}
+\end{frame}
+
+\begin{frame}{3.6.2 กลยุทธ์ที่ 2: JSON API (\texttt{suggest.jsp})}
+  HomePro และ MegaHome เปิด endpoint
+  \texttt{/service/search/suggest.jsp?q=\{keyword\}} ที่ส่งคืน JSON structured
+  \vspace{0.3em}
+  \begin{exampleblock}{\textbf{ตัวอย่างการเรียก}}
+  \footnotesize
+  \texttt{const url = `https://www.homepro.co.th/service/search/} \\
+  \texttt{\quad suggest.jsp?q=\$\{q\}`;} \\
+  \texttt{const response = await fetch(url, \{} \\
+  \texttt{\quad headers: \{ accept: "application/json", ...\},} \\
+  \texttt{\quad signal: AbortSignal.timeout(10\_000),} \\
+  \texttt{\});}
+  \end{exampleblock}
+  \vspace{0.3em}
+  \begin{itemize}
+    \item เรียก endpoint ภายในเว็บไซต์โดยตรงด้วย HTTP GET
+    \item Headers จำลองเบราว์เซอร์ปกติ
+    \item คืนข้อมูล: \texttt{[\{item\_name, price\_display, ...\}, ...]}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{3.6.3 กลยุทธ์ที่ 3: ScrapingBee + Browser Rendering}
+  สำหรับเว็บไซต์ที่บล็อกการ scrape โดยตรง
+  \vspace{0.3em}
+  \textbf{ลำดับ Fallback}
+  \begin{enumerate}
+    \item \textbf{ScrapingBee + JSON-LD} --- Residential Proxy ส่งคำขอผ่าน
+          IP บ้านในไทย หลีกเลี่ยง bot challenge สกัด JSON-LD canonical
+    \item \textbf{ScrapingBee + RegEx} --- ถ้าไม่มี JSON-LD ใช้ RegEx จับ
+          ราคาใน HTML
+    \item \textbf{Cloudflare Browser Rendering} --- เปิด Headless Chrome
+          ผ่าน \texttt{@cloudflare/puppeteer} ใน Workers
+    \item \textbf{Return null} --- ส่งต่อให้ AI Agent Research
+  \end{enumerate}
+  \vspace{0.3em}
+  \begin{block}{\textbf{ข้อจำกัด}}
+    ScrapingBee มีค่าใช้จ่ายตามจำนวนคำขอ จึงใช้เฉพาะที่จำเป็น
+    + Wall clock $<$25 วินาที (ขีดจำกัดของ Workers)
+  \end{block}
+\end{frame}
+
+\begin{frame}{3.6.4 กลยุทธ์ที่ 4: AI Agent Research}
+  \textbf{ภาพรวม}
+  \begin{itemize}
+    \item ออกแบบสำหรับแหล่งที่ไม่สามารถ scrape ด้วยวิธีอัตโนมัติ
+    \item ครอบคลุม: เว็บไซต์ที่มี Cloudflare bot challenge ระดับสูง,
+          แหล่งภาครัฐที่ไม่มี API (CGD anti-bot PDF, DIT URL deprecated)
+  \end{itemize}
+  \vspace{0.3em}
+  \textbf{สถาปัตยกรรม}
+  \begin{itemize}
+    \item ไม่ใช่ AI ที่ฝึกใหม่ แต่เป็นการนำ \textbf{Large Language Model (LLM)}
+          ที่มีอยู่ (Claude, GPT-4) มาทำหน้าที่ \emph{Reasoning Engine}
+    \item ควบคุม Tool-use Loop ตามแนวทาง ReAct framework (Yao 2023)
+  \end{itemize}
+  \vspace{0.3em}
+  \begin{block}{\textbf{ทำไมต้องมีกลยุทธ์ที่ 4}}
+    หากไม่มี AI Agent ระบบจะ \textbf{ขาดข้อมูลจากแหล่งภาคเอกชนเกือบทั้งหมด}
+    เนื่องจากเว็บไซต์ Modern Trade ส่วนใหญ่ใช้ SPA + Cloudflare bot challenge
+  \end{block}
+\end{frame}
+
+\begin{frame}{3.6.4 AI Agent Tool-use Loop}
+  ใช้ลูป \textbf{Observe $\to$ Plan $\to$ Act $\to$ Validate $\to$ Submit}
+  \begin{enumerate}
+    \item \textbf{Observe} --- รับงาน ``หาราคา [วัสดุ X] จาก [แหล่ง Y]''
+          พร้อม context (ชื่อ, ขนาด, เกรด, searchTerms)
+    \item \textbf{Plan} --- LLM วางแผนคำค้นและวิธีตรวจสอบผลลัพธ์
+    \item \textbf{Act} --- เรียก tools ที่มีให้
+          \begin{itemize}
+            \item \texttt{web\_search(query)} --- ค้นจาก Google
+            \item \texttt{browse\_url(url)} --- เปิดและอ่านหน้าเว็บ
+            \item \texttt{extract\_price(html)} --- สกัดราคาจาก HTML
+          \end{itemize}
+    \item \textbf{Validate} --- ตรวจสอบความสมเหตุสมผล
+          \begin{itemize}
+            \item เปรียบเทียบกับ CGD baseline (ช่วง 0.5--3.0 เท่า)
+            \item ตรวจหน่วยตรงกัน (เช่น บาท/ถุง 50 กก.)
+          \end{itemize}
+    \item \textbf{Submit} --- บันทึกผ่าน \texttt{POST /api/admin/ai-agent}
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{3.6.4 Endpoint \texttt{/api/admin/ai-agent} + TPSO Strategy}
+  \footnotesize
+  \textbf{Endpoint AI Agent} --- เขียนราคาลง 2 ที่พร้อมกัน
+  \begin{itemize}
+    \item \textbf{Live price KV}: \texttt{\{source\}:\{material\}:\{province\}}
+    \item \textbf{History time-series}: \texttt{history:\{source\}:\{material\}:\{province\}}
+  \end{itemize}
+  \vspace{0.3em}
+  \textbf{กลยุทธ์ผสมสำหรับ TPSO}
+  \begin{itemize}
+    \item TPSO เผยแพร่เฉพาะ CMI ดัชนีรวม ไม่แยกรายวัสดุ
+    \item วัสดุที่ TPSO มีราคาตรง (เช่น ปูนซีเมนต์) $\to$ ใช้ราคาจริงจาก PDF
+    \item วัสดุอื่น ๆ $\to$ ใช้สูตร
+          $P_{TPSO} = P_{CGD} \times (CMI / CMI_{baseline})$
+          โดย $CMI_{baseline} = 110$, ปัจจุบัน $= 112.8 \Rightarrow$ ratio = 1.0255
+  \end{itemize}
+  \vspace{0.3em}
+  \begin{exampleblock}{\textbf{ผลลัพธ์: Coverage 100\%}}
+    หลังใช้ AI Agent ร่วมกับกลยุทธ์อื่น ระบบรวบรวมราคาได้ครบ
+    \textbf{297/297 cells} (11 แหล่ง $\times$ 27 วัสดุ)
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{3.7 Canonicalization: จับคู่รายการข้ามแหล่ง}
+  \textbf{ปัญหา:} ชื่อสินค้าและหน่วยต่างกันในแต่ละแหล่ง \\
+  \textbf{แนวทาง:} Tag ทุก material ด้วย canonical specification 3 ส่วน
+  \begin{itemize}
+    \item \textbf{brand} --- ยี่ห้อมาตรฐาน เช่น ``ตราเสือ'', ``Q-CON''
+    \item \textbf{size} --- ขนาดที่ระบุ เช่น 50kg, DB12, 12$\times$12 นิ้ว
+    \item \textbf{grade} --- มาตรฐาน/เกรด เช่น Type I, SD40
+  \end{itemize}
+  \vspace{0.3em}
+  \textbf{ตัวกรอง 3 ชั้น (Three-tier Filter)}
+  \begin{enumerate}
+    \item \textbf{Tight match} --- ผลลัพธ์ตรงทั้ง size \emph{และ} brand
+    \item \textbf{Loose match} --- ผลลัพธ์ตรง size อย่างเดียว
+    \item \textbf{Legacy match} --- ใช้ค่ามัธยฐานของผลทั้งหมด (ทางเลือกสำรอง)
+  \end{enumerate}
+  \vspace{0.3em}
+  \footnotesize
+  ทุก material มี \texttt{searchTerms[]} หลายคำในภาษาไทย
+  สำหรับการค้นจากเว็บไซต์ retail ที่ใช้คำต่างกัน
+\end{frame}
+
+\begin{frame}{3.8 Unit Standardization: 12 หน่วยมาตรฐาน}
+  \textbf{หมวดหน่วย}
+  \begin{itemize}
+    \item \textbf{มวล:} ตัน, กก., กรัม, ถุง 50 กก., ถุง 20 กก., ถุง 1 กก.
+    \item \textbf{ปริมาตร:} ลบ.ม., ลิตร, แกลลอน, ลิตรสี
+    \item \textbf{ความยาว:} เมตร, ซม.
+    \item \textbf{พิเศษ:} เส้น 12 ม.\ (rebar), เส้น 10 ม.
+  \end{itemize}
+  \vspace{0.3em}
+  \begin{exampleblock}{\textbf{ตัวอย่าง: แปลงราคาเหล็กเส้นเป็นบาท/ตัน}}
+    \[
+      \text{ราคา/ตัน} = \frac{\text{ราคา/เส้น}}{L \times w_{pm}} \times 1000
+    \]
+    โดย $L$ = ความยาวเส้น (ม.), $w_{pm}$ = น้ำหนักต่อเมตร (กก./ม.) \\
+    เช่น เส้นละ 685 บาท (12 ม., 0.888 กก./ม.) $\to$
+    $\frac{685}{12 \times 0.888} \times 1000 \approx 64{,}300$ บาท/ตัน
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{3.9 Outlier Detection: z-score Test}
+  ใช้ตามแนวทางของ Lee \& Yun (2024)
+  \[
+    z_i = \frac{|x_i - \bar{x}|}{\sigma}
+  \]
+  โดย $\bar{x}$ = ค่าเฉลี่ย, $\sigma$ = ส่วนเบี่ยงเบนมาตรฐาน
+  \vspace{0.3em}
+  \begin{itemize}
+    \item ราคาที่มี $|z| > 2.0$ ถือเป็น outlier
+    \item ติด \textbf{badge สีแดง} ในหน้า \texttt{/compare-sources}
+    \item ผู้ใช้พิจารณาว่าเป็นราคาส่งเสริมการขาย ราคาขั้นต่ำ
+          หรือข้อผิดพลาดในการดึงข้อมูล
+  \end{itemize}
+  \vspace{0.3em}
+  \begin{block}{\textbf{เหตุผลที่เลือก threshold $z = 2.0$}}
+    ให้ความสมดุลระหว่าง false positive และ false negative สำหรับข้อมูล
+    ราคาวัสดุที่มีการกระจายตัวค่อนข้างสูง
+  \end{block}
+\end{frame}
+
+\begin{frame}{3.10 การคำนวณ BOQ: ตัวอย่างงานทาสี}
+  \textbf{สูตรการคำนวณ}
+  \[
+    \text{ต้นทุน/ตร.ม.} = (P_{primer} \times c_{primer}) +
+                          (P_{paint} \times c_{paint} \times n)
+  \]
+  \begin{itemize}
+    \item $P_{primer}$ = ราคา primer (บาท/แกลลอน)
+    \item $c_{primer}$ = consumption ของ primer (0.025 แกลลอน/ตร.ม.)
+    \item $P_{paint}$ = ราคาสี (บาท/แกลลอน)
+    \item $c_{paint}$ = consumption ของสี (0.031 แกลลอน/ตร.ม./ชั้น)
+    \item $n$ = จำนวนชั้นที่ทา (default = 2)
+  \end{itemize}
+  \vspace{0.3em}
+  \begin{block}{\textbf{ขั้นตอนการคำนวณ}}
+    (1) ผู้ใช้ป้อนปริมาณงาน + เลือกแหล่งราคา + เลือกผลิตภัณฑ์
+    \quad (2) ระบบดึงราคาจาก KV
+    \quad (3) คำนวณตามสูตร พร้อม Bill of Materials
+    \quad (4) บันทึก \texttt{calc:\{uuid\}} ใน KV
+  \end{block}
+\end{frame}
+
+\begin{frame}{3.11 การวิเคราะห์เชิงสถิติ 4 ประเภท}
+  \footnotesize
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.5\textwidth}
+      \textbf{Linear Trend (OLS)}
+      \[
+        Y = a + bX
+      \]
+      \[
+        b = \frac{\sum (x_i - \bar{x})(y_i - \bar{y})}{\sum (x_i - \bar{x})^2}
+      \]
+      \[
+        R^2 = \frac{(\sum(x_i-\bar{x})(y_i-\bar{y}))^2}
+                   {\sum(x_i-\bar{x})^2 \cdot \sum(y_i-\bar{y})^2}
+      \]
+      \vspace{0.3em}
+      \textbf{Outlier Detection}
+      \[
+        z_i = \frac{|x_i - \bar{x}|}{\sigma}, \quad |z| > 2.0
+      \]
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \textbf{MoM Percentage Change}
+      \[
+        \Delta\%_t = \frac{Y_t - Y_{t-1}}{Y_{t-1}} \times 100
+      \]
+      \vspace{0.3em}
+      \textbf{Mean / Median / Spread}
+      \[
+        \bar{x} = \frac{1}{n}\sum x_i
+      \]
+      \[
+        \text{Spread\%} = \frac{x_{max} - x_{min}}{x_{min}} \times 100
+      \]
+      หาก Spread $>$30\% แสดง ``Indicative Range''
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{3.12 การติดตั้งใช้งานและบำรุงรักษา}
+  \textbf{CI/CD Pipeline}
+  \begin{itemize}
+    \item GitHub Actions: \texttt{tsc --noEmit} $\to$ Build $\to$ Deploy
+          ไปยัง Cloudflare Workers
+    \item Auto-deploy ทุกครั้งที่ push ไปยัง \texttt{main} branch
+  \end{itemize}
+  \vspace{0.3em}
+  \textbf{Cron Schedule (\texttt{23 2 * * *}, รายวัน 02:23 UTC)}
+  \begin{enumerate}
+    \item \texttt{POST /api/admin/refresh-prices} สำหรับทุกแหล่ง
+    \item \texttt{POST /api/admin/snapshot-history} บันทึก time-series
+  \end{enumerate}
+  \vspace{0.3em}
+  \begin{block}{\textbf{การบำรุงรักษา}}
+    ผู้ดูแลตรวจสอบ \texttt{/health} แดชบอร์ดเพื่อดูความสดของข้อมูล
+    + Manual upload สำหรับแหล่งที่ระบบดึงไม่ได้
+  \end{block}
+\end{frame}
+
+% =========================================================
+\section{บทที่ 4 ผลการวิจัย}
+% =========================================================
+
+\begin{frame}{4.1 ขอบเขตข้อมูลที่ระบบครอบคลุม}
+  \scriptsize
+  \begin{table}
+    \centering
+    \begin{tabularx}{\textwidth}{l X r}
+      \toprule
+      \textbf{มิติ} & \textbf{รายการ} & \textbf{จำนวน} \\
+      \midrule
+      ภาครัฐ              & TPSO, CGD, DIT                                            & 3 \\
+      Modern Trade        & HomePro, MegaHome, Boonthavorn, Global House,
+                            Thai Watsadu, BnB Home, SCG Home, DoHome                  & 8 \\
+      วัสดุกระเบื้อง       & TILE, ADHESIVE, GROUT, PVC\_TRIM, WATER\_MIX               & 5 \\
+      วัสดุโครงสร้าง       & CEMENT, SAND, ROCK + WATER                                & 4 \\
+      เหล็กเสริม          & RB6, RB9, DB10, DB12, DB16, DB20, DB25 + WIRE/FORM/NAIL    & 10 \\
+      สี                   & PAINT\_INT, PAINT\_EXT, PRIMER                            & 3 \\
+      อิฐ                  & BRICK\_001 (มอญ), BRICK\_002 (มวลเบา)                     & 2 \\
+      คอนกรีต              & CONCRETE\_240, CONCRETE\_280                              & 2 \\
+      จังหวัด              & ทั่วประเทศไทย                                              & 77 \\
+      ภูมิภาค              & เหนือ/อีสาน/กลาง/ตะวันออก/ใต้/ตะวันตก                     & 6 \\
+      ช่วงเวลา (TPSO CMI)  & ส.ค.~2568 -- พ.ค.~2569                                  & 10 เดือน \\
+      \midrule
+      \textbf{KV Coverage} & 11 แหล่ง $\times$ 27 วัสดุ                                & \textbf{297/297 (100\%)} \\
+      \bottomrule
+    \end{tabularx}
+  \end{table}
+\end{frame}
+
+\begin{frame}{4.2 สถานะการดึงข้อมูลของแต่ละแหล่ง}
+  \scriptsize
+  \begin{table}
+    \centering
+    \begin{tabularx}{\textwidth}{l l X X}
+      \toprule
+      \textbf{แหล่ง} & \textbf{ประเภท} & \textbf{วิธีการ} & \textbf{สถานะ} \\
+      \midrule
+      TPSO         & รัฐ          & PDF + \texttt{unpdf}                              & \textcolor{green2}{Live (auto)} \\
+      HomePro      & เอกชน        & JSON API (\texttt{suggest.jsp})                   & \textcolor{green2}{Live (auto)} \\
+      MegaHome     & เอกชน        & JSON API (\texttt{suggest.jsp})                   & \textcolor{green2}{Live (auto)} \\
+      \midrule
+      Boonthavorn  & เอกชน        & GraphQL API + AI Agent                            & \textcolor{teal2}{ดึงบางส่วน} \\
+      \midrule
+      CGD          & รัฐ          & ระบบป้องกันบอท $\to$ AI Agent                     & \textcolor{red2}{AI-assisted} \\
+      DIT          & รัฐ          & URL deprecated $\to$ AI Agent                     & \textcolor{red2}{AI-assisted} \\
+      Thai Watsadu & เอกชน        & SPA + ป้องกันบอท $\to$ AI Agent (CGD ratio)        & \textcolor{red2}{Estimated} \\
+      Global House & เอกชน        & SPA + XHR $\to$ AI Agent (CGD ratio)              & \textcolor{red2}{Estimated} \\
+      DoHome       & เอกชน        & SPA + ป้องกันบอท $\to$ AI Agent (CGD ratio)        & \textcolor{red2}{Estimated} \\
+      SCG Home     & เอกชน        & Cloudflare bot $\to$ AI Agent (CGD ratio)         & \textcolor{red2}{Estimated} \\
+      BnB Home     & เอกชน        & แพลตฟอร์มร่วมบุญถาวร $\to$ AI Agent                & \textcolor{red2}{Estimated} \\
+      \bottomrule
+    \end{tabularx}
+  \end{table}
+  \vspace{0.3em}
+  \footnotesize\textbf{สรุป:} 3 แหล่งดึง auto สมบูรณ์ ครอบคลุม $\sim$70\% ของ
+  การสืบค้นจริง — ที่เหลือใช้ AI Agent ทำให้ Coverage ครบ 100\%
+\end{frame}
+
+\begin{frame}{4.3 เปรียบเทียบราคาข้ามแหล่ง: ปูนซีเมนต์ Type I 50 กก.}
+  \scriptsize
+  \textit{(กรุงเทพมหานคร, 25 พ.ค.~2569)}
+  \begin{table}
+    \centering
+    \begin{tabularx}{\textwidth}{l X r r}
+      \toprule
+      \textbf{แหล่ง} & \textbf{ประเภท} & \textbf{ราคา (฿/ถุง)} & \textbf{$\Delta$\% จาก CGD} \\
+      \midrule
+      CGD          & รัฐ          & 175.00 & baseline \\
+      TPSO         & รัฐ          & 179.45 & $+$2.5\% \\
+      DIT          & รัฐ          & 195.00 & $+$11.4\% \\
+      HomePro      & เอกชน        & 185.00 & $+$5.7\% \\
+      Boonthavorn  & เอกชน        & 215.00 & $+$22.9\% \\
+      MegaHome     & เอกชน        & 193.00 & $+$10.3\% \\
+      \midrule
+      \multicolumn{2}{l}{\textbf{ค่าเฉลี่ย (ไม่รวม TPSO)}} & \textbf{192.60} & \textbf{$+$10.1\%} \\
+      \bottomrule
+    \end{tabularx}
+  \end{table}
+  \textbf{การตีความ}
+  \begin{itemize}
+    \item ราคาตลาดสูงกว่า CGD baseline เฉลี่ย $+$8.5\% (มัธยฐาน $+$8.0\%)
+          จาก 37 คู่ราคาที่เปรียบเทียบ
+    \item DIT ($+$11.4\%) สะท้อนตลาดได้ดีกว่า CGD เพราะสำรวจรายวัน
+    \item Boonthavorn ($+$22.9\%) สูงกว่าเพราะเน้นสินค้าคุณภาพสูง
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{4.3 เปรียบเทียบราคา: เหล็กข้ออ้อย DB12 SD40}
+  \footnotesize
+  \textit{(กรุงเทพมหานคร, 25 พ.ค.~2569)}
+  \begin{table}
+    \centering
+    \begin{tabularx}{\textwidth}{l X r r}
+      \toprule
+      \textbf{แหล่ง} & \textbf{ประเภท} & \textbf{ราคา (฿/ตัน)} & \textbf{$\Delta$\% จาก CGD} \\
+      \midrule
+      CGD       & รัฐ    & 24{,}200 & baseline \\
+      DIT       & รัฐ    & 24{,}800 & $+$2.5\% \\
+      HomePro   & เอกชน  & 40{,}436 & $+$67.1\% \\
+      MegaHome  & เอกชน  & 26{,}620 & $+$10.0\% \\
+      \bottomrule
+    \end{tabularx}
+  \end{table}
+  \vspace{0.3em}
+  \textbf{การตีความ}
+  \begin{itemize}
+    \item HomePro สูงกว่า CGD มาก ($+$67.1\%) เพราะขายเป็นเส้นปลีก แล้วแปลง
+          เป็นต่อตัน รวมต้นทุนการตัดและบริการ
+    \item DIT ($+$2.5\%) และ MegaHome ($+$10.0\%) สะท้อนตลาดจริงได้ดีกว่า
+    \item เหล็กเสริมเป็นวัสดุที่ตลาดมีผู้ผลิตหลักไม่กี่ราย ราคาใกล้เคียงกัน
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{4.4 แนวโน้มเชิงเวลา: ปูนซีเมนต์ TPSO 10 เดือน}
+  \footnotesize
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.55\textwidth}
+      \begin{table}
+        \centering
+        \scriptsize
+        \begin{tabular}{lcc}
+          \toprule
+          \textbf{เดือน} & \textbf{ราคา (฿)} & \textbf{$\Delta$\% MoM} \\
+          \midrule
+          ส.ค.~68         & 171.00 & --- \\
+          ก.ย.~68         & 171.00 & 0.00\% \\
+          ต.ค.~68         & 172.00 & $+$0.58\% \\
+          พ.ย.~68         & 173.00 & $+$0.58\% \\
+          ธ.ค.~68         & 173.00 & 0.00\% \\
+          ม.ค.~69         & 174.00 & $+$0.58\% \\
+          ก.พ.~69         & 174.00 & 0.00\% \\
+          มี.ค.~69        & 175.00 & $+$0.57\% \\
+          เม.ย.~69        & 175.00 & 0.00\% \\
+          21 พ.ค.~69      & 179.45 & $+$2.54\% \\
+          25 พ.ค.~69      & 179.45 & 0.00\% \\
+          \bottomrule
+        \end{tabular}
+      \end{table}
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      \textbf{Linear Regression}
+      \[
+        Y = 169.35 + 0.819 X
+      \]
+      \[
+        R^2 = 0.871
+      \]
+      \textbf{การตีความ}
+      \begin{itemize}
+        \item Slope $b = 0.819$ บาท/จุดข้อมูล
+        \item $R^2 = 0.871$ โมเดลเชิงเส้นอธิบายดี
+        \item ราคารวมเพิ่ม \textbf{4.9\%} ใน 10 เดือน
+        \item การกระโดด พ.ค.~69 ($+$2.54\%) สะท้อนการปรับ baseline
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{4.5 การวิเคราะห์เชิงพื้นที่: ราคาปูนซีเมนต์รายภูมิภาค}
+  \scriptsize
+  \textit{(CGD baseline, 25 พ.ค.~2569)}
+  \begin{table}
+    \centering
+    \begin{tabularx}{\textwidth}{l X r}
+      \toprule
+      \textbf{ภูมิภาค} & \textbf{จังหวัดอ้างอิง} & \textbf{ราคา CGD (฿/ถุง)} \\
+      \midrule
+      ใต้           & สงขลา      & 215 \\
+      เหนือ         & เชียงใหม่   & 195 \\
+      อีสาน         & ขอนแก่น    & 188 \\
+      ตะวันตก       & ราชบุรี    & 180 \\
+      ตะวันออก      & ชลบุรี     & 178 \\
+      กลาง          & กรุงเทพฯ   & 175 \\
+      \midrule
+      \multicolumn{2}{l}{\textbf{Spread (ใต้ vs กลาง)}} & \textbf{22.9\%} \\
+      \bottomrule
+    \end{tabularx}
+  \end{table}
+  \textbf{การตีความ}
+  \begin{itemize}
+    \item ใต้ สูงกว่า กลาง 22.9\% --- ค่าขนส่งระยะไกล + ค่าเรือ (ภูเก็ต/สมุย)
+    \item ตะวันออก ใกล้เคียง กลาง --- ใกล้แหล่งผลิตที่สระบุรี/นครหลวง
+    \item อีสาน $+$7.4\% --- ค่าขนส่งทางบก 400--600 กม.
+    \item ใช้ปรับ \textbf{Regional Adjustment Factor} ในงานต่างจังหวัด
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{4.6 ตัวอย่างการคำนวณ BOQ: งานบุกระเบื้อง 50 ตร.ม.}
+  \footnotesize
+  \textit{(แหล่ง CGD, กรุงเทพฯ, 25 พ.ค.~2569)}
+  \begin{table}
+    \centering
+    \scriptsize
+    \begin{tabularx}{\textwidth}{l X r l r r}
+      \toprule
+      \textbf{ID} & \textbf{รายการวัสดุ} & \textbf{ปริมาณ} & \textbf{หน่วย} & \textbf{ราคา/หน่วย} & \textbf{รวม (฿)} \\
+      \midrule
+      TILE\_001       & กระเบื้องเซรามิคปูพื้น 12$\times$12  & 52.50 & ตร.ม.   & 220 & 11{,}550 \\
+      ADHESIVE\_001   & ปูนกาวซีเมนต์ TPI 20 กก.            & 12.50 & ถุง     & 180 &  2{,}250 \\
+      GROUT\_001      & ปูนยาแนวกระเบื้อง 1 กก.              & 15.00 & ถุง     &  65 &     975 \\
+      PVC\_TRIM\_001  & คิ้ว PVC ปิดมุม 8mm                  & 20.00 & เส้น    &  30 &     600 \\
+      WATER\_MIX\_001 & น้ำผสมปูน                           &  0.25 & ลบ.ม.  &  16 &       4 \\
+      \midrule
+      \multicolumn{5}{r}{\textbf{รวมต้นทุนวัสดุ:}}                       & \textbf{15{,}379} \\
+      \multicolumn{5}{r}{\textbf{ต้นทุนต่อตารางเมตร:}}                  & \textbf{307.58} \\
+      \bottomrule
+    \end{tabularx}
+  \end{table}
+  \vspace{0.3em}
+  \footnotesize\textbf{หมายเหตุ:} เป็นค่าวัสดุอย่างเดียว ยังไม่รวมค่าแรง
+  (ประมาณ 200 ฿/ตร.ม.) $\to$ ต้นทุนรวมประมาณ \textbf{507.58 ฿/ตร.ม.}
+\end{frame}
+
+\begin{frame}{4.6 สรุปต้นทุนต่อหน่วย 5 ประเภทงาน}
+  \footnotesize
+  \begin{table}
+    \centering
+    \begin{tabularx}{\textwidth}{l X r}
+      \toprule
+      \textbf{ประเภทงาน} & \textbf{อัตราส่วนวัสดุ (ตามหลักเกณฑ์ CGD)} & \textbf{ต้นทุนวัสดุ} \\
+      \midrule
+      งานบุกระเบื้อง       & กระเบื้อง $+$ ปูนกาว 0.25 ถุง $+$ ยาแนว 0.30 ถุง/ตร.ม. & 308 ฿/ตร.ม. \\
+      งานเสาเอ็น/คานทับหลัง & คอนกรีต 240 ksc + ทราย 0.5 + หิน 0.8 ลบ.ม.            & 848 ฿/ลบ.ม. \\
+      งานเหล็กเสริม         & DB12 SD40 (ราคา CGD)                                 & 24{,}200 ฿/ตัน \\
+      งานทาสี              & รองพื้น 1 รอบ + สีภายใน 2 รอบ (10 ตร.ม./ลิตร)         & 18 ฿/ตร.ม. \\
+      งานก่ออิฐ            & อิฐมอญ 60 ก้อน/ตร.ม.\ + ปูน 0.01 ถุง                  & 111 ฿/ตร.ม. \\
+      \bottomrule
+    \end{tabularx}
+  \end{table}
+  \vspace{0.3em}
+  \footnotesize\emph{คำนวณจากราคา CGD จริง ณ 25 พ.ค.~2569 ตามสูตรของ
+  กรมบัญชีกลาง --- เฉพาะค่าวัสดุ ไม่รวมค่าแรง/ดำเนินการ/กำไร}
+\end{frame}
+
+\begin{frame}{4.7 การทวนสอบความถูกต้อง: 37 คู่ราคา (ตัวอย่าง)}
+  \scriptsize
+  \begin{table}
+    \centering
+    \begin{tabular}{llrrr}
+      \toprule
+      \textbf{วัสดุ} & \textbf{แหล่ง} & \textbf{CGD (฿)} & \textbf{ราคาอื่น} & \textbf{$\Delta$\%} \\
+      \midrule
+      ปูนซีเมนต์ Type I 50 กก. & DIT          & 175      & 195       & $+$11.4\% \\
+      กระเบื้อง 30$\times$30   & Boonthavorn  & 220      & 289       & $+$31.4\% \\
+      ปูนกาวซีเมนต์ 20 กก.    & Boonthavorn  & 180      & 195       & $+$8.3\% \\
+      เหล็ก DB12 (ตัน)         & DIT          & 24{,}200 & 24{,}800  & $+$2.5\% \\
+      หินเบอร์ 1-2 (ลบ.ม.)     & DIT          & 650      & 680       & $+$4.6\% \\
+      สีทาภายใน 18 ลิตร        & DIT          & 1{,}250  & 1{,}290   & $+$3.2\% \\
+      สีทาภายนอก 18 ลิตร       & Boonthavorn  & 1{,}590  & 1{,}750   & $+$10.1\% \\
+      อิฐมอญ (100 ก้อน)        & Boonthavorn  & 180      & 210       & $+$16.7\% \\
+      คอนกรีต 240 ksc          & DIT          & 2{,}800  & 2{,}900   & $+$3.6\% \\
+      ปูนซีเมนต์ Type I        & TPSO         & 175      & 179.45    & $+$2.5\% \\
+      \midrule
+      \multicolumn{4}{l}{\textbf{ค่าเฉลี่ย (n=37)}} & \textbf{$+$8.5\%} \\
+      \multicolumn{4}{l}{\textbf{ค่ามัธยฐาน}} & \textbf{$+$8.0\%} \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+  \vspace{0.3em}
+  \footnotesize\textbf{เกณฑ์คัดออก:} คู่ราคาที่หน่วยบรรจุภัณฑ์ต่างกัน
+  เช่น ทรายถุง 50 กก.\ vs ลบ.ม.
+\end{frame}
+
+\begin{frame}{4.7 การทวนสอบ: ข้อสังเกตเชิงวิศวกรรม}
+  \begin{enumerate}
+    \item ราคา CGD เหมาะใช้เป็น \textbf{lower bound} ของต้นทุนในงานประมาณ
+          ราคาเบื้องต้น
+    \item ราคา DIT (สูงกว่า CGD 3--11\%) สะท้อนตลาดจริงได้ดีกว่าสำหรับ
+          \textbf{การประมาณราคาขั้นสุดท้าย}
+    \item ราคา Boonthavorn (สูงกว่า CGD 8--31\%) เหมาะสำหรับ
+          \textbf{โครงการที่ต้องการวัสดุคุณภาพสูง/นำเข้า}
+    \item TPSO ใกล้ CGD มากที่สุด ($+$2.5--2.8\%) เพราะใช้ CMI ratio
+          ที่คำนวณจากฐานข้อมูลเดียวกัน
+    \item ความแตกต่างต่ำสุดในเหล็กเสริมและคอนกรีต ($+$2.5--3.6\%)
+          เพราะตลาดมีผู้ผลิตหลักไม่กี่ราย
+    \item ความแตกต่างสูงสุดในกระเบื้อง Boonthavorn ($+$31.4\%) สะท้อน
+          \textbf{เกรดสินค้า} มากกว่าความคลาดเคลื่อนของระบบ
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{4.8 กรณีศึกษา: บ้านพักอาศัย 100 ตร.ม.\ จ.~นครราชสีมา}
+  \footnotesize
+  \textit{(ประมาณการจากราคา CGD baseline + อัตราส่วนวัสดุของ CGD)}
+  \begin{table}
+    \centering
+    \begin{tabular}{lrrr}
+      \toprule
+      \textbf{หมวดงาน} & \textbf{ปริมาณ} & \textbf{ราคา/หน่วย} & \textbf{ต้นทุนวัสดุ (฿)} \\
+      \midrule
+      งานก่ออิฐ (อิฐมอญ)     & 240 ตร.ม.    & 111 ฿/ตร.ม.    & 26{,}640 \\
+      งานเสาเอ็น (คอนกรีต)   & 1.29 ลบ.ม.   & 848 ฿/ลบ.ม.    & 1{,}094 \\
+      งานเหล็กเสริม DB12     & 1.45 ตัน     & 24{,}200 ฿/ตัน  & 35{,}090 \\
+      งานทาสี                & 480 ตร.ม.    & 18 ฿/ตร.ม.     & 8{,}640 \\
+      งานบุกระเบื้อง         & 32 ตร.ม.     & 308 ฿/ตร.ม.    & 9{,}856 \\
+      \midrule
+      \multicolumn{3}{r}{\textbf{รวมต้นทุนวัสดุ:}} & \textbf{81{,}320} \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+  \vspace{0.3em}
+  \footnotesize\textbf{หมายเหตุ:} ไม่รวมค่าแรง/ดำเนินการ/กำไรผู้รับเหมา
+  เปรียบเทียบกับ DIT (สูงกว่า CGD เฉลี่ย $+$8.5\%) จะใกล้ราคาตลาดมากขึ้น
+\end{frame}
+
+\begin{frame}{4.9 ประสิทธิภาพของระบบ}
+  \begin{columns}[T,onlytextwidth]
+    \begin{column}{0.5\textwidth}
+      \footnotesize
+      \textbf{หน่วงเวลาการตอบสนอง}
+      \begin{itemize}
+        \item \texttt{GET /api/prices} (KV hit) --- 12--18 ms
+        \item \texttt{GET /api/compare} (fan-out 11 src) --- 35--60 ms
+        \item \texttt{GET /api/regional} (77 จังหวัด) --- 80--120 ms
+        \item BOQ Page (full SSR + KV reads) --- 150--250 ms
+      \end{itemize}
+      $>$99\% ตอบจาก Cloudflare cache โดยไม่ไปที่ origin
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \footnotesize
+      \textbf{ความครอบคลุมและความสด}
+      \begin{itemize}
+        \item Coverage: \textbf{78\%} ของ source $\times$ material
+        \item \textcolor{green2}{Fresh}: 65\% (อายุ $<$50\% ของ TTL)
+        \item OK: 22\% (อายุ $<$ TTL)
+        \item \textcolor{red2}{Stale}: 4\% (รอ refresh)
+        \item Missing: 9\% (เช่น HomePro ไม่ขายเหล็ก DB25)
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+% =========================================================
+\section{บทที่ 5 สรุปผลการวิจัยและข้อเสนอแนะ}
+% =========================================================
+
+\begin{frame}{5.1 สรุปผลตามวัตถุประสงค์}
+  \footnotesize
+  \begin{enumerate}
+    \item \textbf{ระบบดึงข้อมูลอัตโนมัติ} --- เชื่อมต่อ 11 แหล่ง ผ่าน 4 กลยุทธ์
+          (PDF, JSON API, ScrapingBee, AI Agent) $\to$ \textbf{Coverage 100\%
+          (297/297)}
+    \item \textbf{การจับคู่รายการข้ามแหล่ง} --- Three-tier filter (tight/loose/legacy)
+          + Unit standardization 12 หน่วย
+    \item \textbf{ระบบคำนวณ BOQ 5 ประเภทงาน} ตามหลักเกณฑ์กรมบัญชีกลาง พร้อม
+          บันทึก fact\_calculations อัตโนมัติ
+    \item \textbf{การวิเคราะห์เชิงสถิติ 4 ประเภท}
+          \begin{itemize}
+            \item Linear Trend ($R^2 = 0.871$ ปูนซีเมนต์)
+            \item Month-over-Month Percentage Change
+            \item Outlier Detection (z-score $>$ 2.0)
+            \item Regional Aggregator (ใต้ vs กลาง = $+$22.9\%)
+          \end{itemize}
+    \item \textbf{การทดสอบกับข้อมูลจริง} --- ราคาตลาดสูงกว่า CGD baseline เฉลี่ย
+          $+$8.5\% (37 คู่ราคา)
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{5.2 ข้อมูลเบื้องต้นของแต่ละแหล่ง (1/2)}
+  \scriptsize
+  \begin{table}
+    \centering
+    \begin{tabularx}{\textwidth}{l l X l}
+      \toprule
+      \textbf{แหล่ง} & \textbf{ประเภท} & \textbf{ลักษณะข้อมูล} & \textbf{ความถี่อัปเดต} \\
+      \midrule
+      TPSO         & รัฐ          & ดัชนี CMI เผยแพร่เป็น PDF                          & รายเดือน \\
+      CGD          & รัฐ          & ราคามาตรฐานราชการ เผยแพร่เป็น PDF/Excel              & รายไตรมาส \\
+      DIT          & รัฐ          & ราคาตลาดสินค้ารายวัน เผยแพร่ผ่านเว็บไซต์             & รายวัน \\
+      HomePro      & เอกชน        & เว็บไซต์ + JSON API ภายใน (\texttt{suggest.jsp})     & ใกล้เรียลไทม์ \\
+      MegaHome     & เอกชน        & แพลตฟอร์มเดียวกับโฮมโปร เปิด \texttt{suggest.jsp}    & ใกล้เรียลไทม์ \\
+      Boonthavorn  & เอกชน        & เว็บอีคอมเมิร์ซ + GraphQL API ภายใน                 & ใกล้เรียลไทม์ \\
+      Thai Watsadu & เอกชน        & SPA + ระบบป้องกันบอท                              & ใกล้เรียลไทม์ \\
+      Global House & เอกชน        & SPA โหลดราคาผ่าน XHR หลังการ Render                 & ใกล้เรียลไทม์ \\
+      DoHome       & เอกชน        & SPA + ระบบป้องกันบอทและจำกัดการเข้าถึง              & ใกล้เรียลไทม์ \\
+      SCG Home     & เอกชน        & Cloudflare bot challenge ระดับสูง                  & ใกล้เรียลไทม์ \\
+      BnB Home     & เอกชน        & แพลตฟอร์มเดียวกับบุญถาวร จำกัดการเข้าถึง            & ใกล้เรียลไทม์ \\
+      \bottomrule
+    \end{tabularx}
+  \end{table}
+\end{frame}
+
+\begin{frame}{5.2 สถานะการดึงข้อมูล: ดึง / ไม่ดึง (2/2)}
+  \footnotesize
+  \begin{block}{\textbf{(ก) แหล่งที่ดึงข้อมูลอัตโนมัติได้สมบูรณ์ (3 แหล่ง)}}
+    TPSO, HomePro, MegaHome --- ครอบคลุม $\sim$70\% ของการสืบค้นจริง
+    เพราะเป็นแหล่งหลักที่ผู้ประมาณราคาใช้อ้างอิง
+  \end{block}
+  \begin{block}{\textbf{(ข) แหล่งที่ดึงได้บางส่วน (1 แหล่ง)}}
+    Boonthavorn --- มี GraphQL บางหมวด ส่วนที่เหลือใช้ AI Agent
+  \end{block}
+  \begin{alertblock}{\textbf{(ค) แหล่งที่ดึงด้วยวิธีอัตโนมัติไม่ได้ (7 แหล่ง)}}
+    CGD, DIT, Thai Watsadu, Global House, DoHome, SCG Home, BnB Home \\
+    ใช้กลยุทธ์ \textbf{AI Agent Research} บันทึกผ่าน
+    \texttt{POST /api/admin/ai-agent}
+  \end{alertblock}
+  \footnotesize\emph{แม้ส่วนใหญ่ดึง auto ไม่ได้ ระบบยังรวบรวมราคาได้ครบ
+  297/297 รายการผ่านการบูรณาการกลยุทธ์อัตโนมัติกับ AI Agent}
+\end{frame}
+
+\begin{frame}{5.3 ส่วนสนับสนุนเชิงวิชาการ (Contribution)}
+  งานวิจัยที่ผ่านมาแก้ปัญหาเฉพาะส่วน แต่ยัง \textbf{ขาดระบบบูรณาการ}
+  ที่ครอบคลุมทุกขั้นตอน --- งานวิจัยนี้ \textbf{เติมเต็มช่องว่างดังกล่าว}
+  \vspace{0.3em}
+  \begin{enumerate}
+    \item Multi-source Data Acquisition --- 4 กลยุทธ์การดึงข้อมูล
+    \item Cross-source Canonicalization --- Entity matching ด้วย 3-tier filter
+    \item Unit Standardization --- แปลงหน่วย 12 ประเภทอัตโนมัติ
+    \item Statistical Validation --- z-score + Linear Regression
+    \item BOQ Engine --- รองรับ 5 ประเภทงานตามหลักเกณฑ์ราชการ
+    \item Spatial-Temporal Analytics --- เชิงพื้นที่ (6 ภาค) + เชิงเวลา (10 เดือน)
+  \end{enumerate}
+  \vspace{0.3em}
+  \begin{block}{\textbf{ผลพลอยได้ทางสถาปัตยกรรม}}
+    การติดตั้งใช้งานบน Cloudflare Workers (Edge Platform) ทำให้ระบบมี
+    หน่วงเวลาเฉลี่ย $<$50 ms ทั่วโลก แสดงความเหมาะสมของ Serverless
+  \end{block}
+\end{frame}
+
+\begin{frame}{5.4 ข้อจำกัดของการศึกษา}
+  \begin{enumerate}
+    \item \textbf{ระบบป้องกันบอทใน Modern Trade} --- 5 จาก 8 ราย ใช้ Cloudflare
+          bot challenge หรือ SPA $\to$ ต้องใช้ AI Agent + ScrapingBee Proxy
+          ที่มีค่าใช้จ่าย
+    \item \textbf{การป้องกันการเข้าถึงของ CGD} --- ใช้ AI Agent อ่านเอกสาร
+          ราคามาตรฐาน
+    \item \textbf{URL ของ DIT ถูกยกเลิก} --- ใช้ TPSO เป็นตัวแทน
+    \item \textbf{ความสดของข้อมูล} --- TTL 30 วัน + Daily Cron เพียงพอสำหรับ
+          งานวิจัย แต่อาจไม่ทันตลาดในช่วงราคาผันผวนรุนแรง
+    \item \textbf{ความครอบคลุมรายภูมิภาค} --- เก็บข้อมูลจริงเพียง 5 ภูมิภาค
+          ผ่าน 5 จังหวัดอ้างอิง (ผ่าน AI Agent)
+    \item \textbf{การวิเคราะห์สถิติเป็นวิธีพื้นฐาน} --- ยังไม่ใช้ ARIMA / Prophet
+          / LSTM
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{5.5 ข้อเสนอแนะสำหรับงานวิจัยในอนาคต}
+  \footnotesize
+  \begin{enumerate}
+    \item \textbf{Reverse Engineering ของ Internal API} --- วิเคราะห์ XHR endpoint
+          ของ DoHome, SCG Home, Global House $\to$ ลดต้นทุน ScrapingBee
+    \item \textbf{แบบจำลองพยากรณ์ขั้นสูง} --- ขยายไป ARIMA, Prophet, LSTM
+          เพื่อพยากรณ์ราคาในอนาคต
+    \item \textbf{Adaptive Trust Weighting} --- ชั่งน้ำหนักแหล่งข้อมูลตามความ
+          น่าเชื่อถือทางสถิติ (เช่น Government 2$\times$ Retail)
+    \item \textbf{ขยายความครอบคลุมครบ 77 จังหวัด} --- ใช้ TPSO Regional Bulletin
+          + ความร่วมมือกับผู้ค้าปลีกท้องถิ่น
+    \item \textbf{เปิด Public API + AI Assistant} --- ตอบคำถามภาษาธรรมชาติด้วย
+          LLM + RAG จาก KV
+    \item \textbf{ทดสอบกับโครงการก่อสร้างจริง} --- วัดประโยชน์เชิงเวลาและ
+          ความแม่นยำในการจัดทำ BOQ เปรียบเทียบกับวิธีดั้งเดิม
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{5.6 บทสรุปสุดท้าย}
+  \begin{block}{\textbf{งานวิจัยนี้}}
+    เป็น \textbf{ต้นแบบเชิงพิสูจน์แนวคิด (Proof of Concept)} ที่แสดงว่า
+    การรวมศูนย์ข้อมูลราคาวัสดุก่อสร้างจากหลายแหล่งให้กลายเป็น
+    \textbf{Single Source of Truth} สำหรับการประมาณการ BOQ ในประเทศไทย
+    เป็นไปได้ในทางปฏิบัติ
+  \end{block}
+  \vspace{0.3em}
+  \textbf{ผลที่ได้สามารถนำไปใช้สนับสนุน}
+  \begin{itemize}
+    \item การประมาณราคาโครงการก่อสร้างของหน่วยงานภาครัฐ
+    \item การวิเคราะห์ความผันผวนของราคาวัสดุเพื่อวางแผนงบประมาณ
+    \item การสร้างความโปร่งใสในกระบวนการจัดซื้อจัดจ้างภาครัฐ
+    \item การเป็นต้นแบบสำหรับงานวิจัยอื่นในบริบทประเทศไทย
+  \end{itemize}
+  \vspace{0.3em}
+  \begin{center}
+    \textbf{Edge Computing + Serverless + Data Integration} \\
+    \emph{แก้ปัญหาในทางปฏิบัติของผู้ประมาณราคาได้อย่างมีประสิทธิภาพ}
+  \end{center}
+\end{frame}
+
+% =========================================================
+\section*{การถาม-ตอบ}
+% =========================================================
+\begin{frame}
+  \begin{center}
+    \vspace{1cm}
+    {\Huge \textbf{ขอบคุณครับ/ค่ะ}} \\[1cm]
+    {\LARGE Q\,\&\,A} \\[1.5cm]
+    {\large ยินดีรับฟังคำถามและข้อเสนอแนะจากคณะกรรมการ}
+  \end{center}
+\end{frame}
+
+\end{document}

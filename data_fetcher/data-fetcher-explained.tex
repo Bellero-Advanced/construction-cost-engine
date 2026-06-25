@@ -1,0 +1,552 @@
+% ============================================================================
+%  data-fetcher-explained.tex
+%  เอกสารอธิบาย src ของ Construction Data Fetcher แบบภาษาคนเขียน
+%  Compile: xelatex (ต้องใช้ XeLaTeX เพราะมีฟอนต์ไทย)
+% ============================================================================
+\documentclass[12pt,a4paper]{article}
+
+% ── ฟอนต์ไทย + อังกฤษ ผ่าน XeLaTeX ──────────────────────────────────
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setdefaultlanguage{thai}
+\setotherlanguage{english}
+
+% ใช้ Sarabun (Google Fonts) จากโฟลเดอร์ fonts/ — ดีไซน์เดียวกับ TH Sarabun New
+\setmainfont[
+  Path=./fonts/,
+  UprightFont=Sarabun-Regular.ttf,
+  BoldFont=Sarabun-Bold.ttf,
+  ItalicFont=Sarabun-Italic.ttf,
+  BoldItalicFont=Sarabun-BoldItalic.ttf,
+  Scale=1.25,
+  Ligatures=TeX
+]{Sarabun}
+
+% mono font สำหรับโค้ด — ใช้ Menlo (มีใน macOS) + Thai fallback
+\setmonofont[Scale=0.85]{Menlo}
+\newfontfamily\thaifonttt[
+  Path=./fonts/,
+  UprightFont=Sarabun-Regular.ttf,
+  BoldFont=Sarabun-Bold.ttf,
+  Scale=1.15
+]{Sarabun}
+
+% ── การตัดคำไทย ─────────────────────────────────────────────────────
+\XeTeXlinebreaklocale "th"
+\XeTeXlinebreakskip = 0pt plus 1pt minus 0.1pt
+\tolerance=2000
+\emergencystretch=3em
+\hyphenpenalty=5000
+
+% ── หน้ากระดาษ ──────────────────────────────────────────────────────
+\usepackage[a4paper,top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+
+% ── สี + กล่อง + ตาราง + โค้ด ───────────────────────────────────────
+\usepackage{xcolor}
+\definecolor{ink}{HTML}{0A1628}
+\definecolor{amber}{HTML}{D97706}
+\definecolor{paper2}{HTML}{EDE5D3}
+\definecolor{green}{HTML}{4D7C0F}
+\definecolor{teal}{HTML}{0E7C7B}
+\definecolor{rust}{HTML}{B94D2C}
+\definecolor{codebg}{HTML}{F5F1E8}
+\definecolor{linecol}{HTML}{2A4769}
+
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{listings}
+\usepackage{graphicx}
+
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=ink,
+  urlcolor=teal,
+  pdftitle={Construction Data Fetcher — คู่มืออธิบาย src}
+}
+
+% ── ตั้งค่า listing สำหรับ Python ───────────────────────────────────
+\lstdefinestyle{py}{
+  language=Python,
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\footnotesize,
+  keywordstyle=\color{amber}\bfseries,
+  commentstyle=\color{green}\itshape,
+  stringstyle=\color{teal},
+  numbers=left,
+  numberstyle=\tiny\color{linecol},
+  frame=single,
+  rulecolor=\color{linecol},
+  breaklines=true,
+  showstringspaces=false,
+  tabsize=2,
+  captionpos=b,
+  xleftmargin=2em,
+  framexleftmargin=1.5em
+}
+
+% ── กล่องสไตล์ต่าง ๆ ────────────────────────────────────────────────
+\newtcolorbox{infobox}[1]{
+  colback=paper2, colframe=ink, boxrule=1pt,
+  arc=2pt, title=#1, fonttitle=\bfseries,
+  breakable, enhanced
+}
+\newtcolorbox{tipbox}{
+  colback=codebg, colframe=amber, boxrule=1.5pt,
+  arc=2pt, breakable, enhanced,
+  borderline west={3pt}{0pt}{amber}
+}
+
+% ── header / footer ─────────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{linecol}Construction Data Fetcher}
+\fancyhead[R]{\small\color{linecol}คู่มืออธิบาย src}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ── คำสั่งช่วย: หัวข้อแบบมีแถบ ──────────────────────────────────────
+\newcommand{\barsection}[1]{%
+  \section*{\color{ink}\rule[-0.2ex]{4pt}{2.2ex}\hspace{0.4em}#1}%
+  \addcontentsline{toc}{section}{#1}%
+}
+
+\begin{document}
+
+% ============================================================================
+%  หน้าปก
+% ============================================================================
+\begin{titlepage}
+\centering
+\vspace*{2cm}
+{\Huge\bfseries\color{ink} Construction Data Fetcher\par}
+\vspace{0.5cm}
+{\Large\color{amber} คู่มืออธิบายโค้ด (src) แบบเข้าใจง่าย\par}
+\vspace{1.5cm}
+
+\begin{tcolorbox}[colback=paper2,colframe=ink,width=0.85\textwidth,arc=4pt]
+\centering\large
+สคริปต์ Python ที่ดึง \textbf{ราคาวัสดุก่อสร้างจริง} \\
+จาก API ของหน่วยงานภาครัฐไทย \\
+แล้วบันทึกลงไฟล์ Excel อัตโนมัติ
+\end{tcolorbox}
+
+\vspace{2cm}
+{\large
+\begin{tabular}{rl}
+\textbf{ไฟล์หลัก:} & \texttt{fetch\_construction\_data.py} \\[4pt]
+\textbf{ภาษา:} & Python 3 \\[4pt]
+\textbf{แหล่งข้อมูล:} & กระทรวงพาณิชย์ (MOC) + ฉลากเขียว \\[4pt]
+\textbf{ผลลัพธ์:} & ไฟล์ Excel (.xlsx) หลาย sheet \\
+\end{tabular}
+\par}
+
+\vfill
+{\color{linecol} โครงการ Construction Cost Engine \\ ปรับปรุงล่าสุด: มิถุนายน 2569}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\barsection{1. ภาพรวม: สคริปต์นี้ทำอะไร}
+% ============================================================================
+
+ลองนึกภาพแบบนี้ครับ — เราอยากรู้ว่า ``ราคาวัสดุก่อสร้างในประเทศไทยตอนนี้เป็นยังไง''
+ปกติเราต้องเข้าเว็บราชการหลายเว็บ คลิกหาเอกสาร PDF โหลดมาเปิดอ่านทีละไฟล์
+ซึ่งเสียเวลามาก และข้อมูลก็กระจัดกระจาย
+
+สคริปต์ตัวนี้ทำงานแทนเราทั้งหมด มันจะ:
+
+\begin{enumerate}[leftmargin=2em]
+  \item โทรไปถาม API ของหน่วยงานรัฐ 3 แห่ง (เหมือนโทรไปถามราคาทางโทรศัพท์ แต่เป็นคอมพิวเตอร์คุยกัน)
+  \item รับข้อมูลกลับมาในรูปแบบ JSON (รูปแบบข้อมูลที่เครื่องอ่านง่าย)
+  \item จัดระเบียบข้อมูลให้เป็นตาราง
+  \item เซฟลงไฟล์ Excel ที่เราเปิดดูได้เลย พร้อมแยกเป็นหลาย sheet
+\end{enumerate}
+
+\begin{tipbox}
+\textbf{จุดเด่นสำคัญ:} ข้อมูลทั้งหมดเป็น \textbf{ของจริง} ดึงสด ๆ จาก API ภาครัฐ
+ไม่ใช่ข้อมูลปลอม (mock) ที่พิมพ์ขึ้นมาเอง — รันเมื่อไหร่ก็ได้ข้อมูลล่าสุดเมื่อนั้น
+\end{tipbox}
+
+\vspace{0.5em}
+\begin{infobox}{ทำไมต้องเขียนสคริปต์ ไม่ทำมือ?}
+เพราะราคาวัสดุ \textbf{เปลี่ยนทุกเดือน} ถ้าทำมือ เราต้องมานั่งโหลดใหม่ทุกครั้ง
+แต่ถ้ามีสคริปต์ แค่รันคำสั่งเดียว \texttt{python3 fetch\_construction\_data.py}
+ก็ได้ไฟล์ Excel ใหม่พร้อมข้อมูลล่าสุดทันที ภายในไม่กี่นาที
+\end{infobox}
+
+\newpage
+% ============================================================================
+\barsection{2. แหล่งข้อมูล: เราไปเอาข้อมูลจากไหน}
+% ============================================================================
+
+สคริปต์ดึงข้อมูลจาก API จริง 3 แหล่ง แต่ละแหล่งให้ข้อมูลคนละมุม:
+
+\vspace{0.5em}
+\begin{infobox}{แหล่งที่ 1 — CSI: ดัชนีราคาวัสดุระดับประเทศ}
+\textbf{เจ้าของ:} กระทรวงพาณิชย์ (สำนักงานนโยบายและยุทธศาสตร์การค้า) \\
+\textbf{URL:} \texttt{\small dataapi.moc.go.th/csi-indexes} \\
+\textbf{ให้อะไร:} ตัวเลขดัชนีราคาวัสดุก่อสร้างทั้งประเทศ รายเดือน
+ว่าเดือนนี้แพงขึ้นหรือถูกลงกี่เปอร์เซ็นต์เทียบปีก่อน \\
+\textbf{เปรียบเทียบ:} เหมือน ``เทอร์โมมิเตอร์วัดราคา'' ของทั้งวงการก่อสร้าง
+\end{infobox}
+
+\begin{infobox}{แหล่งที่ 2 — CPIP: ดัชนีราคารายจังหวัด}
+\textbf{เจ้าของ:} กระทรวงพาณิชย์ \\
+\textbf{URL:} \texttt{\small dataapi.moc.go.th/cpip-indexes} \\
+\textbf{ให้อะไร:} ดัชนีราคาก่อสร้างแยก \textbf{รายจังหวัด} (มากถึง 77 จังหวัด) รายเดือน
+ใช้สำหรับงานก่อสร้างภาครัฐ \\
+\textbf{เปรียบเทียบ:} เหมือนแผนที่ราคา บอกว่าจังหวัดไหนของแพง จังหวัดไหนของถูก
+\end{infobox}
+
+\begin{infobox}{แหล่งที่ 3 — Green Label: ราคาวัสดุจริงเป็นบาท}
+\textbf{เจ้าของ:} ศูนย์ข้อมูลที่อยู่อาศัยแห่งชาติ (ฉลากเขียว) \\
+\textbf{URL:} \texttt{\small nhicservices.nha.co.th/.../green\_label/mid} \\
+\textbf{ให้อะไร:} ราคาวัสดุ \textbf{จริงเป็นบาท} กว่า 5,500 รายการ มียี่ห้อ สเปค หน่วย ครบ \\
+\textbf{เปรียบเทียบ:} เหมือนใบเสนอราคาจริง ที่บอกว่า ``ปูนยี่ห้อนี้ถุงละเท่านี้''
+\end{infobox}
+
+\vspace{0.5em}
+\begin{tipbox}
+\textbf{ข้อควรรู้:} API ของกระทรวงพาณิชย์ (2 แหล่งแรก) \textbf{ตอบช้ามาก}
+บางครั้งใช้เวลา 30--45 วินาทีต่อครั้ง สคริปต์เลยมีระบบ ``ลองใหม่'' (retry)
+ถ้าครั้งแรกไม่สำเร็จ จะรออีกหน่อยแล้วลองอีก 2 ครั้ง
+\end{tipbox}
+
+\newpage
+% ============================================================================
+\barsection{3. โครงสร้างโค้ด: แต่ละส่วนทำหน้าที่อะไร}
+% ============================================================================
+
+โค้ดถูกแบ่งเป็นก้อน ๆ ให้อ่านง่าย แต่ละก้อนมีหน้าที่ชัดเจน
+ลองดูภาพรวมก่อน แล้วค่อยเจาะทีละส่วน:
+
+\vspace{0.5em}
+\begin{center}
+\begin{tabular}{>{\raggedright}p{5cm} p{9.5cm}}
+\toprule
+\textbf{ส่วนของโค้ด} & \textbf{หน้าที่ (พูดแบบบ้าน ๆ)} \\
+\midrule
+\texttt{class Config} & กล่องเก็บค่าตั้งต้น เช่น จะดึงปีไหน timeout กี่วินาที ปรับตรงนี้ที่เดียว \\
+\addlinespace
+\texttt{http\_get\_json()} & ``คนวิ่งของ'' โทรไปขอข้อมูลจาก API ถ้าพลาดก็ลองใหม่ให้ \\
+\addlinespace
+\texttt{class ConstructionDataFetcher} & ``หัวหน้างาน'' คุมการดึงทั้งหมด + เขียน Excel \\
+\addlinespace
+\quad\texttt{.fetch\_csi\_national()} & ดึงแหล่งที่ 1 (ดัชนีประเทศ) \\
+\quad\texttt{.fetch\_cpip\_provincial()} & ดึงแหล่งที่ 2 (รายจังหวัด) \\
+\quad\texttt{.fetch\_green\_label()} & ดึงแหล่งที่ 3 (ราคาจริง) \\
+\quad\texttt{.write\_excel()} & รวมทุกอย่างเขียนลง Excel + จัดสวย \\
+\addlinespace
+\texttt{main()} & ``ปุ่มสตาร์ท'' สั่งให้ทุกอย่างทำงานตามลำดับ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{1em}
+เราจะไล่ดูทีละส่วนในหน้าถัด ๆ ไป พร้อมโค้ดจริงและคำอธิบาย
+
+\newpage
+% ============================================================================
+\barsection{4. เจาะส่วนที่ 1: Config — กล่องตั้งค่า}
+% ============================================================================
+
+ส่วนนี้คือ ``แผงควบคุม'' ของสคริปต์ ถ้าอยากเปลี่ยนอะไร เปลี่ยนตรงนี้ที่เดียว
+ไม่ต้องไปไล่แก้ทั้งโค้ด
+
+\begin{lstlisting}[style=py,caption={คลาส Config — ค่าตั้งต้นทั้งหมด}]
+class Config:
+    OUTPUT_DIR = "output"      # โฟลเดอร์เก็บไฟล์ Excel
+    TIMEOUT = 45               # รอ API นานสุดกี่วินาที
+    RETRIES = 2                # ลองใหม่กี่ครั้งถ้าพลาด
+    RETRY_DELAY = 3            # รอกี่วินาทีก่อนลองใหม่
+    PACE_DELAY = 1.0           # หน่วงระหว่าง request กัน rate-limit
+
+    CSI_FROM_YEAR = 2023       # ดึง CSI ตั้งแต่ปีไหน
+    CSI_TO_YEAR = 2025         # ถึงปีไหน
+    CPIP_FROM_YEAR = 2024
+    CPIP_TO_YEAR = 2025
+\end{lstlisting}
+
+\begin{infobox}{อ่านง่าย ๆ}
+อยากได้ข้อมูลย้อนหลังถึงปี 2020? เปลี่ยน \texttt{CSI\_FROM\_YEAR = 2020} จบ \\
+API ตอบช้าจนพลาดบ่อย? เพิ่ม \texttt{TIMEOUT = 60} หรือ \texttt{RETRIES = 3} \\
+ไม่ต้องเข้าใจโค้ดทั้งหมด แค่รู้ว่าแต่ละค่าหมายถึงอะไรก็ปรับได้
+\end{infobox}
+
+\newpage
+% ============================================================================
+\barsection{5. เจาะส่วนที่ 2: http\_get\_json — คนวิ่งของ}
+% ============================================================================
+
+ฟังก์ชันนี้มีหน้าที่เดียว: ``ไปขอข้อมูลจาก URL ที่กำหนด แล้วเอากลับมา''
+แต่เพราะ API ราชการชอบตอบช้า/พลาด มันเลยมีระบบ \textbf{ลองใหม่อัตโนมัติ}
+
+\begin{lstlisting}[style=py,caption={http\_get\_json — ขอข้อมูลพร้อม retry}]
+def http_get_json(url, timeout, retries, retry_delay, logger=print):
+    last_err = None
+    for attempt in range(retries + 1):       # ลองทั้งหมด retries+1 ครั้ง
+        try:
+            req = urllib.request.Request(url, headers={...})
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                raw = resp.read().decode("utf-8")
+                return json.loads(raw)        # สำเร็จ! คืนข้อมูลเลย
+        except (URLError, TimeoutError, JSONDecodeError) as err:
+            last_err = err
+            if attempt < retries:
+                logger(f"retry {attempt+1}/{retries} ...")
+                time.sleep(retry_delay)        # รอแล้วลองใหม่
+    return None                                # ลองครบแล้วยังพลาด -> คืน None
+\end{lstlisting}
+
+\textbf{เล่าเป็นเรื่อง:} เหมือนเราโทรสั่งพิซซ่า ถ้าสายไม่ว่าง เราไม่ได้เลิกล้ม
+เราวางสาย รอแป๊บ แล้วโทรใหม่ ลองสัก 3 ครั้ง ถ้ายังไม่ติดจริง ๆ ค่อยยอมแพ้
+(คืนค่า \texttt{None} แปลว่า ``ไม่ได้ของ'')
+
+\begin{tipbox}
+\textbf{ทำไมต้องคืน None ไม่ใช่ crash?} เพราะถ้าแหล่งหนึ่งล่ม
+เรายังอยากได้ข้อมูลจากอีก 2 แหล่งที่เหลือ การคืน \texttt{None} ทำให้สคริปต์
+``ข้าม'' แหล่งที่พังไปได้ ไม่ทำให้ทั้งโปรแกรมตาย
+\end{tipbox}
+
+\newpage
+% ============================================================================
+\barsection{6. เจาะส่วนที่ 3: การดึงแต่ละแหล่ง}
+% ============================================================================
+
+หัวหน้างาน (\texttt{ConstructionDataFetcher}) มีลูกน้อง 3 คน แต่ละคนดึงคนละแหล่ง
+หลักการเหมือนกันหมด: สร้าง URL $\rightarrow$ เรียก \texttt{http\_get\_json} $\rightarrow$
+แปลงเป็นตาราง (DataFrame)
+
+\begin{lstlisting}[style=py,caption={fetch\_csi\_national — ดึงดัชนีระดับประเทศ}]
+def fetch_csi_national(self):
+    url = (f"{self.MOC_BASE}/csi-indexes"
+           f"?index_id=0000000000000000"      # 0000... = ดัชนีรวม
+           f"&from_year={Config.CSI_FROM_YEAR}"
+           f"&to_year={Config.CSI_TO_YEAR}")
+
+    data = http_get_json(url, ...)             # เรียกคนวิ่งของ
+    if not data:
+        return None                            # ไม่ได้ก็ข้าม
+
+    df = pd.DataFrame(data)                     # แปลง JSON -> ตาราง
+    df = self._add_thai_date(df)               # เพิ่มคอลัมน์ period
+    return df
+\end{lstlisting}
+
+\textbf{Green Label พิเศษหน่อย} เพราะข้อมูลที่ได้ซ่อนอยู่ลึกกว่า
+ต้องเจาะเข้าไปที่ \texttt{result $\rightarrow$ items} และราคายังเป็นข้อความ
+``2,731.10'' (มีลูกน้ำ) ต้องแปลงเป็นตัวเลขก่อนคำนวณได้:
+
+\begin{lstlisting}[style=py,caption={แปลงราคาข้อความเป็นตัวเลข}]
+# "2,731.10" (str) -> 2731.10 (float)
+df["price_baht_numeric"] = (
+    df["price_baht"].astype(str)
+      .str.replace(",", "")             # เอาลูกน้ำออก
+      .apply(lambda x: pd.to_numeric(x, errors="coerce"))
+)
+\end{lstlisting}
+
+\newpage
+% ============================================================================
+\barsection{7. เจาะส่วนที่ 4: write\_excel — เขียนไฟล์ + จัดสวย}
+% ============================================================================
+
+พอดึงข้อมูลครบแล้ว ส่วนนี้รวมทุกอย่างเขียนลง Excel ไฟล์เดียว แยกเป็นหลาย sheet
+แล้วจัด format ให้สวย (หัวตารางสีน้ำเงิน ตัวอักษรขาว ปรับความกว้างคอลัมน์อัตโนมัติ)
+
+\begin{lstlisting}[style=py,caption={write\_excel — เขียนหลาย sheet}]
+def write_excel(self, frames):
+    ts = self.run_started.strftime("%Y%m%d_%H%M%S")
+    filename = f"construction_data_{ts}.xlsx"   # ชื่อมี timestamp กันชนกัน
+
+    with pd.ExcelWriter(filepath, engine="openpyxl") as writer:
+        self._write_summary_sheet(writer, frames)   # sheet สรุป
+        # เขียนแต่ละแหล่งเป็น sheet แยก
+        csi.to_excel(writer, sheet_name="CSI_National")
+        cpip.to_excel(writer, sheet_name="CPIP_Provincial")
+        green.to_excel(writer, sheet_name="GreenLabel_Prices")
+        # เขียน log การดึงทั้งหมด
+        logs_df.to_excel(writer, sheet_name="Fetch_Logs")
+
+    self._style_workbook(filepath)               # จัดสวยทีหลัง
+\end{lstlisting}
+
+\begin{infobox}{ทำไมชื่อไฟล์มี timestamp?}
+เพราะเราอยากเก็บประวัติทุกครั้งที่ดึง ไม่ให้ทับกัน
+ถ้ารันวันนี้ได้ \texttt{construction\_data\_20260610\_154817.xlsx}
+รันพรุ่งนี้ก็ได้อีกไฟล์ชื่อใหม่ ทำให้ย้อนดูได้ว่าข้อมูลเดือนนี้ต่างจากเดือนก่อนยังไง
+\end{infobox}
+
+\newpage
+% ============================================================================
+\barsection{8. Data Pipeline: เส้นทางข้อมูลตั้งแต่ต้นจนจบ}
+% ============================================================================
+
+ภาพรวมว่าข้อมูล ``ไหล'' จากต้นทางถึงปลายทางอย่างไร:
+
+\vspace{1em}
+\begin{center}
+\begin{tcolorbox}[colback=codebg,colframe=ink,width=\textwidth,arc=3pt]
+\centering\ttfamily\small
+\textbf{[1] API ภาครัฐ}\\
+(CSI / CPIP / Green Label)\\
+$\big\downarrow$ \textnormal{ส่ง request ผ่าน HTTPS}\\[4pt]
+\textbf{[2] http\_get\_json()}\\
+\textnormal{รับ JSON + retry ถ้าพลาด}\\
+$\big\downarrow$ \textnormal{ได้ list/dict}\\[4pt]
+\textbf{[3] pandas DataFrame}\\
+\textnormal{แปลงเป็นตาราง + เพิ่มคอลัมน์ period + แปลงราคาเป็นตัวเลข}\\
+$\big\downarrow$ \textnormal{ตารางสะอาด}\\[4pt]
+\textbf{[4] write\_excel()}\\
+\textnormal{รวมหลาย sheet + จัด format}\\
+$\big\downarrow$ \textnormal{เขียนไฟล์}\\[4pt]
+\textbf{[5] output/construction\_data\_<timestamp>.xlsx}\\
+\textnormal{เปิดดูได้เลยใน Excel}
+\end{tcolorbox}
+\end{center}
+
+\vspace{1em}
+สรุปเป็นประโยคเดียว: \textbf{API $\rightarrow$ ดึง+ลองใหม่ $\rightarrow$ จัดตาราง
+$\rightarrow$ เขียน Excel $\rightarrow$ เปิดดู}
+
+\newpage
+% ============================================================================
+\barsection{9. ตัวอย่างจริง: Input / Process / Output}
+% ============================================================================
+
+มาดูตัวอย่างจริง ตั้งแต่สิ่งที่เราใส่เข้าไป จนถึงสิ่งที่ได้ออกมา
+
+\subsection*{9.1 INPUT — สิ่งที่เราสั่ง}
+
+\begin{lstlisting}[style=py,caption={แค่รันคำสั่งเดียว},numbers=none]
+$ python3 fetch_construction_data.py
+\end{lstlisting}
+
+ไม่ต้องใส่ argument อะไรเลย ค่าทั้งหมดอยู่ใน \texttt{Config} แล้ว
+(อยากเปลี่ยนปีก็ไปแก้ใน \texttt{Config} ก่อนรัน)
+
+\subsection*{9.2 PROCESS — สิ่งที่เกิดขึ้นระหว่างรัน}
+
+สคริปต์จะพ่น log ออกมาให้เห็นว่ากำลังทำอะไร (ตัวอย่างจริงจากการรัน):
+
+\begin{lstlisting}[style=py,numbers=none,basicstyle=\ttfamily\scriptsize]
+[1/3] CSI - ดัชนีราคาวัสดุก่อสร้างระดับประเทศ (รายเดือน)
+      GET https://dataapi.moc.go.th/csi-indexes?index_id=00...
+      retry 1/2 (TimeoutError) ...
+      [OK] 24 แถว (2023/1 - 2024/12)
+[2/3] CPIP - ดัชนีราคาก่อสร้างรายจังหวัด (77 จังหวัด)
+      [OK] 728 แถว, 61 จังหวัด
+[3/3] Green Label - ราคาวัสดุฉลากเขียวจริง (บาท)
+      [OK] 5571 รายการ, 12 หมวดหมู่
+\end{lstlisting}
+
+\subsection*{9.3 OUTPUT — สิ่งที่ได้ (ข้อมูลจริง)}
+
+\textbf{ตัวอย่างข้อมูล CSI ที่ได้} (ดัชนีราคาวัสดุระดับประเทศ):
+
+\begin{center}
+\begin{tabular}{cccc}
+\toprule
+\textbf{period} & \textbf{price\_index} & \textbf{yoy (\%)} & \textbf{ความหมาย} \\
+\midrule
+2023-01 & 113.1 & +3.5 & แพงขึ้น 3.5\% จากปีก่อน \\
+2023-12 & 112.0 & $-$0.4 & ถูกลงเล็กน้อย \\
+2024-12 & 112.4 & +0.4 & ทรงตัว \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.8em}
+\textbf{ตัวอย่างข้อมูล CPIP ที่ได้} (ดัชนีรายจังหวัด, ม.ค. 2024):
+
+\begin{center}
+\begin{tabular}{ccc}
+\toprule
+\textbf{จังหวัด} & \textbf{period} & \textbf{price\_index} \\
+\midrule
+พังงา & 2024-01 & 106.7 \\
+นนทบุรี & 2024-01 & 109.1 \\
+เชียงราย & 2024-01 & 107.3 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.8em}
+\textbf{ตัวอย่างข้อมูล Green Label ที่ได้} (ราคาจริงเป็นบาท):
+
+\begin{center}
+\begin{tabular}{llcc}
+\toprule
+\textbf{ยี่ห้อ} & \textbf{วัสดุ} & \textbf{หน่วย} & \textbf{ราคา (บาท)} \\
+\midrule
+ซีแพค & วัสดุก่อ (คอนกรีต 400) & ลบ.ม. & 2,731.10 \\
+ซีแพค & วัสดุก่อ (คอนกรีต 380) & ลบ.ม. & 2,667.40 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.8em}
+\textbf{ไฟล์ Excel ที่ได้} มี 6 sheet:
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{ชื่อ sheet} & \textbf{เนื้อหา} \\
+\midrule
+Summary & สรุปภาพรวมการดึง (เวลา, จำนวนแถวแต่ละแหล่ง) \\
+CSI\_National & ดัชนีระดับประเทศ 24 แถว \\
+CPIP\_Provincial & ดัชนีรายจังหวัด 728 แถว \\
+GreenLabel\_Prices & ราคาวัสดุจริง 5,571 รายการ \\
+GreenLabel\_Summary & สรุปราคา เฉลี่ย/ต่ำสุด/สูงสุด ต่อหมวด \\
+Fetch\_Logs & log การดึงทุกขั้นตอน \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\newpage
+% ============================================================================
+\barsection{10. วิธีใช้งานจริง}
+% ============================================================================
+
+\subsection*{ขั้นที่ 1 — ติดตั้ง library ที่ต้องใช้}
+\begin{lstlisting}[style=py,numbers=none]
+pip install -r requirements.txt
+# หรือ
+pip install pandas openpyxl
+\end{lstlisting}
+
+\subsection*{ขั้นที่ 2 — รันสคริปต์}
+\begin{lstlisting}[style=py,numbers=none]
+cd data_fetcher
+python3 fetch_construction_data.py
+\end{lstlisting}
+
+\subsection*{ขั้นที่ 3 — เปิดไฟล์}
+ไฟล์จะอยู่ในโฟลเดอร์ \texttt{output/} ชื่อมี timestamp
+เปิดด้วย Excel / Numbers / Google Sheets ได้เลย
+
+\vspace{1em}
+\begin{infobox}{สรุปสั้น ๆ}
+สคริปต์นี้เปลี่ยนงานที่เคยต้องนั่งทำมือหลายชั่วโมง
+(เข้าเว็บ โหลด PDF อ่าน จดใส่ Excel) ให้เหลือแค่ \textbf{รันคำสั่งเดียว}
+แล้วได้ไฟล์ Excel พร้อมข้อมูลราคาวัสดุจริงจากภาครัฐ 3 แหล่ง
+รวมกว่า 6,300 แถว ภายในไม่กี่นาที — และทำซ้ำได้ทุกเมื่อที่อยากได้ข้อมูลใหม่
+\end{infobox}
+
+\vfill
+\begin{center}
+\color{linecol}\rule{0.5\textwidth}{0.4pt}\\[0.5em]
+\textit{จบคู่มือ — Construction Data Fetcher}
+\end{center}
+
+\end{document}

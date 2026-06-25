@@ -12,10 +12,11 @@
 (5) ผลการวิเคราะห์เชิงพื้นที่
 (6) ตัวอย่างการคำนวณ BOQ.
 
-ข้อมูลที่ใช้ในการทดสอบมาจากการดึงผ่านระบบจริงตั้งแต่เดือนสิงหาคม 2568
-ถึงพฤษภาคม 2569 รวม 10 เดือน บวกกับการ seed ราคา baseline ของ CGD,
-DIT, และ Boonthavorn ผ่าน \texttt{/api/admin/ai-agent} ตาม
-ข้อมูลที่อ้างอิงจาก published catalog ของแต่ละผู้ค้า.
+ข้อมูลที่ใช้ในการทดสอบมาจากการดึงผ่านระบบจริงตั้งแต่เดือนสิงหาคม
+พ.ศ.\ 2568 ถึงเดือนพฤษภาคม พ.ศ.\ 2569 รวม 10 เดือน ร่วมกับการบันทึก
+ราคาฐาน (Baseline) ของ CGD, DIT และ Boonthavorn ผ่าน Endpoint
+\texttt{/api/admin/ai-agent} โดยอ้างอิงจากเอกสารราคามาตรฐานที่
+เผยแพร่ของแต่ละแหล่ง.
 
 \section{สรุปขอบเขตข้อมูลที่ระบบครอบคลุม}
 \label{sec:coverage}
@@ -79,18 +80,20 @@ DoHome       & Modern Trade & SPA $+$ XHR $\to$ AI agent (CGD ratio)        & Es
 \end{table}
 
 \textbf{สรุป:} จาก 11 แหล่ง มี 3 แหล่งที่ดึงได้อัตโนมัติเต็มรูปแบบ
-(TPSO, HomePro, MegaHome), 3 แหล่งที่ใช้ AI agent research จากข้อมูลจริง
-(CGD, DIT, Boonthavorn), และ 5 แหล่งที่ใช้ \emph{estimated price}
-(CGD $\times$ 1.08) ผ่าน AI agent (Global House, Thai Watsadu, BnB Home,
-SCG Home, DoHome). ราคา estimated ถือเป็น market proxy ที่สมเหตุสมผล
-เนื่องจากแหล่งเหล่านี้ไม่มี public API และมีระบบป้องกันบอทระดับสูง.
+(TPSO, HomePro, MegaHome), 3 แหล่งที่ใช้ AI Agent สืบค้นจากข้อมูลจริง
+(CGD, DIT, Boonthavorn), และ 5 แหล่งที่ใช้ \emph{ราคาประมาณการ}
+(CGD $\times$ 1.08) ผ่าน AI Agent (Global House, Thai Watsadu, BnB Home,
+SCG Home, DoHome). ราคาประมาณการถือเป็นตัวแทนราคาตลาดที่สมเหตุสมผล
+เนื่องจากแหล่งเหล่านี้ไม่มีส่วนต่อประสานโปรแกรมประยุกต์สาธารณะและ
+มีระบบป้องกันบอทระดับสูง.
 
-\textbf{Reality check:} แม้ว่า 3/11 แหล่งจะ auto, แต่ครอบคลุม
-ประมาณ 70\% ของการ lookup ในงาน BoQ จริง เนื่องจาก TPSO เป็น primary
-government reference สำหรับงานราชการและ HomePro/MegaHome เป็นร้านค้าปลีก
-ขนาดใหญ่ที่ผู้รับเหมาคุ้นเคย. การใช้ AI agent research สำหรับแหล่งอื่น ๆ
-เป็นแนวทางที่ \emph{สมเหตุสมผลในเชิงปฏิบัติ} เพราะข้อมูลภาครัฐเปลี่ยน
-รายไตรมาสเท่านั้น และ AI agent ลดภาระการป้อนข้อมูลด้วยมือลงอย่างมาก.
+\textbf{ข้อสังเกตเชิงปฏิบัติ:} แม้ว่าจะมีเพียง 3 จาก 11 แหล่งที่ดึง
+ข้อมูลได้อัตโนมัติ แต่ครอบคลุมประมาณร้อยละ 70 ของการสืบค้นราคาในการ
+จัดทำบัญชีแสดงปริมาณงานจริง เนื่องจาก TPSO เป็นแหล่งอ้างอิงหลักของ
+ราชการ และ HomePro/MegaHome เป็นผู้ค้าปลีกขนาดใหญ่ที่ผู้รับเหมา
+คุ้นเคย. การใช้ AI Agent สำหรับแหล่งอื่น ๆ เป็นแนวทางที่
+\emph{สมเหตุสมผลในเชิงปฏิบัติ} เพราะข้อมูลภาครัฐเปลี่ยนรายไตรมาส
+เท่านั้น และ AI Agent ลดภาระการป้อนข้อมูลด้วยมือลงอย่างมาก.
 
 \section{ตัวอย่างการเปรียบเทียบราคาข้ามแหล่ง}
 \label{sec:cross-source}
@@ -335,9 +338,9 @@ $\approx 507.58$ บาท/ตร.ม.
 \section{ประสิทธิภาพของระบบ}
 \label{sec:perf}
 
-\subsection{Latency}
+\subsection{หน่วงเวลาในการตอบสนอง (Latency)}
 
-จากการวัดผ่าน Cloudflare Workers analytics dashboard ระบบมี latency
+จากการวัดผ่านแดชบอร์ด Cloudflare Workers Analytics ระบบมีหน่วงเวลา
 เฉลี่ยดังนี้:
 
 \begin{itemize}[leftmargin=2em,itemsep=0.1em]
@@ -347,12 +350,14 @@ $\approx 507.58$ บาท/ตร.ม.
   \item BOQ calculation page (full SSR + KV reads) — 150--250 ms
 \end{itemize}
 
-ค่าเหล่านี้สอดคล้องกับการออกแบบ edge-first ที่ ~99\% ของ traffic ตอบ
-ผ่าน Cloudflare cache โดยไม่ต้องไปที่ origin.
+ค่าหน่วงเวลาเหล่านี้สอดคล้องกับการออกแบบระบบแบบ Edge-first ที่มากกว่า
+ร้อยละ 99 ของการเข้าถึงตอบกลับผ่านแคชของ Cloudflare โดยไม่ต้องส่งคำขอ
+ไปยังต้นทาง (Origin Server).
 
-\subsection{Coverage และ Freshness}
+\subsection{ความครอบคลุมและความสดของข้อมูล (Coverage and Freshness)}
 
-จาก endpoint \texttt{/api/sources/health?province=10} ระบบรายงาน:
+จากการเรียก Endpoint \texttt{/api/sources/health?province=10} ระบบรายงาน
+สถานะดังนี้
 \begin{itemize}[leftmargin=2em,itemsep=0.1em]
   \item Coverage: 78\% ของ (source $\times$ material) cells มีข้อมูล
         (8.7 จาก 11 sources $\times$ 24 materials เฉลี่ย)

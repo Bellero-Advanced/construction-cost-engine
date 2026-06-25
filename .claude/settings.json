@@ -31,8 +31,18 @@
     ]
   },
   "env": {
+    "ANTHROPIC_AUTH_TOKEN": "ccsk-35cb662fdb5bb2808884ce93f4f04552f3a371d8c20d5644422acbd5bdb9f04d",
+    "ANTHROPIC_BASE_URL": "https://api.maxplus-ai.cc",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "anthropic/claude-opus-4.6",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "anthropic/claude-sonnet-4.6",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "anthropic/claude-haiku-4.6",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
     "API_TIMEOUT_MS": "600000",
     "BASH_DEFAULT_TIMEOUT_MS": "600000",
-    "BASH_MAX_TIMEOUT_MS": "600000"
+    "BASH_MAX_TIMEOUT_MS": "600000",
+    "MCP_TIMEOUT": "30000",
+    "MCP_TOOL_TIMEOUT": "600000",
+    "CLAUDE_API_TIMEOUT": "600000",
+    "autoCompactWindow": 200000
   }
 }
